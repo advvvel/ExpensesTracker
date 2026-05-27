@@ -33,19 +33,9 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.03);
         }
 
-        header {
-            margin-bottom: 40px;
-        }
+        header { margin-bottom: 40px; }
+        header h1 { font-size: 1.4rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; margin: 0; }
 
-        header h1 {
-            font-size: 1.4rem;
-            font-weight: 800;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            margin: 0;
-        }
-
-        /* DASHBOARD TOP SECTION */
         .dashboard-top {
             display: grid;
             grid-template-columns: 1fr 300px 1fr;
@@ -54,11 +44,8 @@
             margin-bottom: 60px;
         }
 
-        .nav-links {
-            list-style: none;
-            padding: 0;
-        }
-
+        /* SIDEBAR NAV */
+        .nav-links { list-style: none; padding: 0; }
         .nav-links li {
             padding: 12px 0;
             font-weight: 600;
@@ -69,28 +56,13 @@
             align-items: center;
             gap: 10px;
         }
-
         .nav-links li:hover { color: var(--text-main); }
         .nav-links li.active { color: var(--text-main); border-left: 3px solid var(--text-main); padding-left: 15px; }
 
         /* PROGRESS CIRCLE */
-        .circle-container {
-            position: relative;
-            width: 280px;
-            height: 280px;
-            margin: 0 auto;
-        }
-
-        .circle-svg {
-            transform: rotate(-90deg);
-        }
-
-        .circle-bg {
-            fill: none;
-            stroke: var(--border-light);
-            stroke-width: 12;
-        }
-
+        .circle-container { position: relative; width: 280px; height: 280px; margin: 0 auto; }
+        .circle-svg { transform: rotate(-90deg); }
+        .circle-bg { fill: none; stroke: var(--border-light); stroke-width: 12; }
         .circle-progress {
             fill: none;
             stroke: var(--text-main);
@@ -98,7 +70,6 @@
             stroke-linecap: round;
             transition: stroke-dashoffset 0.5s ease;
         }
-
         .circle-text {
             position: absolute;
             top: 50%;
@@ -106,56 +77,16 @@
             transform: translate(-50%, -50%);
             text-align: center;
         }
+        .circle-text span { display: block; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); font-weight: 700; }
+        .circle-text h2 { margin: 5px 0 0; font-size: 2.5rem; font-weight: 300; }
 
-        .circle-text span {
-            display: block;
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--text-muted);
-            font-weight: 700;
-        }
+        /* CONTENT SECTIONS */
+        .tab-content { display: none; }
+        .tab-content.active { display: grid; grid-template-columns: 2fr 1fr; gap: 40px; }
 
-        .circle-text h2 {
-            margin: 5px 0 0;
-            font-size: 2.5rem;
-            font-weight: 300;
-        }
-
-        /* TABLE SECTION */
-        .main-content {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 40px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.9rem;
-        }
-
-        th {
-            text-align: left;
-            background: #ededeb;
-            padding: 12px 15px;
-            color: var(--text-muted);
-            font-weight: 700;
-            text-transform: uppercase;
-            font-size: 0.75rem;
-        }
-
-        td {
-            padding: 15px;
-            border-bottom: 1px solid var(--border-light);
-        }
-
-        .input-row input {
-            border: 1px solid var(--border-light);
-            padding: 8px;
-            border-radius: 6px;
-            width: 90%;
-        }
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        th { text-align: left; background: #ededeb; padding: 12px 15px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; font-size: 0.75rem; }
+        td { padding: 15px; border-bottom: 1px solid var(--border-light); }
 
         .btn-add {
             background: var(--text-main);
@@ -168,65 +99,16 @@
             margin-top: 20px;
         }
 
-        .income-section {
-            margin-top: 30px;
-            padding: 20px;
-            background: #f9f9f7;
-            border-radius: 12px;
-        }
-
-        .income-section label {
-            display: block;
-            font-size: 0.75rem;
-            font-weight: 800;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-        }
+        .section-box { margin-top: 30px; padding: 20px; background: #f9f9f7; border-radius: 12px; }
+        .section-box label { display: block; font-size: 0.75rem; font-weight: 800; margin-bottom: 10px; text-transform: uppercase; }
 
         /* SAVINGS SECTION */
-        .savings-card {
-            background: #ededeb;
-            padding: 25px;
-            border-radius: 16px;
-        }
-
-        .savings-header {
-            font-size: 0.8rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            margin-bottom: 20px;
-            display: block;
-        }
-
-        .savings-bar-bg {
-            background: var(--card-white);
-            height: 12px;
-            border-radius: 10px;
-            margin: 15px 0;
-            overflow: hidden;
-        }
-
-        .savings-bar-fill {
-            background: var(--text-main);
-            height: 100%;
-            width: 70%;
-            transition: width 0.5s ease;
-        }
-
-        .savings-stats div {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            font-size: 0.9rem;
-        }
-
-        .delete-btn {
-            color: #cc0000;
-            cursor: pointer;
-            font-size: 0.8rem;
-            text-decoration: underline;
-        }
-
+        .savings-card { background: #ededeb; padding: 25px; border-radius: 16px; align-self: start; }
+        .savings-header { font-size: 0.8rem; font-weight: 800; text-transform: uppercase; margin-bottom: 20px; display: block; }
+        .savings-bar-bg { background: var(--card-white); height: 12px; border-radius: 10px; margin: 15px 0; overflow: hidden; }
+        .savings-bar-fill { background: var(--text-main); height: 100%; width: 0%; transition: width 0.5s ease; }
+        .savings-stats div { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.9rem; }
+        .delete-btn { color: #cc0000; cursor: pointer; font-size: 0.8rem; text-decoration: underline; }
     </style>
 </head>
 <body>
@@ -238,150 +120,163 @@
 
     <div class="dashboard-top">
         <ul class="nav-links">
-            <li class="active">🏠 Overview</li>
-            <li>💵 Income</li>
-            <li>🏦 Savings</li>
-            <li>📊 Reports</li>
+            <li class="active" onclick="switchTab('overview', this)">🏠 Overview</li>
+            <li onclick="switchTab('income', this)">💵 Income</li>
+            <li onclick="switchTab('savings', this)">🏦 Savings</li>
         </ul>
 
         <div class="circle-container">
             <svg class="circle-svg" width="280" height="280">
                 <circle class="circle-bg" cx="140" cy="140" r="130"></circle>
-                <circle id="progress-bar" class="circle-progress" cx="140" cy="140" r="130" stroke-dasharray="816" stroke-dashoffset="200"></circle>
+                <circle id="progress-bar" class="circle-progress" cx="140" cy="140" r="130" stroke-dasharray="816" stroke-dashoffset="0"></circle>
             </svg>
             <div class="circle-text">
                 <span>Total Available Funds</span>
-                <h2 id="total-display">$1,000.00</h2>
+                <h2 id="total-display">$0.00</h2>
             </div>
         </div>
-
         <div></div>
     </div>
 
-    <div class="main-content">
+    <div id="overview" class="tab-content active">
         <div class="table-container">
             <table>
                 <thead>
-                    <tr>
-                        <th>Type</th>
-                        <th>Category</th>
-                        <th>Amount</th>
-                        <th>Date</th>
-                        <th></th>
-                    </tr>
+                    <tr><th>Type</th><th>Category</th><th>Amount</th><th>Date</th><th></th></tr>
                 </thead>
-                <tbody id="expense-body">
-                    </tbody>
+                <tbody id="expense-body"></tbody>
             </table>
             
-            <div class="income-section">
-                <label>Add Expense</label>
+            <div class="section-box">
+                <label>Quick Add Expense</label>
                 <div style="display: flex; gap: 10px;">
-                    <input type="text" id="in-name" placeholder="Name (e.g. Rent)" style="flex: 2; padding: 10px; border-radius: 8px; border: 1px solid var(--border-light);">
-                    <input type="number" id="in-amount" placeholder="$ Amount" style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--border-light);">
+                    <input type="text" id="exp-name" placeholder="Name" style="flex: 2; padding: 10px; border-radius: 8px; border: 1px solid var(--border-light);">
+                    <input type="number" id="exp-amount" placeholder="$" style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--border-light);">
                     <button class="btn-add" onclick="addExpense()" style="margin: 0;">Add</button>
                 </div>
-            </div>
-
-            <div class="income-section">
-                <label>Add Incoming Money / Reset Total</label>
-                <input type="number" id="incoming-funds" placeholder="Enter amount to add..." style="width: 200px; padding: 10px; border-radius: 8px; border: 1px solid var(--border-light);">
-                <button class="btn-add" onclick="addFunds()" style="margin-left: 10px;">Update Balance</button>
             </div>
         </div>
 
         <div class="savings-card">
             <span class="savings-header">Savings Snapshot</span>
             <div class="savings-stats">
-                <div><span>Savings Goal</span> <strong>$5,000.00</strong></div>
-                <div class="savings-bar-bg">
-                    <div id="savings-fill" class="savings-bar-fill"></div>
-                </div>
-                <div><span>Currently Saved</span> <strong id="saved-display">$3,500.00</strong></div>
+                <div><span>Goal</span> <strong>$5,000.00</strong></div>
+                <div class="savings-bar-bg"><div id="savings-fill" class="savings-bar-fill"></div></div>
+                <div><span>Saved</span> <strong id="saved-display">$0.00</strong></div>
             </div>
-            <button class="btn-add" style="width: 100%; background: var(--card-white); color: var(--text-main); border: 1px solid var(--border-light); margin-top: 15px;">Add to Savings</button>
+            <button class="btn-add" onclick="addSavedFunds()" style="width: 100%; background: var(--card-white); color: var(--text-main); border: 1px solid var(--border-light);">Add to Savings</button>
+        </div>
+    </div>
+
+    <div id="income" class="tab-content">
+        <div style="grid-column: span 2;">
+            <div class="section-box">
+                <label>Deposit Funds</label>
+                <p>Add money to your available balance.</p>
+                <input type="number" id="deposit-amount" placeholder="Enter amount..." style="padding: 10px; border-radius: 8px; border: 1px solid var(--border-light); width: 250px;">
+                <button class="btn-add" onclick="depositMoney()">Deposit</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="savings" class="tab-content">
+        <div style="grid-column: span 2;">
+            <div class="section-box">
+                <label>Adjust Savings Goal</label>
+                <input type="number" id="goal-input" placeholder="New goal amount..." style="padding: 10px; border-radius: 8px; border: 1px solid var(--border-light); width: 250px;">
+                <button class="btn-add" onclick="updateGoal()">Update Goal</button>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
-    let totalFunds = 1000.00;
-    let initialFunds = 1000.00; // Used to calculate circle percentage
-    let expenses = [
-        { name: "Rent", category: "Fixed", amount: 800, date: "May 1" },
-        { name: "Groceries", category: "Variable", amount: 150, date: "May 3" }
-    ];
+    let state = {
+        totalFunds: 1000,
+        initialFunds: 1000,
+        savedAmount: 3500,
+        savingsGoal: 5000,
+        expenses: [
+            { name: "Rent", category: "Fixed", amount: 800, date: "May 1" },
+            { name: "Groceries", category: "Variable", amount: 150, date: "May 3" }
+        ]
+    };
+
+    function switchTab(tabId, el) {
+        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.nav-links li').forEach(li => li.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        el.classList.add('active');
+    }
 
     function updateUI() {
-        // Update Total Text
-        document.getElementById('total-display').innerText = `$${totalFunds.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
-
-        // Update Circle Progress
-        const circle = document.getElementById('progress-bar');
+        // Main Circle
+        document.getElementById('total-display').innerText = `$${state.totalFunds.toLocaleString()}`;
         const circumference = 130 * 2 * Math.PI;
-        let percentage = (totalFunds / initialFunds);
-        if (percentage < 0) percentage = 0;
-        if (percentage > 1) percentage = 1;
-        
-        const offset = circumference - (percentage * circumference);
-        circle.style.strokeDashoffset = offset;
+        let perc = state.totalFunds / state.initialFunds;
+        perc = Math.max(0, Math.min(1, perc));
+        document.getElementById('progress-bar').style.strokeDashoffset = circumference - (perc * circumference);
 
-        // Render Table
+        // Savings Bar
+        document.getElementById('saved-display').innerText = `$${state.savedAmount.toLocaleString()}`;
+        let savePerc = (state.savedAmount / state.savingsGoal) * 100;
+        document.getElementById('savings-fill').style.width = Math.min(100, savePerc) + "%";
+
+        // Table
         const tbody = document.getElementById('expense-body');
-        tbody.innerHTML = "";
-        expenses.forEach((exp, index) => {
-            const row = `<tr>
-                <td>${index + 1}. ${exp.name}</td>
+        tbody.innerHTML = state.expenses.map((exp, i) => `
+            <tr>
+                <td>${i+1}. ${exp.name}</td>
                 <td>${exp.category}</td>
                 <td>$${exp.amount.toFixed(2)}</td>
                 <td>${exp.date}</td>
-                <td class="delete-btn" onclick="deleteExpense(${index})">Delete</td>
-            </tr>`;
-            tbody.innerHTML += row;
-        });
+                <td class="delete-btn" onclick="removeExpense(${i})">Delete</td>
+            </tr>
+        `).join('');
     }
 
     function addExpense() {
-        const nameIn = document.getElementById('in-name');
-        const amountIn = document.getElementById('in-amount');
-           
-        if (nameIn.value && amountIn.value) {
-            const amt = parseFloat(amountIn.value);
-            expenses.push({
-                name: nameIn.value,
-                category: "Variable",
-                amount: amt,
-                date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-            });
-            
-            totalFunds -= amt;
-            nameIn.value = "";
-            amountIn.value = "";
+        const name = document.getElementById('exp-name').value;
+        const amt = parseFloat(document.getElementById('exp-amount').value);
+        if (name && amt) {
+            state.expenses.push({ name, category: "Variable", amount: amt, date: "Today" });
+            state.totalFunds -= amt;
             updateUI();
         }
     }
 
-    function addFunds() {
-        const fundIn = document.getElementById('incoming-funds');
-        if (fundIn.value) {
-            const amt = parseFloat(fundIn.value);
-            totalFunds += amt;
-            // Update initial funds so the circle doesn't break if we add more money than we started with
-            if (totalFunds > initialFunds) initialFunds = totalFunds;
-            fundIn.value = "";
-            updateUI();
-        }
-    }
-
-    function deleteExpense(index) {
-        totalFunds += expenses[index].amount;
-        expenses.splice(index, 1);
+    function removeExpense(i) {
+        state.totalFunds += state.expenses[i].amount;
+        state.expenses.splice(i, 1);
         updateUI();
     }
 
-    // Initialize
+    function depositMoney() {
+        const amt = parseFloat(document.getElementById('deposit-amount').value);
+        if (amt) {
+            state.totalFunds += amt;
+            state.initialFunds = Math.max(state.initialFunds, state.totalFunds);
+            updateUI();
+        }
+    }
+
+    function addSavedFunds() {
+        const amt = parseFloat(prompt("How much would you like to move to savings?"));
+        if (amt && amt <= state.totalFunds) {
+            state.totalFunds -= amt;
+            state.savedAmount += amt;
+            updateUI();
+        } else if (amt > state.totalFunds) {
+            alert("Insufficient available funds!");
+        }
+    }
+
+    function updateGoal() {
+        const amt = parseFloat(document.getElementById('goal-input').value);
+        if (amt) { state.savingsGoal = amt; updateUI(); }
+    }
+
     updateUI();
 </script>
-
 </body>
 </html>
