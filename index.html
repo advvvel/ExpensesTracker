@@ -48,6 +48,9 @@
             transition: 0.2s;
             border-radius: 8px;
             margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         .nav-links li:hover { background: #f0f0ee; color: var(--text-main); }
         .nav-links li.active { 
@@ -88,7 +91,7 @@
         /* SAVINGS CARD */
         .savings-card { background: #ededeb; padding: 30px; border-radius: 20px; align-self: start; }
         .savings-bar { background: white; height: 12px; border-radius: 10px; margin: 15px 0; position: relative; overflow: hidden; }
-        #savings-progress { background: #1a1a1a; height: 100%; width: 70%; transition: 0.3s; }
+        #savings-progress { background: #1a1a1a; height: 100%; width: 0%; transition: 0.3s; }
         
         .action-btn { color: #cc0000; text-decoration: underline; cursor: pointer; font-size: 0.8rem; border: none; background: none; }
         .edit-btn { color: #0055cc; margin-right: 10px; }
@@ -113,19 +116,17 @@
             <div class="circle-container">
                 <div class="main-circle">
                     <span>Total Available Funds</span>
-                    <h2 id="display-total">$1,000.00</h2>
+                    <h2 id="display-total">$0.00</h2>
                 </div>
             </div>
 
             <div id="page-overview" class="page-content active">
                 <table>
-                    <thead><tr><th>Type</th><th>Category</th><th>Amount</th><th>Date</th></tr></thead>
-                    <tbody id="expense-table">
-                        <tr><td>1. Rent</td><td>Fixed</td><td>$800.00</td><td>May 1</td></tr>
-                    </tbody>
+                    <thead><tr><th>Type</th><th>Category</th><th>Amount</th><th>Date</th><th>Action</th></tr></thead>
+                    <tbody id="expense-table"></tbody>
                 </table>
                 <div class="add-section">
-                    <input type="text" id="new-name" placeholder="Name (e.g. Rent)">
+                    <input type="text" id="new-name" placeholder="Name (e.g. Groceries)">
                     <input type="number" id="new-amount" placeholder="$ Amount">
                     <button class="btn-black" onclick="addItem()">Add</button>
                 </div>
@@ -135,8 +136,7 @@
                 <h3 style="text-transform: uppercase; font-size: 0.8rem; color: var(--text-muted);">Modification History</h3>
                 <table>
                     <thead><tr><th>Action</th><th>Amount</th><th>Date</th><th>Management</th></tr></thead>
-                    <tbody id="report-log">
-                        </tbody>
+                    <tbody id="report-log"></tbody>
                 </table>
             </div>
 
@@ -149,7 +149,7 @@
             <div id="page-savings" class="page-content">
                 <h3>Savings Settings</h3>
                 <label>Change Goal:</label><br><br>
-                <input type="number" id="new-goal" placeholder="$ 5,000.00">
+                <input type="number" id="new-goal-input" placeholder="Enter new goal">
                 <button class="btn-black" onclick="updateGoal()">Update Goal</button>
             </div>
         </main>
@@ -157,13 +157,13 @@
         <aside class="savings-card">
             <span style="font-weight: 800; font-size: 0.7rem; text-transform: uppercase;">Savings Snapshot</span>
             <div style="display: flex; justify-content: space-between; margin-top: 20px;">
-                <span>Goal</span><strong id="goal-text">$5,000.00</strong>
+                <span>Goal</span><strong id="goal-text">$5,000</strong>
             </div>
             <div class="savings-bar"><div id="savings-progress"></div></div>
             <div style="display: flex; justify-content: space-between;">
-                <span>Saved</span><strong id="saved-text">$3,500.00</strong>
+                <span>Saved</span><strong id="saved-text">$3,500</strong>
             </div>
-            <button class="btn-black" style="width: 100%; margin-top: 20px; background: white; color: black; border: 1px solid #ccc;" onclick="modifySavingsManual()">Modify Savings</button>
+            <button class="btn-black" style="width: 100%; margin-top: 20px; background: white; color: black; border: 1px solid #ccc;" onclick="navigateTo('savings')">Modify Savings</button>
             <button class="btn-black" style="width: 100%; margin-top: 10px;" onclick="addToSavings()">Add to Savings</button>
         </aside>
 
@@ -175,64 +175,93 @@
         total: 1000,
         saved: 3500,
         goal: 5000,
+        expenses: [],
         history: []
     };
 
-    // NAVIGATION LOGIC
     function navigateTo(pageId) {
-        // Switch Active Class on Sidebar
         document.querySelectorAll('.nav-links li').forEach(li => li.classList.remove('active'));
         document.getElementById('nav-' + pageId).classList.add('active');
-
-        // Switch Active Page Content
         document.querySelectorAll('.page-content').forEach(page => page.classList.remove('active'));
         document.getElementById('page-' + pageId).classList.add('active');
     }
 
     function logChange(action, amount) {
-        const entry = {
+        state.history.unshift({
             id: Date.now(),
             action: action,
             amount: amount,
             date: new Date().toLocaleString()
-        };
-        state.history.unshift(entry);
+        });
         renderReports();
     }
 
     function renderReports() {
-        const logBody = document.getElementById('report-log');
-        logBody.innerHTML = state.history.map(item => `
-            <tr id="row-${item.id}">
+        document.getElementById('report-log').innerHTML = state.history.map(item => `
+            <tr>
                 <td>${item.action}</td>
-                <td id="amt-${item.id}">$${item.amount}</td>
+                <td>$${parseFloat(item.amount).toLocaleString()}</td>
                 <td>${item.date}</td>
                 <td>
-                    <button class="action-btn edit-btn" onclick="editLog(${item.id})">Edit</button>
                     <button class="action-btn" onclick="deleteLog(${item.id})">Delete</button>
                 </td>
             </tr>
         `).join('');
     }
 
-    // ACTIONS
     function addItem() {
         const name = document.getElementById('new-name').value;
-        const amt = document.getElementById('new-amount').value;
-        if(name && amt) {
-            state.total -= parseFloat(amt);
+        const amt = parseFloat(document.getElementById('new-amount').value);
+        if(name && !isNaN(amt)) {
+            state.total -= amt;
+            state.expenses.push({ id: Date.now(), name, amt, date: "Today" });
             logChange("Expense: " + name, amt);
+            updateDisplay();
+            document.getElementById('new-name').value = '';
+            document.getElementById('new-amount').value = '';
+        }
+    }
+
+    function deleteExpense(id) {
+        const item = state.expenses.find(e => e.id === id);
+        if(item) {
+            state.total += item.amt; // Refund the money!
+            state.expenses = state.expenses.filter(e => e.id !== id);
+            logChange("Deleted: " + item.name, item.amt);
             updateDisplay();
         }
     }
 
+    function deposit() {
+        const amt = parseFloat(document.getElementById('deposit-amt').value);
+        if(!isNaN(amt)) {
+            state.total += amt;
+            logChange("Deposit", amt);
+            updateDisplay();
+            document.getElementById('deposit-amt').value = '';
+        }
+    }
+
+    function updateGoal() {
+        const newGoal = parseFloat(document.getElementById('new-goal-input').value);
+        if(!isNaN(newGoal)) {
+            state.goal = newGoal;
+            logChange("Goal Updated", newGoal);
+            updateDisplay();
+            document.getElementById('new-goal-input').value = '';
+            alert("Goal updated to $" + newGoal.toLocaleString());
+        }
+    }
+
     function addToSavings() {
-        const amt = prompt("How much to move to savings?");
-        if(amt) {
-            state.total -= parseFloat(amt);
-            state.saved += parseFloat(amt);
+        const amt = parseFloat(prompt("How much to move to savings?"));
+        if(!isNaN(amt) && amt <= state.total) {
+            state.total -= amt;
+            state.saved += amt;
             logChange("Transfer to Savings", amt);
             updateDisplay();
+        } else {
+            alert("Insufficient funds or invalid amount.");
         }
     }
 
@@ -241,25 +270,29 @@
         renderReports();
     }
 
-    function editLog(id) {
-        const newAmt = prompt("Enter new amount:");
-        if(newAmt) {
-            const item = state.history.find(i => i.id === id);
-            item.amount = newAmt;
-            renderReports();
-        }
-    }
-
     function updateDisplay() {
         document.getElementById('display-total').innerText = "$" + state.total.toLocaleString();
         document.getElementById('saved-text').innerText = "$" + state.saved.toLocaleString();
         document.getElementById('goal-text').innerText = "$" + state.goal.toLocaleString();
+        
+        // Progress Bar Calculation
         const progress = (state.saved / state.goal) * 100;
-        document.getElementById('savings-progress').style.width = progress + "%";
+        document.getElementById('savings-progress').style.width = Math.min(progress, 100) + "%";
+
+        // Render Expenses Table
+        document.getElementById('expense-table').innerHTML = state.expenses.map(e => `
+            <tr>
+                <td>${e.name}</td>
+                <td>Variable</td>
+                <td>$${e.amt.toLocaleString()}</td>
+                <td>${e.date}</td>
+                <td><button class="action-btn" onclick="deleteExpense(${e.id})">Delete</button></td>
+            </tr>
+        `).join('');
     }
 
+    // Initial load
     updateDisplay();
 </script>
-
 </body>
 </html>
