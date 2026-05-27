@@ -44,7 +44,6 @@
             margin-bottom: 60px;
         }
 
-        /* SIDEBAR NAV */
         .nav-links { list-style: none; padding: 0; }
         .nav-links li {
             padding: 12px 0;
@@ -59,7 +58,6 @@
         .nav-links li:hover { color: var(--text-main); }
         .nav-links li.active { color: var(--text-main); border-left: 3px solid var(--text-main); padding-left: 15px; }
 
-        /* PROGRESS CIRCLE */
         .circle-container { position: relative; width: 280px; height: 280px; margin: 0 auto; }
         .circle-svg { transform: rotate(-90deg); }
         .circle-bg { fill: none; stroke: var(--border-light); stroke-width: 12; }
@@ -80,9 +78,9 @@
         .circle-text span { display: block; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); font-weight: 700; }
         .circle-text h2 { margin: 5px 0 0; font-size: 2.5rem; font-weight: 300; }
 
-        /* CONTENT SECTIONS */
         .tab-content { display: none; }
         .tab-content.active { display: grid; grid-template-columns: 2fr 1fr; gap: 40px; }
+        #history.active { display: block; } /* History takes full width */
 
         table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
         th { text-align: left; background: #ededeb; padding: 12px 15px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; font-size: 0.75rem; }
@@ -96,33 +94,33 @@
             border-radius: 8px;
             font-weight: 600;
             cursor: pointer;
-            margin-top: 20px;
+            margin-top: 10px;
         }
 
         .section-box { margin-top: 30px; padding: 20px; background: #f9f9f7; border-radius: 12px; }
         .section-box label { display: block; font-size: 0.75rem; font-weight: 800; margin-bottom: 10px; text-transform: uppercase; }
 
-        /* SAVINGS SECTION */
         .savings-card { background: #ededeb; padding: 25px; border-radius: 16px; align-self: start; }
         .savings-header { font-size: 0.8rem; font-weight: 800; text-transform: uppercase; margin-bottom: 20px; display: block; }
         .savings-bar-bg { background: var(--card-white); height: 12px; border-radius: 10px; margin: 15px 0; overflow: hidden; }
         .savings-bar-fill { background: var(--text-main); height: 100%; width: 0%; transition: width 0.5s ease; }
         .savings-stats div { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.9rem; }
+        
+        .editable:hover { text-decoration: underline; cursor: pointer; color: var(--accent-green); }
         .delete-btn { color: #cc0000; cursor: pointer; font-size: 0.8rem; text-decoration: underline; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <header>
-        <h1>Stash Expense Tracker.</h1>
-    </header>
+    <header><h1>Stash Expense Tracker.</h1></header>
 
     <div class="dashboard-top">
         <ul class="nav-links">
             <li class="active" onclick="switchTab('overview', this)">🏠 Overview</li>
             <li onclick="switchTab('income', this)">💵 Income</li>
-            <li onclick="switchTab('savings', this)">🏦 Savings</li>
+            <li onclick="switchTab('savings-tab', this)">🏦 Savings</li>
+            <li onclick="switchTab('history', this)">📜 History</li>
         </ul>
 
         <div class="circle-container">
@@ -141,18 +139,15 @@
     <div id="overview" class="tab-content active">
         <div class="table-container">
             <table>
-                <thead>
-                    <tr><th>Type</th><th>Category</th><th>Amount</th><th>Date</th><th></th></tr>
-                </thead>
+                <thead><tr><th>Type</th><th>Category</th><th>Amount</th><th>Date</th><th></th></tr></thead>
                 <tbody id="expense-body"></tbody>
             </table>
-            
             <div class="section-box">
                 <label>Quick Add Expense</label>
                 <div style="display: flex; gap: 10px;">
                     <input type="text" id="exp-name" placeholder="Name" style="flex: 2; padding: 10px; border-radius: 8px; border: 1px solid var(--border-light);">
                     <input type="number" id="exp-amount" placeholder="$" style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--border-light);">
-                    <button class="btn-add" onclick="addExpense()" style="margin: 0;">Add</button>
+                    <button class="btn-add" onclick="addExpense()">Add</button>
                 </div>
             </div>
         </div>
@@ -160,9 +155,9 @@
         <div class="savings-card">
             <span class="savings-header">Savings Snapshot</span>
             <div class="savings-stats">
-                <div><span>Goal</span> <strong>$5,000.00</strong></div>
+                <div><span>Goal</span> <strong id="goal-display" class="editable" onclick="modifyGoal()">$5,000.00</strong></div>
                 <div class="savings-bar-bg"><div id="savings-fill" class="savings-bar-fill"></div></div>
-                <div><span>Saved</span> <strong id="saved-display">$0.00</strong></div>
+                <div><span>Saved</span> <strong id="saved-display" class="editable" onclick="modifySaved()">$3,500.00</strong></div>
             </div>
             <button class="btn-add" onclick="addSavedFunds()" style="width: 100%; background: var(--card-white); color: var(--text-main); border: 1px solid var(--border-light);">Add to Savings</button>
         </div>
@@ -172,20 +167,28 @@
         <div style="grid-column: span 2;">
             <div class="section-box">
                 <label>Deposit Funds</label>
-                <p>Add money to your available balance.</p>
                 <input type="number" id="deposit-amount" placeholder="Enter amount..." style="padding: 10px; border-radius: 8px; border: 1px solid var(--border-light); width: 250px;">
                 <button class="btn-add" onclick="depositMoney()">Deposit</button>
             </div>
         </div>
     </div>
 
-    <div id="savings" class="tab-content">
+    <div id="savings-tab" class="tab-content">
         <div style="grid-column: span 2;">
             <div class="section-box">
-                <label>Adjust Savings Goal</label>
-                <input type="number" id="goal-input" placeholder="New goal amount..." style="padding: 10px; border-radius: 8px; border: 1px solid var(--border-light); width: 250px;">
-                <button class="btn-add" onclick="updateGoal()">Update Goal</button>
+                <label>Savings Settings</label>
+                <p>Click the numbers on the Overview page to modify directly, or use the "Add to Savings" button.</p>
             </div>
+        </div>
+    </div>
+
+    <div id="history" class="tab-content">
+        <div style="grid-column: span 2;">
+            <label style="font-weight: 800; text-transform: uppercase; font-size: 0.75rem; color: var(--text-muted);">Modification History</label>
+            <table style="margin-top: 15px;">
+                <thead><tr><th>Action</th><th>Amount</th><th>Date</th><th></th></tr></thead>
+                <tbody id="history-body"></tbody>
+            </table>
         </div>
     </div>
 </div>
@@ -199,7 +202,8 @@
         expenses: [
             { name: "Rent", category: "Fixed", amount: 800, date: "May 1" },
             { name: "Groceries", category: "Variable", amount: 150, date: "May 3" }
-        ]
+        ],
+        history: []
     };
 
     function switchTab(tabId, el) {
@@ -209,30 +213,56 @@
         el.classList.add('active');
     }
 
+    function logHistory(action, amount) {
+        state.history.unshift({
+            action: action,
+            amount: amount,
+            date: new Date().toLocaleString([], {month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit'})
+        });
+        updateUI();
+    }
+
     function updateUI() {
-        // Main Circle
         document.getElementById('total-display').innerText = `$${state.totalFunds.toLocaleString()}`;
         const circumference = 130 * 2 * Math.PI;
         let perc = state.totalFunds / state.initialFunds;
         perc = Math.max(0, Math.min(1, perc));
         document.getElementById('progress-bar').style.strokeDashoffset = circumference - (perc * circumference);
 
-        // Savings Bar
+        // Savings Snapshot Updates
+        document.getElementById('goal-display').innerText = `$${state.savingsGoal.toLocaleString()}`;
         document.getElementById('saved-display').innerText = `$${state.savedAmount.toLocaleString()}`;
         let savePerc = (state.savedAmount / state.savingsGoal) * 100;
         document.getElementById('savings-fill').style.width = Math.min(100, savePerc) + "%";
 
-        // Table
-        const tbody = document.getElementById('expense-body');
-        tbody.innerHTML = state.expenses.map((exp, i) => `
-            <tr>
-                <td>${i+1}. ${exp.name}</td>
-                <td>${exp.category}</td>
-                <td>$${exp.amount.toFixed(2)}</td>
-                <td>${exp.date}</td>
-                <td class="delete-btn" onclick="removeExpense(${i})">Delete</td>
-            </tr>
+        // Render Expenses
+        document.getElementById('expense-body').innerHTML = state.expenses.map((exp, i) => `
+            <tr><td>${exp.name}</td><td>${exp.category}</td><td>$${exp.amount.toFixed(2)}</td><td>${exp.date}</td><td class="delete-btn" onclick="removeExpense(${i})">Delete</td></tr>
         `).join('');
+
+        // Render History
+        document.getElementById('history-body').innerHTML = state.history.map((item, i) => `
+            <tr><td>${item.action}</td><td>$${item.amount.toLocaleString()}</td><td>${item.date}</td><td class="delete-btn" onclick="removeHistory(${i})">Delete Log</td></tr>
+        `).join('');
+    }
+
+    function modifyGoal() {
+        const val = parseFloat(prompt("Enter new Savings Goal:"));
+        if (val) { state.savingsGoal = val; logHistory("Goal Changed", val); }
+    }
+
+    function modifySaved() {
+        const val = parseFloat(prompt("Manually set Currently Saved amount:"));
+        if (!isNaN(val)) { state.savedAmount = val; logHistory("Saved Balance Adjusted", val); }
+    }
+
+    function addSavedFunds() {
+        const amt = parseFloat(prompt("How much to move from Total to Savings?"));
+        if (amt && amt <= state.totalFunds) {
+            state.totalFunds -= amt;
+            state.savedAmount += amt;
+            logHistory("Transferred to Savings", amt);
+        } else if (amt > state.totalFunds) { alert("Insufficient funds!"); }
     }
 
     function addExpense() {
@@ -241,14 +271,10 @@
         if (name && amt) {
             state.expenses.push({ name, category: "Variable", amount: amt, date: "Today" });
             state.totalFunds -= amt;
-            updateUI();
+            logHistory(`Expense: ${name}`, amt);
+            document.getElementById('exp-name').value = '';
+            document.getElementById('exp-amount').value = '';
         }
-    }
-
-    function removeExpense(i) {
-        state.totalFunds += state.expenses[i].amount;
-        state.expenses.splice(i, 1);
-        updateUI();
     }
 
     function depositMoney() {
@@ -256,24 +282,21 @@
         if (amt) {
             state.totalFunds += amt;
             state.initialFunds = Math.max(state.initialFunds, state.totalFunds);
-            updateUI();
+            logHistory("Deposit", amt);
+            document.getElementById('deposit-amount').value = '';
         }
     }
 
-    function addSavedFunds() {
-        const amt = parseFloat(prompt("How much would you like to move to savings?"));
-        if (amt && amt <= state.totalFunds) {
-            state.totalFunds -= amt;
-            state.savedAmount += amt;
-            updateUI();
-        } else if (amt > state.totalFunds) {
-            alert("Insufficient available funds!");
-        }
+    function removeExpense(i) {
+        let exp = state.expenses[i];
+        state.totalFunds += exp.amount;
+        state.expenses.splice(i, 1);
+        logHistory(`Deleted Expense: ${exp.name}`, exp.amount);
     }
 
-    function updateGoal() {
-        const amt = parseFloat(document.getElementById('goal-input').value);
-        if (amt) { state.savingsGoal = amt; updateUI(); }
+    function removeHistory(i) {
+        state.history.splice(i, 1);
+        updateUI();
     }
 
     updateUI();
