@@ -36,15 +36,15 @@
         header { margin-bottom: 40px; }
         header h1 { font-size: 1.4rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; margin: 0; }
 
-        .dashboard-top {
+        .dashboard-layout {
             display: grid;
-            grid-template-columns: 1fr 300px 1fr;
-            align-items: center;
+            grid-template-columns: 200px 1fr 300px;
             gap: 40px;
-            margin-bottom: 60px;
+            align-items: start;
         }
 
-        .nav-links { list-style: none; padding: 0; }
+        /* SIDEBAR */
+        .nav-links { list-style: none; padding: 0; margin: 0; }
         .nav-links li {
             padding: 12px 0;
             font-weight: 600;
@@ -58,56 +58,50 @@
         .nav-links li:hover { color: var(--text-main); }
         .nav-links li.active { color: var(--text-main); border-left: 3px solid var(--text-main); padding-left: 15px; }
 
-        .circle-container { position: relative; width: 280px; height: 280px; margin: 0 auto; }
+        /* CENTER AREA */
+        .center-column { display: flex; flex-direction: column; align-items: center; }
+
+        .circle-container { position: relative; width: 260px; height: 260px; margin-bottom: 40px; }
         .circle-svg { transform: rotate(-90deg); }
         .circle-bg { fill: none; stroke: var(--border-light); stroke-width: 12; }
         .circle-progress {
-            fill: none;
-            stroke: var(--text-main);
-            stroke-width: 12;
-            stroke-linecap: round;
-            transition: stroke-dashoffset 0.5s ease;
+            fill: none; stroke: var(--text-main); stroke-width: 12; 
+            stroke-linecap: round; transition: stroke-dashoffset 0.5s ease;
         }
         .circle-text {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;
         }
-        .circle-text span { display: block; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); font-weight: 700; }
-        .circle-text h2 { margin: 5px 0 0; font-size: 2.5rem; font-weight: 300; }
+        .circle-text span { display: block; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); font-weight: 700; }
+        .circle-text h2 { margin: 5px 0 0; font-size: 2.2rem; font-weight: 300; }
 
-        .tab-content { display: none; }
-        .tab-content.active { display: grid; grid-template-columns: 2fr 1fr; gap: 40px; }
-        #history.active { display: block; } /* History takes full width */
+        /* TABS CONTROL */
+        .tab-view { display: none; width: 100%; }
+        .tab-view.active { display: block; }
 
-        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-        th { text-align: left; background: #ededeb; padding: 12px 15px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; font-size: 0.75rem; }
+        /* TABLES */
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin-top: 20px; }
+        th { text-align: left; background: #ededeb; padding: 12px 15px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; font-size: 0.7rem; }
         td { padding: 15px; border-bottom: 1px solid var(--border-light); }
 
-        .btn-add {
-            background: var(--text-main);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 10px;
+        .btn-black {
+            background: var(--text-main); color: white; border: none; padding: 10px 20px; 
+            border-radius: 8px; font-weight: 600; cursor: pointer;
         }
 
-        .section-box { margin-top: 30px; padding: 20px; background: #f9f9f7; border-radius: 12px; }
-        .section-box label { display: block; font-size: 0.75rem; font-weight: 800; margin-bottom: 10px; text-transform: uppercase; }
+        .input-group {
+            display: flex; gap: 10px; margin-top: 20px; background: #f9f9f7; padding: 20px; border-radius: 12px;
+        }
+        input { padding: 12px; border: 1px solid var(--border-light); border-radius: 8px; font-family: inherit; }
 
-        .savings-card { background: #ededeb; padding: 25px; border-radius: 16px; align-self: start; }
+        /* SAVINGS CARD */
+        .savings-card { background: #ededeb; padding: 25px; border-radius: 16px; }
         .savings-header { font-size: 0.8rem; font-weight: 800; text-transform: uppercase; margin-bottom: 20px; display: block; }
         .savings-bar-bg { background: var(--card-white); height: 12px; border-radius: 10px; margin: 15px 0; overflow: hidden; }
         .savings-bar-fill { background: var(--text-main); height: 100%; width: 0%; transition: width 0.5s ease; }
         .savings-stats div { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.9rem; }
-        
-        .editable:hover { text-decoration: underline; cursor: pointer; color: var(--accent-green); }
-        .delete-btn { color: #cc0000; cursor: pointer; font-size: 0.8rem; text-decoration: underline; }
+
+        .action-link { color: #cc0000; cursor: pointer; font-size: 0.8rem; text-decoration: underline; margin-right: 10px; }
+        .edit-link { color: #0055cc; }
     </style>
 </head>
 <body>
@@ -115,187 +109,195 @@
 <div class="container">
     <header><h1>Stash Expense Tracker.</h1></header>
 
-    <div class="dashboard-top">
-        <ul class="nav-links">
-            <li class="active" onclick="switchTab('overview', this)">🏠 Overview</li>
-            <li onclick="switchTab('income', this)">💵 Income</li>
-            <li onclick="switchTab('savings-tab', this)">🏦 Savings</li>
-            <li onclick="switchTab('history', this)">📜 History</li>
-        </ul>
+    <div class="dashboard-layout">
+        <aside>
+            <ul class="nav-links">
+                <li class="active" onclick="showTab('overview', this)">🏠 Overview</li>
+                <li onclick="showTab('income', this)">💵 Income</li>
+                <li onclick="showTab('savings', this)">🏦 Savings</li>
+                <li onclick="showTab('reports', this)">📊 Reports</li>
+            </ul>
+        </aside>
 
-        <div class="circle-container">
-            <svg class="circle-svg" width="280" height="280">
-                <circle class="circle-bg" cx="140" cy="140" r="130"></circle>
-                <circle id="progress-bar" class="circle-progress" cx="140" cy="140" r="130" stroke-dasharray="816" stroke-dashoffset="0"></circle>
-            </svg>
-            <div class="circle-text">
-                <span>Total Available Funds</span>
-                <h2 id="total-display">$0.00</h2>
-            </div>
-        </div>
-        <div></div>
-    </div>
-
-    <div id="overview" class="tab-content active">
-        <div class="table-container">
-            <table>
-                <thead><tr><th>Type</th><th>Category</th><th>Amount</th><th>Date</th><th></th></tr></thead>
-                <tbody id="expense-body"></tbody>
-            </table>
-            <div class="section-box">
-                <label>Quick Add Expense</label>
-                <div style="display: flex; gap: 10px;">
-                    <input type="text" id="exp-name" placeholder="Name" style="flex: 2; padding: 10px; border-radius: 8px; border: 1px solid var(--border-light);">
-                    <input type="number" id="exp-amount" placeholder="$" style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--border-light);">
-                    <button class="btn-add" onclick="addExpense()">Add</button>
+        <main class="center-column">
+            <div class="circle-container">
+                <svg class="circle-svg" width="260" height="260">
+                    <circle class="circle-bg" cx="130" cy="130" r="120"></circle>
+                    <circle id="progress-bar" class="circle-progress" cx="130" cy="130" r="120" stroke-dasharray="754" stroke-dashoffset="0"></circle>
+                </svg>
+                <div class="circle-text">
+                    <span>Total Available Funds</span>
+                    <h2 id="total-display">$0.00</h2>
                 </div>
             </div>
-        </div>
 
-        <div class="savings-card">
+            <div id="overview" class="tab-view active">
+                <table>
+                    <thead><tr><th>Type</th><th>Category</th><th>Amount</th><th>Date</th><th>Action</th></tr></thead>
+                    <tbody id="expense-list"></tbody>
+                </table>
+                <div class="input-group">
+                    <input type="text" id="exp-name" placeholder="Name (e.g. Rent)" style="flex: 2;">
+                    <input type="number" id="exp-amount" placeholder="$ Amount" style="flex: 1;">
+                    <button class="btn-black" onclick="addExpense()">Add</button>
+                </div>
+            </div>
+
+            <div id="income" class="tab-view">
+                <h3>Deposit Income</h3>
+                <div class="input-group">
+                    <input type="number" id="deposit-amt" placeholder="Enter amount..." style="flex: 1;">
+                    <button class="btn-black" onclick="depositMoney()">Deposit</button>
+                </div>
+            </div>
+
+            <div id="reports" class="tab-view">
+                <h3>Modification History</h3>
+                <table>
+                    <thead><tr><th>Change</th><th>Prev Value</th><th>New Value</th><th>Date</th><th>Action</th></tr></thead>
+                    <tbody id="report-list"></tbody>
+                </table>
+            </div>
+        </main>
+
+        <aside class="savings-card">
             <span class="savings-header">Savings Snapshot</span>
             <div class="savings-stats">
-                <div><span>Goal</span> <strong id="goal-display" class="editable" onclick="modifyGoal()">$5,000.00</strong></div>
+                <div><span>Savings Goal</span> <strong id="goal-val">$0.00</strong></div>
                 <div class="savings-bar-bg"><div id="savings-fill" class="savings-bar-fill"></div></div>
-                <div><span>Saved</span> <strong id="saved-display" class="editable" onclick="modifySaved()">$3,500.00</strong></div>
+                <div><span>Currently Saved</span> <strong id="saved-val">$0.00</strong></div>
             </div>
-            <button class="btn-add" onclick="addSavedFunds()" style="width: 100%; background: var(--card-white); color: var(--text-main); border: 1px solid var(--border-light);">Add to Savings</button>
-        </div>
-    </div>
-
-    <div id="income" class="tab-content">
-        <div style="grid-column: span 2;">
-            <div class="section-box">
-                <label>Deposit Funds</label>
-                <input type="number" id="deposit-amount" placeholder="Enter amount..." style="padding: 10px; border-radius: 8px; border: 1px solid var(--border-light); width: 250px;">
-                <button class="btn-add" onclick="depositMoney()">Deposit</button>
+            <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;">
+                <button class="btn-black" style="background: white; color: black; border: 1px solid #ccc;" onclick="modifyGoal()">Modify Goal</button>
+                <button class="btn-black" onclick="transferToSavings()">Add to Savings</button>
             </div>
-        </div>
-    </div>
-
-    <div id="savings-tab" class="tab-content">
-        <div style="grid-column: span 2;">
-            <div class="section-box">
-                <label>Savings Settings</label>
-                <p>Click the numbers on the Overview page to modify directly, or use the "Add to Savings" button.</p>
-            </div>
-        </div>
-    </div>
-
-    <div id="history" class="tab-content">
-        <div style="grid-column: span 2;">
-            <label style="font-weight: 800; text-transform: uppercase; font-size: 0.75rem; color: var(--text-muted);">Modification History</label>
-            <table style="margin-top: 15px;">
-                <thead><tr><th>Action</th><th>Amount</th><th>Date</th><th></th></tr></thead>
-                <tbody id="history-body"></tbody>
-            </table>
-        </div>
+        </aside>
     </div>
 </div>
 
 <script>
     let state = {
-        totalFunds: 1000,
-        initialFunds: 1000,
-        savedAmount: 3500,
-        savingsGoal: 5000,
+        total: 1000,
+        goal: 5000,
+        saved: 3500,
         expenses: [
-            { name: "Rent", category: "Fixed", amount: 800, date: "May 1" },
-            { name: "Groceries", category: "Variable", amount: 150, date: "May 3" }
+            { id: Date.now(), name: "Rent", cat: "Fixed", amt: 800, date: "May 1" },
+            { id: Date.now()+1, name: "Groceries", cat: "Variable", amt: 150, date: "May 3" }
         ],
-        history: []
+        logs: []
     };
 
-    function switchTab(tabId, el) {
-        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+    function showTab(id, el) {
+        document.querySelectorAll('.tab-view').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.nav-links li').forEach(li => li.classList.remove('active'));
-        document.getElementById(tabId).classList.add('active');
+        document.getElementById(id).classList.add('active');
         el.classList.add('active');
     }
 
-    function logHistory(action, amount) {
-        state.history.unshift({
-            action: action,
-            amount: amount,
-            date: new Date().toLocaleString([], {month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit'})
+    function logChange(desc, oldV, newV) {
+        state.logs.unshift({
+            id: Date.now(),
+            desc: desc,
+            old: oldV,
+            new: newV,
+            date: new Date().toLocaleTimeString()
         });
         updateUI();
     }
 
     function updateUI() {
-        document.getElementById('total-display').innerText = `$${state.totalFunds.toLocaleString()}`;
-        const circumference = 130 * 2 * Math.PI;
-        let perc = state.totalFunds / state.initialFunds;
-        perc = Math.max(0, Math.min(1, perc));
-        document.getElementById('progress-bar').style.strokeDashoffset = circumference - (perc * circumference);
+        // Update Circle & Text
+        document.getElementById('total-display').innerText = `$${state.total.toLocaleString()}`;
+        const circ = 754;
+        let p = Math.max(0, Math.min(1, state.total / 2000)); // Normalized to $2k for visual
+        document.getElementById('progress-bar').style.strokeDashoffset = circ - (p * circ);
 
-        // Savings Snapshot Updates
-        document.getElementById('goal-display').innerText = `$${state.savingsGoal.toLocaleString()}`;
-        document.getElementById('saved-display').innerText = `$${state.savedAmount.toLocaleString()}`;
-        let savePerc = (state.savedAmount / state.savingsGoal) * 100;
+        // Update Savings
+        document.getElementById('goal-val').innerText = `$${state.goal.toLocaleString()}`;
+        document.getElementById('saved-val').innerText = `$${state.saved.toLocaleString()}`;
+        let savePerc = (state.saved / state.goal) * 100;
         document.getElementById('savings-fill').style.width = Math.min(100, savePerc) + "%";
 
         // Render Expenses
-        document.getElementById('expense-body').innerHTML = state.expenses.map((exp, i) => `
-            <tr><td>${exp.name}</td><td>${exp.category}</td><td>$${exp.amount.toFixed(2)}</td><td>${exp.date}</td><td class="delete-btn" onclick="removeExpense(${i})">Delete</td></tr>
+        const expBody = document.getElementById('expense-list');
+        expBody.innerHTML = state.expenses.map(e => `
+            <tr><td>${e.name}</td><td>${e.cat}</td><td>$${e.amt}</td><td>${e.date}</td>
+            <td><span class="action-link" onclick="deleteExpense(${e.id})">Delete</span></td></tr>
         `).join('');
 
-        // Render History
-        document.getElementById('history-body').innerHTML = state.history.map((item, i) => `
-            <tr><td>${item.action}</td><td>$${item.amount.toLocaleString()}</td><td>${item.date}</td><td class="delete-btn" onclick="removeHistory(${i})">Delete Log</td></tr>
+        // Render Reports (Audit Log)
+        const reportBody = document.getElementById('report-list');
+        reportBody.innerHTML = state.logs.map(l => `
+            <tr><td>${l.desc}</td><td>$${l.old}</td><td>$${l.new}</td><td>${l.date}</td>
+            <td>
+                <span class="action-link edit-link" onclick="editLog(${l.id})">Edit</span>
+                <span class="action-link" onclick="deleteLog(${l.id})">Delete</span>
+            </td></tr>
         `).join('');
-    }
-
-    function modifyGoal() {
-        const val = parseFloat(prompt("Enter new Savings Goal:"));
-        if (val) { state.savingsGoal = val; logHistory("Goal Changed", val); }
-    }
-
-    function modifySaved() {
-        const val = parseFloat(prompt("Manually set Currently Saved amount:"));
-        if (!isNaN(val)) { state.savedAmount = val; logHistory("Saved Balance Adjusted", val); }
-    }
-
-    function addSavedFunds() {
-        const amt = parseFloat(prompt("How much to move from Total to Savings?"));
-        if (amt && amt <= state.totalFunds) {
-            state.totalFunds -= amt;
-            state.savedAmount += amt;
-            logHistory("Transferred to Savings", amt);
-        } else if (amt > state.totalFunds) { alert("Insufficient funds!"); }
     }
 
     function addExpense() {
-        const name = document.getElementById('exp-name').value;
-        const amt = parseFloat(document.getElementById('exp-amount').value);
-        if (name && amt) {
-            state.expenses.push({ name, category: "Variable", amount: amt, date: "Today" });
-            state.totalFunds -= amt;
-            logHistory(`Expense: ${name}`, amt);
+        const n = document.getElementById('exp-name').value;
+        const a = parseFloat(document.getElementById('exp-amount').value);
+        if (n && a) {
+            let oldTotal = state.total;
+            state.total -= a;
+            state.expenses.push({ id: Date.now(), name: n, cat: "Variable", amt: a, date: "Today" });
+            logChange(`Added Expense: ${n}`, oldTotal, state.total);
             document.getElementById('exp-name').value = '';
             document.getElementById('exp-amount').value = '';
         }
     }
 
+    function deleteExpense(id) {
+        const e = state.expenses.find(x => x.id === id);
+        let oldTotal = state.total;
+        state.total += e.amt;
+        state.expenses = state.expenses.filter(x => x.id !== id);
+        logChange(`Deleted Expense: ${e.name}`, oldTotal, state.total);
+    }
+
     function depositMoney() {
-        const amt = parseFloat(document.getElementById('deposit-amount').value);
-        if (amt) {
-            state.totalFunds += amt;
-            state.initialFunds = Math.max(state.initialFunds, state.totalFunds);
-            logHistory("Deposit", amt);
-            document.getElementById('deposit-amount').value = '';
+        const a = parseFloat(document.getElementById('deposit-amt').value);
+        if (a) {
+            let old = state.total;
+            state.total += a;
+            logChange("Manual Deposit", old, state.total);
+            document.getElementById('deposit-amt').value = '';
         }
     }
 
-    function removeExpense(i) {
-        let exp = state.expenses[i];
-        state.totalFunds += exp.amount;
-        state.expenses.splice(i, 1);
-        logHistory(`Deleted Expense: ${exp.name}`, exp.amount);
+    function modifyGoal() {
+        const g = parseFloat(prompt("Enter new Savings Goal:", state.goal));
+        if (g) {
+            let old = state.goal;
+            state.goal = g;
+            logChange("Goal Modified", old, state.goal);
+        }
     }
 
-    function removeHistory(i) {
-        state.history.splice(i, 1);
+    function transferToSavings() {
+        const a = parseFloat(prompt("Move how much from Available to Savings?"));
+        if (a && a <= state.total) {
+            let oldS = state.saved;
+            let oldT = state.total;
+            state.total -= a;
+            state.saved += a;
+            logChange("Transferred to Savings", oldS, state.saved);
+        }
+    }
+
+    function deleteLog(id) {
+        state.logs = state.logs.filter(l => l.id !== id);
+        updateUI();
+    }
+
+    function editLog(id) {
+        const l = state.logs.find(x => x.id === id);
+        const newDesc = prompt("Edit Description:", l.desc);
+        const newVal = parseFloat(prompt("Edit New Value:", l.new));
+        if (newDesc) l.desc = newDesc;
+        if (!isNaN(newVal)) l.new = newVal;
         updateUI();
     }
 
