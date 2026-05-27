@@ -139,9 +139,19 @@
 
             <div id="page-savings" class="page-content">
                 <h3>Savings Settings</h3>
-                <label>Change Goal:</label><br><br>
-                <input type="number" id="new-goal-input" placeholder="10000">
-                <button class="btn-black" onclick="updateGoalValue()">Update Goal</button>
+                
+                <div style="margin-bottom: 25px;">
+                    <label><strong>Modify Savings Goal:</strong></label><br><br>
+                    <input type="number" id="new-goal-input" placeholder="e.g. 5000">
+                    <button class="btn-black" onclick="updateGoalValue()">Update Goal</button>
+                </div>
+
+                <div style="margin-bottom: 25px;">
+                    <label><strong>Modify Currently Saved Amount:</strong></label><br><br>
+                    <input type="number" id="new-saved-input" placeholder="e.g. 1500">
+                    <button class="btn-black" onclick="updateSavedValue()">Update Saved</button>
+                </div>
+                <p style="font-size: 0.85rem; color: var(--text-muted);">*Manual updates here do not affect your Total Available Funds circle.</p>
             </div>
 
             <div id="page-reports" class="page-content">
@@ -163,7 +173,7 @@
                 <span>Saved</span><strong id="saved-text">$0</strong>
             </div>
             <button class="btn-black" style="width: 100%; margin-top: 20px; background: white; color: black; border: 1px solid #ccc;" onclick="navigateTo('savings')">Modify Savings</button>
-            <button class="btn-black" style="width: 100%; margin-top: 10px;" onclick="addFundsToSavings()">Add to Savings</button>
+            <button class="btn-black" style="width: 100%; margin-top: 10px;" onclick="addFundsToSavings()">Quick Add to Savings</button>
         </aside>
 
     </div>
@@ -208,7 +218,7 @@
     }
 
     function addFundsToSavings() {
-        const amt = parseFloat(prompt("Enter amount to transfer to savings:"));
+        const amt = parseFloat(prompt("Enter amount to transfer from available funds to savings:"));
         if(!isNaN(amt)) {
             state.total -= amt;
             state.saved += amt;
@@ -217,40 +227,37 @@
         }
     }
 
+    // FIX: Manual Savings Updates
     function updateGoalValue() {
-        const newGoal = parseFloat(document.getElementById('new-goal-input').value);
-        if(!isNaN(newGoal)) {
-            state.goal = newGoal;
+        const val = parseFloat(document.getElementById('new-goal-input').value);
+        if(!isNaN(val)) {
+            state.goal = val;
+            state.history.unshift({ id: Date.now(), type: 'ManualUpdate', name: 'Goal Set to $' + val, amount: val, date: new Date().toLocaleString() });
             updateAllUI();
             document.getElementById('new-goal-input').value = '';
         }
     }
 
-    // THE UPDATED DELETE FUNCTION YOU ASKED FOR
+    function updateSavedValue() {
+        const val = parseFloat(document.getElementById('new-saved-input').value);
+        if(!isNaN(val)) {
+            state.saved = val;
+            state.history.unshift({ id: Date.now(), type: 'ManualUpdate', name: 'Saved Amount Set to $' + val, amount: val, date: new Date().toLocaleString() });
+            updateAllUI();
+            document.getElementById('new-saved-input').value = '';
+        }
+    }
+
     function deleteAction(id) {
-        // 1. Find the item we are about to delete
         const item = state.history.find(h => h.id === id);
-        
         if(item) {
-            // 2. REVERSE the math based on what type of action it was
-            if(item.type === 'Expense') {
-                // If it was an expense, give the money back to total
-                state.total += item.amount;
-            } 
-            else if(item.type === 'Deposit') {
-                // If it was a deposit, take that money away from total
-                state.total -= item.amount;
-            } 
+            if(item.type === 'Expense') state.total += item.amount;
+            else if(item.type === 'Deposit') state.total -= item.amount;
             else if(item.type === 'SavingsTransfer') {
-                // If money was moved to savings, take it out of savings and put it back in total
                 state.total += item.amount;
                 state.saved -= item.amount;
             }
-
-            // 3. REMOVE the row from the history list
             state.history = state.history.filter(h => h.id !== id);
-            
-            // 4. Update the screen
             updateAllUI();
         }
     }
@@ -262,10 +269,15 @@
         // Right Savings Square
         document.getElementById('goal-text').innerText = "$" + state.goal.toLocaleString();
         document.getElementById('saved-text').innerText = "$" + state.saved.toLocaleString();
-        const progress = (state.saved / state.goal) * 100;
+        
+        // Calculation Fix: Ensure progress is 0 if saved is negative or goal is 0
+        let progress = 0;
+        if (state.goal > 0 && state.saved >= 0) {
+            progress = (state.saved / state.goal) * 100;
+        }
         document.getElementById('savings-progress').style.width = Math.min(progress, 100) + "%";
 
-        // Overview Table Rows (only show expenses here)
+        // Overview Table
         const expenseTable = document.getElementById('expense-table-body');
         expenseTable.innerHTML = state.history.filter(h => h.type === 'Expense').map(h => `
             <tr>
@@ -277,7 +289,7 @@
             </tr>
         `).join('');
 
-        // Reports Table Rows (show everything)
+        // Reports Table
         const reportTable = document.getElementById('report-log-body');
         reportTable.innerHTML = state.history.map(h => `
             <tr>
