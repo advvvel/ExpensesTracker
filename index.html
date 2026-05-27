@@ -171,8 +171,8 @@
 
 <script>
     let state = {
-        total: -9500,
-        saved: 13500,
+        total: 0,
+        saved: 0,
         goal: 5000,
         history: []
     };
@@ -184,7 +184,6 @@
         document.getElementById('page-' + pageId).classList.add('active');
     }
 
-    // FIX 1: Add Item creates a row in the Overview table
     function addItem() {
         const name = document.getElementById('new-name').value;
         const amt = parseFloat(document.getElementById('new-amount').value);
@@ -198,7 +197,6 @@
         }
     }
 
-    // FIX 2: Income page properly adds money to total
     function depositFunds() {
         const amt = parseFloat(document.getElementById('deposit-amt').value);
         if(!isNaN(amt)) {
@@ -209,7 +207,6 @@
         }
     }
 
-    // FIX 3: Add to savings button properly moves money and updates right square
     function addFundsToSavings() {
         const amt = parseFloat(prompt("Enter amount to transfer to savings:"));
         if(!isNaN(amt)) {
@@ -229,17 +226,31 @@
         }
     }
 
-    // FIX 4: Deleting an action reverses the math
+    // THE UPDATED DELETE FUNCTION YOU ASKED FOR
     function deleteAction(id) {
+        // 1. Find the item we are about to delete
         const item = state.history.find(h => h.id === id);
+        
         if(item) {
-            if(item.type === 'Expense') state.total += item.amount;
-            if(item.type === 'Deposit') state.total -= item.amount;
-            if(item.type === 'SavingsTransfer') {
+            // 2. REVERSE the math based on what type of action it was
+            if(item.type === 'Expense') {
+                // If it was an expense, give the money back to total
+                state.total += item.amount;
+            } 
+            else if(item.type === 'Deposit') {
+                // If it was a deposit, take that money away from total
+                state.total -= item.amount;
+            } 
+            else if(item.type === 'SavingsTransfer') {
+                // If money was moved to savings, take it out of savings and put it back in total
                 state.total += item.amount;
                 state.saved -= item.amount;
             }
+
+            // 3. REMOVE the row from the history list
             state.history = state.history.filter(h => h.id !== id);
+            
+            // 4. Update the screen
             updateAllUI();
         }
     }
@@ -254,7 +265,7 @@
         const progress = (state.saved / state.goal) * 100;
         document.getElementById('savings-progress').style.width = Math.min(progress, 100) + "%";
 
-        // Overview Table Rows
+        // Overview Table Rows (only show expenses here)
         const expenseTable = document.getElementById('expense-table-body');
         expenseTable.innerHTML = state.history.filter(h => h.type === 'Expense').map(h => `
             <tr>
@@ -266,7 +277,7 @@
             </tr>
         `).join('');
 
-        // Reports Table Rows
+        // Reports Table Rows (show everything)
         const reportTable = document.getElementById('report-log-body');
         reportTable.innerHTML = state.history.map(h => `
             <tr>
