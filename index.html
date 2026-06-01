@@ -86,7 +86,9 @@
         /* BUTTONS & INPUTS */
         .add-section { background: #f9f9f7; padding: 25px; border-radius: 15px; margin-top: 30px; }
         .btn-black { background: #1a1a1a; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: 600; }
-        input { padding: 12px; border: 1px solid var(--border-light); border-radius: 8px; margin-right: 10px; font-family: inherit; }
+        .btn-outline { background: white; color: #1a1a1a; border: 1px solid var(--border-light); padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.2s; }
+        .btn-outline.active { background: #1a1a1a; color: white; border-color: #1a1a1a; }
+        input, select { padding: 12px; border: 1px solid var(--border-light); border-radius: 8px; margin-right: 10px; font-family: inherit; font-size: 0.9rem; background: white; }
 
         /* SAVINGS CARD */
         .savings-card { background: #ededeb; padding: 30px; border-radius: 20px; align-self: start; }
@@ -94,6 +96,11 @@
         #savings-progress { background: #1a1a1a; height: 100%; width: 0%; transition: 0.3s; }
         
         .action-btn { color: #cc0000; text-decoration: underline; cursor: pointer; font-size: 0.8rem; border: none; background: none; }
+        
+        /* TAX MODULE SPECIFICS */
+        .tax-toggle-container { display: flex; gap: 15px; margin-bottom: 30px; background: #f9f9f7; padding: 15px; border-radius: 12px; }
+        .tax-box { background: #f9f9f7; padding: 25px; border-radius: 15px; border: 1px dashed var(--border-light); margin-top: 20px; }
+        .tax-decision-panel { margin-top: 25px; padding: 20px; background: #ededeb; border-radius: 12px; border-left: 4px solid #1a1a1a; }
     </style>
 </head>
 <body>
@@ -107,7 +114,8 @@
                 <li id="nav-overview" class="active" onclick="navigateTo('overview')">🏠 Overview</li>
                 <li id="nav-income" onclick="navigateTo('income')">💵 Income</li>
                 <li id="nav-savings" onclick="navigateTo('savings')">🏦 Savings</li>
-                <li id="nav-reports" onclick="navigateTo('reports')">📊 Reports</li>
+                <li id="nav-tax" onclick="navigateTo('tax')">📊 Tax Calculator</li>
+                <li id="nav-reports" onclick="navigateTo('reports')">📋 Reports</li>
             </ul>
         </aside>
 
@@ -154,6 +162,45 @@
                 <p style="font-size: 0.85rem; color: var(--text-muted);">*Manual updates here do not affect your Total Available Funds circle.</p>
             </div>
 
+            <div id="page-tax" class="page-content">
+                <h3>Tax Calculation Dashboard</h3>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;">Choose your entry setup option below to begin evaluating your tax obligations:</p>
+                
+                <div class="tax-toggle-container">
+                    <button id="btn-toggle-calc" class="btn-outline active" onclick="switchTaxMode('calc')">Option 1: Bracket Calculation</button>
+                    <button id="btn-toggle-manual" class="btn-outline" onclick="switchTaxMode('manual')">Option 2: Direct Tax Input</button>
+                </div>
+
+                <div id="tax-calc-box" class="tax-box">
+                    <label style="display:block; margin-bottom:12px;"><strong>What is your yearly income bracket?</strong></label>
+                    <select id="tax-bracket-select" onchange="resetTaxDecisionPanel()">
+                        <option value="">-- Select Bracket --</option>
+                        <option value="0.10">Bracket 1: Up to $11,600 (10%)</option>
+                        <option value="0.12">Bracket 2: $11,601 – $47,150 (12%)</option>
+                        <option value="0.22">Bracket 3: $47,151 – $100,525 (22%)</option>
+                        <option value="0.24">Bracket 4: $100,526 – $191,950 (24%)</option>
+                        <option value="0.32">Bracket 5: $191,951 – $243,725 (32%)</option>
+                        <option value="0.35">Bracket 6: $243,726 – $609,350 (35%)</option>
+                        <option value="0.37">Bracket 7: Over $609,350 (37%)</option>
+                    </select>
+                    <button class="btn-black" onclick="calculateBracketTax()">Calculate Tax</button>
+
+                    <div id="tax-decision-block" class="tax-decision-panel" style="display: none;">
+                        <p id="tax-summary-text" style="margin: 0 0 15px 0; font-size: 0.95rem; line-height: 1.5;"></p>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn-black" onclick="applyCalculatedTax()">Apply Tax</button>
+                            <button class="btn-outline" onclick="skipCalculatedTax()">Skip</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tax-manual-box" class="tax-box" style="display: none;">
+                    <label style="display:block; margin-bottom:12px;"><strong>Input explicit amount of money you want to remove for tax:</strong></label>
+                    <input type="number" id="manual-tax-amt" placeholder="$ Amount">
+                    <button class="btn-black" onclick="applyManualTax()">Remove Tax Amount</button>
+                </div>
+            </div>
+
             <div id="page-reports" class="page-content">
                 <h3 style="text-transform: uppercase; font-size: 0.8rem; color: var(--text-muted);">Modification History</h3>
                 <table>
@@ -186,6 +233,9 @@
         goal: 5000,
         history: []
     };
+
+    // Tracking variables for computed temporary tax amounts
+    let currentTaxCalculation = 0;
 
     function navigateTo(pageId) {
         document.querySelectorAll('.nav-links li').forEach(li => li.classList.remove('active'));
@@ -227,7 +277,6 @@
         }
     }
 
-    // FIX: Manual Savings Updates
     function updateGoalValue() {
         const val = parseFloat(document.getElementById('new-goal-input').value);
         if(!isNaN(val)) {
@@ -248,10 +297,95 @@
         }
     }
 
+    /* TAX CALCULATOR INTERACTIVE LOGIC */
+    function switchTaxMode(mode) {
+        resetTaxDecisionPanel();
+        if (mode === 'calc') {
+            document.getElementById('btn-toggle-calc').classList.add('active');
+            document.getElementById('btn-toggle-manual').classList.remove('active');
+            document.getElementById('tax-calc-box').style.display = 'block';
+            document.getElementById('tax-manual-box').style.display = 'none';
+        } else {
+            document.getElementById('btn-toggle-calc').classList.remove('active');
+            document.getElementById('btn-toggle-manual').classList.add('active');
+            document.getElementById('tax-calc-box').style.display = 'none';
+            document.getElementById('tax-manual-box').style.display = 'block';
+        }
+    }
+
+    function resetTaxDecisionPanel() {
+        currentTaxCalculation = 0;
+        document.getElementById('tax-decision-block').style.display = 'none';
+    }
+
+    function calculateBracketTax() {
+        const rate = parseFloat(document.getElementById('tax-bracket-select').value);
+        if (isNaN(rate)) {
+            alert("Please select a valid yearly income bracket.");
+            return;
+        }
+        
+        if (state.total <= 0) {
+            alert("Your Total Available Funds are $0.00 or negative. There are no funds to apply tax deductions against.");
+            return;
+        }
+
+        // Processing approximation calculation based on current available funds
+        currentTaxCalculation = state.total * rate;
+        
+        const summaryText = `Based on your selected bracket, a tax rate of <strong>${rate * 100}%</strong> will be evaluated against your current total available funds.<br>
+        Approximate amount to be removed: <strong>$${currentTaxCalculation.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong>.<br><br>Would you like to apply this deduction to your stash or skip it?`;
+        
+        document.getElementById('tax-summary-text').innerHTML = summaryText;
+        document.getElementById('tax-decision-block').style.display = 'block';
+    }
+
+    function applyCalculatedTax() {
+        if (currentTaxCalculation > 0) {
+            state.total -= currentTaxCalculation;
+            state.history.unshift({
+                id: Date.now(),
+                type: 'TaxDeduction',
+                name: `Tax Deduction (${document.getElementById('tax-bracket-select').value * 100}%)`,
+                amount: currentTaxCalculation,
+                date: new Date().toLocaleDateString()
+            });
+            updateAllUI();
+            alert(`Tax applied successfully! Removed $${currentTaxCalculation.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} from your available funds.`);
+            document.getElementById('tax-bracket-select').value = '';
+            resetTaxDecisionPanel();
+        }
+    }
+
+    function skipCalculatedTax() {
+        alert("Tax application skipped.");
+        document.getElementById('tax-bracket-select').value = '';
+        resetTaxDecisionPanel();
+    }
+
+    function applyManualTax() {
+        const amt = parseFloat(document.getElementById('manual-tax-amt').value);
+        if (!isNaN(amt) && amt > 0) {
+            state.total -= amt;
+            state.history.unshift({
+                id: Date.now(),
+                type: 'TaxDeduction',
+                name: 'Manual Tax Amount Removed',
+                amount: amt,
+                date: new Date().toLocaleDateString()
+            });
+            updateAllUI();
+            alert(`Successfully removed $${amt.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} for tax expenses.`);
+            document.getElementById('manual-tax-amt').value = '';
+        } else {
+            alert("Please enter a valid positive tax amount.");
+        }
+    }
+
     function deleteAction(id) {
         const item = state.history.find(h => h.id === id);
         if(item) {
-            if(item.type === 'Expense') state.total += item.amount;
+            if(item.type === 'Expense' || item.type === 'TaxDeduction') state.total += item.amount;
             else if(item.type === 'Deposit') state.total -= item.amount;
             else if(item.type === 'SavingsTransfer') {
                 state.total += item.amount;
@@ -264,7 +398,7 @@
 
     function updateAllUI() {
         // Main Circle
-        document.getElementById('display-total').innerText = "$" + state.total.toLocaleString();
+        document.getElementById('display-total').innerText = "$" + state.total.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
         
         // Right Savings Square
         document.getElementById('goal-text').innerText = "$" + state.goal.toLocaleString();
@@ -283,7 +417,7 @@
             <tr>
                 <td>${h.name}</td>
                 <td>Variable</td>
-                <td>$${h.amount.toLocaleString()}</td>
+                <td>$${h.amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
                 <td>${h.date}</td>
                 <td><button class="action-btn" onclick="deleteAction(${h.id})">Delete</button></td>
             </tr>
@@ -294,7 +428,7 @@
         reportTable.innerHTML = state.history.map(h => `
             <tr>
                 <td>${h.name}</td>
-                <td>$${h.amount.toLocaleString()}</td>
+                <td>$${h.amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
                 <td>${h.date}</td>
                 <td><button class="action-btn" onclick="deleteAction(${h.id})">Delete</button></td>
             </tr>
