@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stash Expense Tracker</title>
+    <title>Stash Expense Tracker - Dashboard</title>
     <style>
         :root {
             --bg-neutral: #f4f4f2;
@@ -95,10 +95,19 @@
         
         .action-btn { color: #cc0000; text-decoration: underline; cursor: pointer; font-size: 0.8rem; border: none; background: none; }
 
-        /* NEW ADDED STYLE FOR TAX SELECT / TOGGLES */
+        /* TAX SELECT / TOGGLES */
         select { padding: 12px; border: 1px solid var(--border-light); border-radius: 8px; margin-right: 10px; font-family: inherit; font-size: 0.9rem; background: white; }
         .tax-toggle-buttons { display: flex; gap: 10px; margin-bottom: 20px; background: #f9f9f7; padding: 15px; border-radius: 12px; }
         .tax-option-container { background: #f9f9f7; padding: 25px; border-radius: 15px; border: 1px solid var(--border-light); margin-top: 15px; }
+
+        /* LOGOUT TRIGGER INTERFACE STYLING */
+        .logout-btn { 
+            background: none; border: none; color: var(--text-muted); font-weight: 600; 
+            cursor: pointer; padding: 15px 20px; width: 100%; text-align: left; 
+            display: flex; align-items: center; gap: 10px; margin-top: 30px; border-radius: 8px; 
+            font-family: inherit; font-size: 1rem;
+        }
+        .logout-btn:hover { background: #f0f0ee; color: #cc0000; }
     </style>
 </head>
 <body>
@@ -111,10 +120,11 @@
             <ul class="nav-links">
                 <li id="nav-overview" class="active" onclick="navigateTo('overview')">🏠 Overview</li>
                 <li id="nav-income" onclick="navigateTo('income')">💵 Income</li>
-                <li id="nav-savings" onclick="remakeTaxPage(); navigateTo('savings')">🏦 Savings</li>
+                <li id="nav-savings" onclick="navigateTo('savings')">🏦 Savings</li>
                 <li id="nav-tax" onclick="navigateTo('tax')">📊 Tax Calculator</li>
                 <li id="nav-reports" onclick="navigateTo('reports')">📊 Reports</li>
             </ul>
+            <button class="logout-btn" onclick="window.logOutUser()">🚪 Log Out</button>
         </aside>
 
         <main>
@@ -222,7 +232,38 @@
     </div>
 </div>
 
-<script>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+
+    // UPDATED: Added your fresh Stash Tracker keys here
+    const firebaseConfig = {
+        apiKey: "AIzaSyDPz1BPnN7Xan09WgdA6UVKk9gjU0DGIks",
+        authDomain: "stash-tracke.firebaseapp.com",
+        projectId: "stash-tracke",
+        storageBucket: "stash-tracke.firebasestorage.app",
+        messagingSenderId: "187196565090",
+        appId: "1:187196565090:web:347de41a82978f17d5933b",
+        measurementId: "G-DPLQWMGNLC"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // SECURITY LOCK OUT: Bounce unauthenticated traffic back out to dashboard.html immediately
+    onAuthStateChanged(auth, (user) => {
+        if (!user) {
+            window.location.href = 'dashboard.html';
+        }
+    });
+
+    window.logOutUser = async () => {
+        if(confirm("Are you sure you want to log out of STASH?")) {
+            await signOut(auth);
+            window.location.href = 'dashboard.html';
+        }
+    };
+
     let state = {
         total: 0,
         saved: 0,
@@ -230,17 +271,16 @@
         history: []
     };
 
-    // Tracking variables for computed temporary tax amounts
     let computedTaxSum = 0;
 
-    function navigateTo(pageId) {
+    window.navigateTo = function(pageId) {
         document.querySelectorAll('.nav-links li').forEach(li => li.classList.remove('active'));
         document.getElementById('nav-' + pageId).classList.add('active');
         document.querySelectorAll('.page-content').forEach(page => page.classList.remove('active'));
         document.getElementById('page-' + pageId).classList.add('active');
     }
 
-    function addItem() {
+    window.addItem = function() {
         const name = document.getElementById('new-name').value;
         const amt = parseFloat(document.getElementById('new-amount').value);
         if(name && !isNaN(amt)) {
@@ -253,7 +293,7 @@
         }
     }
 
-    function depositFunds() {
+    window.depositFunds = function() {
         const amt = parseFloat(document.getElementById('deposit-amt').value);
         if(!isNaN(amt)) {
             state.total += amt;
@@ -263,7 +303,7 @@
         }
     }
 
-    function addFundsToSavings() {
+    window.addFundsToSavings = function() {
         const amt = parseFloat(prompt("Enter amount to transfer from available funds to savings:"));
         if(!isNaN(amt)) {
             state.total -= amt;
@@ -273,8 +313,7 @@
         }
     }
 
-    // FIX: Manual Savings Updates
-    function updateGoalValue() {
+    window.updateGoalValue = function() {
         const val = parseFloat(document.getElementById('new-goal-input').value);
         if(!isNaN(val)) {
             state.goal = val;
@@ -284,7 +323,7 @@
         }
     }
 
-    function updateSavedValue() {
+    window.updateSavedValue = function() {
         const val = parseFloat(document.getElementById('new-saved-input').value);
         if(!isNaN(val)) {
             state.saved = val;
@@ -294,8 +333,7 @@
         }
     }
 
-    /* ADDED: TAX CALCULATOR SCRIPT LOGIC */
-    function toggleTaxView(view) {
+    window.toggleTaxView = function(view) {
         document.getElementById('tax-decision-box').style.display = 'none';
         if(view === 'calc') {
             document.getElementById('btn-show-calc').style.background = '#1a1a1a';
@@ -310,7 +348,7 @@
         }
     }
 
-    function runBracketCalculation() {
+    window.runBracketCalculation = function() {
         const pct = parseFloat(document.getElementById('tax-bracket-select').value);
         if(isNaN(pct)) {
             alert("Please pick an income bracket first.");
@@ -321,7 +359,7 @@
         document.getElementById('tax-decision-box').style.display = 'block';
     }
 
-    function commitTaxDeduction() {
+    window.commitTaxDeduction = function() {
         if(computedTaxSum > 0) {
             state.total -= computedTaxSum;
             state.history.unshift({ id: Date.now(), type: 'Expense', name: `Tax Deduction (${document.getElementById('tax-bracket-select').value * 100}%)`, amount: computedTaxSum, date: new Date().toLocaleDateString() });
@@ -331,13 +369,13 @@
         clearTaxBracketView();
     }
 
-    function clearTaxBracketView() {
+    window.clearTaxBracketView = function() {
         document.getElementById('tax-bracket-select').value = '';
         document.getElementById('tax-decision-box').style.display = 'none';
         computedTaxSum = 0;
     }
 
-    function commitManualTaxDeduction() {
+    window.commitManualTaxDeduction = function() {
         const val = parseFloat(document.getElementById('tax-manual-input').value);
         if(!isNaN(val) && val > 0) {
             state.total -= val;
@@ -350,7 +388,7 @@
         }
     }
 
-    function deleteAction(id) {
+    window.deleteAction = function(id) {
         const item = state.history.find(h => h.id === id);
         if(item) {
             if(item.type === 'Expense') state.total += item.amount;
@@ -365,21 +403,16 @@
     }
 
     function updateAllUI() {
-        // Main Circle
         document.getElementById('display-total').innerText = "$" + state.total.toLocaleString();
-        
-        // Right Savings Square
         document.getElementById('goal-text').innerText = "$" + state.goal.toLocaleString();
         document.getElementById('saved-text').innerText = "$" + state.saved.toLocaleString();
         
-        // Calculation Fix: Ensure progress is 0 if saved is negative or goal is 0
         let progress = 0;
         if (state.goal > 0 && state.saved >= 0) {
             progress = (state.saved / state.goal) * 100;
         }
         document.getElementById('savings-progress').style.width = Math.min(progress, 100) + "%";
 
-        // Overview Table
         const expenseTable = document.getElementById('expense-table-body');
         expenseTable.innerHTML = state.history.filter(h => h.type === 'Expense').map(h => `
             <tr>
@@ -391,7 +424,6 @@
             </tr>
         `).join('');
 
-        // Reports Table
         const reportTable = document.getElementById('report-log-body');
         reportTable.innerHTML = state.history.map(h => `
             <tr>
