@@ -89,7 +89,7 @@
 </div>
 
 <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
     import { 
         getAuth, 
         signInWithEmailAndPassword, 
@@ -98,24 +98,21 @@
         browserLocalPersistence, 
         browserSessionPersistence,
         onAuthStateChanged
-    } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
-    // UPDATED Configuration Keys
-// FIXED Configuration Keys
     const firebaseConfig = {
         apiKey: "AIzaSyDPz1BPnN7Xan09WgdA6UVKk9gjU0DGIks",
         authDomain: "stash-tracke.firebaseapp.com",
         projectId: "stash-tracke",
         storageBucket: "stash-tracke.firebasestorage.app",
         messagingSenderId: "187196565090",
-        appId: "1:187196565090:web:347de41a82978f17d5933b0", // <-- Added missing '0' here
+        appId: "1:187196565090:web:347de41a82978f17d5933b0",
         measurementId: "G-DPLQWMGNLC"
-    };;
+    };
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    // If already authenticated, automatically push them over to your main index.html file
     onAuthStateChanged(auth, (user) => {
         if (user) {
             window.location.href = 'index.html';
