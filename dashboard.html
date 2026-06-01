@@ -101,15 +101,16 @@
     } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
 
     // UPDATED Configuration Keys
+// FIXED Configuration Keys
     const firebaseConfig = {
         apiKey: "AIzaSyDPz1BPnN7Xan09WgdA6UVKk9gjU0DGIks",
         authDomain: "stash-tracke.firebaseapp.com",
         projectId: "stash-tracke",
         storageBucket: "stash-tracke.firebasestorage.app",
         messagingSenderId: "187196565090",
-        appId: "1:187196565090:web:347de41a82978f17d5933b",
+        appId: "1:187196565090:web:347de41a82978f17d5933b0", // <-- Added missing '0' here
         measurementId: "G-DPLQWMGNLC"
-    };
+    };;
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
