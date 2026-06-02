@@ -316,7 +316,6 @@
         history: []
     };
 
-    // ROUTING CONFIGURATION: Set this value to the file name of your login prompt window
     const AUTH_LOGIN_FILE = 'dashboard.html'; 
 
     onAuthStateChanged(auth, async (user) => {
@@ -328,7 +327,6 @@
         }
     });
 
-    // SECURITY SEGREGATION: Saves records accurately under user's specific authenticated account reference
     async function loadUserData(uid) {
         try {
             const docRef = doc(db, "users", uid);
@@ -627,34 +625,44 @@
                 </tr>
             `).join('');
         }
+        
         const poolSpan = document.getElementById('bucket-pool-available');
         if(poolSpan) {
             poolSpan.innerText = state.saved.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
         }
 
+        // Render Overview Section (Filter out Expenses)
         const expenseTable = document.getElementById('expense-table-body');
-        expenseTable.innerHTML = state.history.filter(h => h.type === 'Expense').map(h => `
-            <tr>
-                <td>${h.name}</td>
-                <td>Variable</td>
-                <td>$${h.amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-                <td>${h.date}</td>
-                <td><button class="action-btn" onclick="deleteAction(${h.id})">Delete</button></td>
-            </tr>
-        `).join('');
+        if (expenseTable) {
+            expenseTable.innerHTML = state.history.filter(h => h.type === 'Expense').map(h => `
+                <tr>
+                    <td><strong>${h.name}</strong></td>
+                    <td>Variable Expense</td>
+                    <td style="color:#cc0000;">-$${h.amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                    <td>${h.date}</td>
+                    <td><button class="action-btn" onclick="deleteAction(${h.id})">Remove</button></td>
+                </tr>
+            `).join('');
+        }
 
+        // Render Comprehensive History Section inside Report Log
         const reportTable = document.getElementById('report-log-body');
-        reportTable.innerHTML = state.history.map(h => `
-            <tr>
-                <td>${h.name}</td>
-                <td>$${h.amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-                <td>${h.date}</td>
-                <td><button class="action-btn" onclick="deleteAction(${h.id})">Delete</button></td>
-            </tr>
-        `).join('');
+        if (reportTable) {
+            reportTable.innerHTML = state.history.map(h => {
+                let textType = h.type;
+                let colorAmt = h.type === 'Expense' ? 'color:#cc0000;' : 'color:#008800;';
+                let prefix = h.type === 'Expense' || h.type === 'SavingsTransfer' ? '-' : '+';
+                return `
+                    <tr>
+                        <td><strong>${h.name}</strong> (${textType})</td>
+                        <td style="${colorAmt}">${prefix}$${h.amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                        <td>${h.date}</td>
+                        <td><button class="action-btn" onclick="deleteAction(${h.id})">Rollback</button></td>
+                    </tr>
+                `;
+            }).join('');
+        }
     }
-
-    updateAllUI();
 </script>
 </body>
 </html>
