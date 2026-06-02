@@ -295,6 +295,8 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+    // IMPORT FIRESTORE DATABASE HOOKS
+    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyDPz1BPnN7Xan09WgdA6UVKk9gjU0DGiKs", 
@@ -308,6 +310,16 @@
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+    const db = getFirestore(app); // Initialize Firestore
+
+    let currentUser = null;
+    let state = {
+        total: 0,
+        saved: 0,
+        goal: 5000,
+        buckets: [],
+        history: []
+    };
 
     // FIXED PROTOCOL: FORCE SIGN OUT AND REDIRECT IF BROWSER WAS REFRESHED/RELOADED
     const navigationEntry = performance.getEntriesByType("navigation")[0];
@@ -316,13 +328,44 @@
         window.location.href = 'dashboard.html';
     } else {
         // Normal routing protocol for standard entry/successful redirects
-        onAuthStateChanged(auth, (user) => {
+        onAuthStateChanged(auth, async (user) => {
             if (!user) {
                 window.location.href = 'dashboard.html';
             } else {
+                currentUser = user;
+                await loadUserData(user.uid); // Fetch user's persistent cloud database data
                 document.body.style.opacity = '1';
             }
         });
+    }
+
+    // DATABASE STORAGE ENGINE: LOAD HANDLER
+    async function loadUserData(uid) {
+        try {
+            const docRef = doc(db, "users", uid);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+                state = docSnap.data();
+            } else {
+                // If it's a completely new account, establish an empty architecture template
+                state = { total: 0, saved: 0, goal: 5000, buckets: [], history: [] };
+                await setDoc(docRef, state);
+            }
+            updateAllUI();
+        } catch (e) {
+            console.error("Error loading user data from cloud storage: ", e);
+        }
+    }
+
+    // DATABASE STORAGE ENGINE: AUTOSAVE ENGINE
+    async function saveUserData() {
+        if (!currentUser) return;
+        try {
+            const docRef = doc(db, "users", currentUser.uid);
+            await setDoc(docRef, state);
+        } catch (e) {
+            console.error("Error backing up application session data to cloud: ", e);
+        }
     }
 
     window.logOutUser = async () => {
@@ -330,14 +373,6 @@
             await signOut(auth);
             window.location.href = 'dashboard.html';
         }
-    };
-
-    let state = {
-        total: 0,
-        saved: 0,
-        goal: 5000,
-        buckets: [],
-        history: []
     };
 
     let computedTaxSum = 0;
@@ -359,6 +394,7 @@
             const entry = { id: Date.now(), type: 'Expense', name: name, amount: amt, date: new Date().toLocaleDateString() };
             state.history.unshift(entry);
             updateAllUI();
+            saveUserData();
             document.getElementById('new-name').value = '';
             document.getElementById('new-amount').value = '';
         }
@@ -370,6 +406,7 @@
             state.total += amt;
             state.history.unshift({ id: Date.now(), type: 'Deposit', name: 'Income Deposit', amount: amt, date: new Date().toLocaleDateString() });
             updateAllUI();
+            saveUserData();
             document.getElementById('deposit-amt').value = '';
         }
     }
@@ -381,6 +418,7 @@
             state.saved += amt;
             state.history.unshift({ id: Date.now(), type: 'SavingsTransfer', name: 'Transfer to Savings', amount: amt, date: new Date().toLocaleString() });
             updateAllUI();
+            saveUserData();
         }
     }
 
@@ -390,6 +428,7 @@
             state.goal = val;
             state.history.unshift({ id: Date.now(), type: 'ManualUpdate', name: 'Goal Set to $' + val, amount: val, date: new Date().toLocaleString() });
             updateAllUI();
+            saveUserData();
             document.getElementById('new-goal-input').value = '';
         }
     }
@@ -400,6 +439,7 @@
             state.saved = val;
             state.history.unshift({ id: Date.now(), type: 'ManualUpdate', name: 'Saved Amount Set to $' + val, amount: val, date: new Date().toLocaleString() });
             updateAllUI();
+            saveUserData();
             document.getElementById('new-saved-input').value = '';
         }
     }
@@ -424,6 +464,7 @@
         document.getElementById('new-bucket-name').value = '';
         document.getElementById('new-bucket-amount').value = '';
         updateAllUI();
+        saveUserData();
     }
 
     window.deleteSavingsBucket = function(id) {
@@ -433,6 +474,7 @@
             state.history.unshift({ id: Date.now(), type: 'ManualUpdate', name: `Dissolved Bucket Refund: ${targetBucket.name}`, amount: targetBucket.amount, date: new Date().toLocaleDateString() });
             state.buckets = state.buckets.filter(b => b.id !== id);
             updateAllUI();
+            saveUserData();
         }
     }
 
@@ -490,6 +532,7 @@
             state.saved += computedInterestSum;
             state.history.unshift({ id: Date.now(), type: 'Deposit', name: interestContextLabel, amount: parseFloat(computedInterestSum.toFixed(2)), date: new Date().toLocaleDateString() });
             updateAllUI();
+            saveUserData();
             alert(`Interest execution confirmed! Applied $${computedInterestSum.toFixed(2)} directly onto savings.`);
         }
         clearInterestSimulationView();
@@ -533,6 +576,7 @@
             state.total -= computedTaxSum;
             state.history.unshift({ id: Date.now(), type: 'Expense', name: `Tax Deduction (${document.getElementById('tax-bracket-select').value * 100}%)`, amount: computedTaxSum, date: new Date().toLocaleDateString() });
             updateAllUI();
+            saveUserData();
             alert("Tax deduction has been applied to your stash funds.");
         }
         clearTaxBracketView();
@@ -550,6 +594,7 @@
             state.total -= val;
             state.history.unshift({ id: Date.now(), type: 'Expense', name: 'Manual Tax Entry Deduction', amount: val, date: new Date().toLocaleDateString() });
             updateAllUI();
+            saveUserData();
             document.getElementById('tax-manual-input').value = '';
             alert("Custom tax value removed successfully.");
         } else {
@@ -568,6 +613,7 @@
             }
             state.history = state.history.filter(h => h.id !== id);
             updateAllUI();
+            saveUserData();
         }
     }
 
