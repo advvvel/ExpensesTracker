@@ -21,10 +21,6 @@
             padding: 40px;
             display: flex;
             justify-content: center;
-            
-            /* Renders clean and prevents flashing */
-            opacity: 0; 
-            transition: opacity 0.15s ease-in;
         }
 
         .container {
@@ -297,9 +293,8 @@
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
     import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-    // EXACT VERIFIED FIREBASE CONFIGURATION RE-ESTABLISHED
     const firebaseConfig = {
-        apiKey: "AIzaSyDPz1BPnN7Xan09WgdA6UVKk9gjU0DGiKs", 
+        apiKey: "AIzaSyDPz1BPnN7Xan09WgdA6UVKk9gjU0DGiKs",
         authDomain: "stash-tracke.firebaseapp.com",
         projectId: "stash-tracke",
         storageBucket: "stash-tracke.firebasestorage.app",
@@ -321,28 +316,17 @@
         history: []
     };
 
-    // NOTE: If your login page filename is NOT 'login.html' (e.g. 'index.html'), change this string below!
-    const LOGIN_PAGE_URL = 'login.html'; 
+    // FIXED GLITCH: Only forces a redirect if the user explicitly drops the auth session
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+            window.location.href = 'dashboard.html';
+        } else {
+            currentUser = user;
+            await loadUserData(user.uid);
+        }
+    });
 
-    // SAFE REFRESH INTERCEPT ROUTING PROTOCOL
-    if (performance.getEntriesByType("navigation")[0]?.type === "reload") {
-        signOut(auth).then(() => {
-            window.location.href = LOGIN_PAGE_URL;
-        });
-    } else {
-        onAuthStateChanged(auth, (user) => {
-            if (!user) {
-                window.location.href = LOGIN_PAGE_URL;
-            } else {
-                currentUser = user;
-                // REVEAL UI IMMEDIATELY so the dashboard never locks up on a white screen
-                document.body.style.opacity = '1';
-                // Pull down data asynchronously in the background
-                loadUserData(user.uid);
-            }
-        });
-    }
-
+    // SECURITY ROUTE: Keeps data locked perfectly to the signed-in user's UID
     async function loadUserData(uid) {
         try {
             const docRef = doc(db, "users", uid);
@@ -357,7 +341,7 @@
             }
             updateAllUI();
         } catch (e) {
-            console.error("Database sync delay/error:", e);
+            console.error("Database initialization error:", e);
         }
     }
 
@@ -367,15 +351,14 @@
             const docRef = doc(db, "users", currentUser.uid);
             await setDoc(docRef, state);
         } catch (e) {
-            alert("Database Save Error: " + e.message);
+            console.error("Database save fallback error:", e);
         }
     }
 
-    window.logOutUser = () => {
+    window.logOutUser = async () => {
         if(confirm("Are you sure you want to log out of STASH?")) {
-            signOut(auth).then(() => {
-                window.location.href = LOGIN_PAGE_URL;
-            });
+            await signOut(auth);
+            window.location.href = 'dashboard.html';
         }
     };
 
