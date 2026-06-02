@@ -22,10 +22,9 @@
             display: flex;
             justify-content: center;
             
-            /* ADDED LINE 1/3 FOR ANTI-GLITCH PROTOCOL */
+            /* ANTI-GLITCH PROTOCOL FOR MAIN DASHBOARD */
             opacity: 0; 
-            /* ADDED LINE 2/3 FOR ANTI-GLITCH PROTOCOL */
-            transition: opacity 0.3s ease-in;
+            transition: opacity 0.2s ease-in;
         }
 
         .container {
@@ -298,8 +297,7 @@
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
     const firebaseConfig = {
-        // ⚠️ FIXED/REPLACED LINE: Remember to insert your exact copied Firebase web key here!
-        apiKey: "YOUR_ACTUAL_API_KEY_FROM_FIREBASE", 
+        apiKey: "AIzaSyDPz1BPnN7Xan09WgdA6UVKk9gjU0DGiKs", 
         authDomain: "stash-tracke.firebaseapp.com",
         projectId: "stash-tracke",
         storageBucket: "stash-tracke.firebasestorage.app",
@@ -311,12 +309,12 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    // FIXED LOGIC ENTRYPOINT FOR REDIRECT LOOPS
+    // ANTI-GLITCH ROUTER FOR INTERIOR DASHBOARD
     onAuthStateChanged(auth, (user) => {
         if (!user) {
             window.location.href = 'dashboard.html';
         } else {
-            // FIXED LINE: Authenticated user clears invisibility threshold safely
+            // Safe to reveal dashboard layout now
             document.body.style.opacity = '1';
         }
     });
@@ -400,7 +398,6 @@
         }
     }
 
-    /* CUSTOM SAVINGS BUCKET ALLOCATION MATRIX */
     window.createSavingsBucket = function() {
         const name = document.getElementById('new-bucket-name').value.trim();
         const amt = parseFloat(document.getElementById('new-bucket-amount').value);
@@ -433,7 +430,6 @@
         }
     }
 
-    /* SYSTEM INTERMEDIARY INTEREST CONTROLLER MODULE */
     window.toggleInterestView = function(view) {
         document.getElementById('interest-decision-box').style.display = 'none';
         if(view === 'calc') {
@@ -580,7 +576,6 @@
         }
         document.getElementById('savings-progress').style.width = Math.min(progress, 100) + "%";
 
-        // Render Buckets Matrix Table
         const bucketsTable = document.getElementById('buckets-table-body');
         if(bucketsTable) {
             bucketsTable.innerHTML = (state.buckets || []).map(b => `
