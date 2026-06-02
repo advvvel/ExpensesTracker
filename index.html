@@ -112,7 +112,7 @@
 </head>
 <body>
 
-<div class="container">
+<div class="container" id="main-container" style="display: none;">
     <div class="dashboard-layout">
         
         <aside>
@@ -305,9 +305,13 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
+    // UPDATED AUTH STATE WATCHER TO ENFORCE NO FLICKERING
     onAuthStateChanged(auth, (user) => {
         if (!user) {
             window.location.href = 'dashboard.html';
+        } else {
+            // Unhide layout only after verification is successful
+            document.getElementById('main-container').style.display = 'block';
         }
     });
 
