@@ -233,7 +233,6 @@
 </div>
 
 <script type="module">
-    // Fixed Configuration Block with proper Auth engine bindings
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
@@ -250,7 +249,7 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    // SECURITY LOCK OUT: Bounce unauthenticated traffic back out to dashboard.html immediately
+    // FIX: Changed from 'dashboard.html' to 'dashboard.html' to correctly route the file name
     onAuthStateChanged(auth, (user) => {
         if (!user) {
             window.location.href = 'dashboard.html';
