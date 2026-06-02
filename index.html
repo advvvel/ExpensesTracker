@@ -233,27 +233,22 @@
 </div>
 
 <script type="module">
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+    // Fixed Configuration Block with proper Auth engine bindings
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyDPz1BPnN7Xan09WgdA6UVKk9gjU0DGiKs",
-  authDomain: "stash-tracke.firebaseapp.com",
-  projectId: "stash-tracke",
-  storageBucket: "stash-tracke.firebasestorage.app",
-  messagingSenderId: "187196565090",
-  appId: "1:187196565090:web:347de41a82978f17d5933b",
-  measurementId: "G-DPLQWMGNLC"
-};
+    const firebaseConfig = {
+        apiKey: "AIzaSyDPz1BPnN7Xan09WgdA6UVKk9gjU0DGIks",
+        authDomain: "stash-tracke.firebaseapp.com",
+        projectId: "stash-tracke",
+        storageBucket: "stash-tracke.firebasestorage.app",
+        messagingSenderId: "187196565090",
+        appId: "1:187196565090:web:347de41a82978f17d5933b",
+        measurementId: "G-DPLQWMGNLC"
+    };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
 
     // SECURITY LOCK OUT: Bounce unauthenticated traffic back out to dashboard.html immediately
     onAuthStateChanged(auth, (user) => {
