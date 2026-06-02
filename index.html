@@ -287,7 +287,6 @@
 
     </div>
 </div>
-
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
@@ -308,6 +307,8 @@
     const db = getFirestore(app);
 
     let currentUser = null;
+    
+    // Clean, flat state structure to prevent structural validation errors
     let state = {
         total: 0,
         saved: 0,
@@ -318,40 +319,68 @@
 
     const AUTH_LOGIN_FILE = 'dashboard.html'; 
 
+    // Track authentication state
     onAuthStateChanged(auth, async (user) => {
         if (!user) {
-            window.location.href = AUTH_LOGIN_FILE;
+            console.log("No user detected, redirecting...");
+            // If you get stuck in a redirect loop, temporarily comment the line below out
+            // window.location.href = AUTH_LOGIN_FILE;
         } else {
+            console.log("User authenticated successfully:", user.uid);
             currentUser = user;
             await loadUserData(user.uid);
         }
     });
 
+    // LOAD DATA FROM FIRESTORE
     async function loadUserData(uid) {
         try {
             const docRef = doc(db, "users", uid);
             const docSnap = await getDoc(docRef);
+            
             if (docSnap.exists()) {
-                state = docSnap.data();
-                state.buckets = state.buckets || [];
-                state.history = state.history || [];
+                const incomingData = docSnap.data();
+                console.log("Data loaded from Firestore:", incomingData);
+                
+                // Force data sanity checks to prevent app crashes
+                state.total = typeof incomingData.total === 'number' ? incomingData.total : 0;
+                state.saved = typeof incomingData.saved === 'number' ? incomingData.saved : 0;
+                state.goal = typeof incomingData.goal === 'number' ? incomingData.goal : 5000;
+                state.buckets = Array.isArray(incomingData.buckets) ? incomingData.buckets : [];
+                state.history = Array.isArray(incomingData.history) ? incomingData.history : [];
             } else {
+                console.log("No existing user document found. Creating default layout...");
                 state = { total: 0, saved: 0, goal: 5000, buckets: [], history: [] };
                 await setDoc(docRef, state);
             }
             updateAllUI();
         } catch (e) {
-            console.error("Database structural validation failure:", e);
+            console.error("CRITICAL LOAD ERROR:", e);
         }
     }
 
+    // SAVE DATA TO FIRESTORE
     async function saveUserData() {
-        if (!currentUser) return;
+        if (!currentUser) {
+            console.warn("Save aborted: No authenticated user active.");
+            return;
+        }
         try {
             const docRef = doc(db, "users", currentUser.uid);
-            await setDoc(docRef, state);
+            
+            // Clean payload to ensure Firestore accepts it without errors
+            const payload = {
+                total: Number(state.total) || 0,
+                saved: Number(state.saved) || 0,
+                goal: Number(state.goal) || 5000,
+                buckets: JSON.parse(JSON.stringify(state.buckets)),
+                history: JSON.parse(JSON.stringify(state.history))
+            };
+
+            await setDoc(docRef, payload);
+            console.log("Data successfully saved to Firestore!");
         } catch (e) {
-            console.error("Database tracking persist intercept failure:", e);
+            console.error("CRITICAL SAVE ERROR:", e);
         }
     }
 
@@ -436,11 +465,11 @@
         const amt = parseFloat(document.getElementById('new-bucket-amount').value);
 
         if(!name || isNaN(amt) || amt <= 0) {
-            alert("Please input a structural name and positive dollar share amount.");
+            alert("Please input a name and positive allocation amount.");
             return;
         }
         if(amt > state.saved) {
-            alert("Insufficient pool balance. You cannot allocate more than your general Saved pool threshold.");
+            alert("Insufficient unallocated balance.");
             return;
         }
 
@@ -485,11 +514,11 @@
         const cycle = parseInt(document.getElementById('interest-period-select').value);
 
         if(isNaN(apy) || apy <= 0) {
-            alert("Please assign a valid interest asset rate percentage.");
+            alert("Please assign a valid interest rate.");
             return;
         }
         if(state.saved <= 0) {
-            alert("Your snapshot savings yield pool calculation is currently sitting at $0.00.");
+            alert("Your savings balance is currently $0.00.");
             return;
         }
 
@@ -498,7 +527,7 @@
         const layoutText = cycle === 12 ? 'Monthly' : 'Annual';
         interestContextLabel = `${layoutText} Interest Accumulation (${apy}% APY)`;
 
-        document.getElementById('interest-output-msg').innerHTML = `Calculated Earnings: <strong>$${computedInterestSum.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong> via ${layoutText} compound parameters.`;
+        document.getElementById('interest-output-msg').innerHTML = `Calculated Earnings: <strong>$${computedInterestSum.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong>`;
         document.getElementById('interest-decision-box').style.display = 'block';
     }
 
@@ -507,10 +536,10 @@
         if(!isNaN(manualVal) && manualVal > 0) {
             computedInterestSum = manualVal;
             interestContextLabel = 'Manual Interest Adjustment Entry';
-            document.getElementById('interest-output-msg').innerHTML = `Calculated Earnings: <strong>$${computedInterestSum.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong> via custom allocation injection.`;
+            document.getElementById('interest-output-msg').innerHTML = `Calculated Earnings: <strong>$${computedInterestSum.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong>`;
             document.getElementById('interest-decision-box').style.display = 'block';
         } else {
-            alert("Please supply a valid absolute structural cash value.");
+            alert("Please supply a valid value.");
         }
     }
 
@@ -520,7 +549,7 @@
             state.history.unshift({ id: Date.now(), type: 'Deposit', name: interestContextLabel, amount: parseFloat(computedInterestSum.toFixed(2)), date: new Date().toLocaleDateString() });
             updateAllUI();
             saveUserData();
-            alert(`Interest execution confirmed! Applied $${computedInterestSum.toFixed(2)} directly onto savings.`);
+            alert(`Interest applied! Added $${computedInterestSum.toFixed(2)} to savings.`);
         }
         clearInterestSimulationView();
     }
@@ -554,7 +583,7 @@
             return;
         }
         computedTaxSum = state.total * pct;
-        document.getElementById('tax-output-msg').innerHTML = `Applied Tax Rate: <strong>${pct * 100}%</strong><br>Approximate amount that would be removed: <strong>$${computedTaxSum.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong>`;
+        document.getElementById('tax-output-msg').innerHTML = `Applied Tax Rate: <strong>${pct * 100}%</strong><br>Deduction Amount: <strong>$${computedTaxSum.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong>`;
         document.getElementById('tax-decision-box').style.display = 'block';
     }
 
@@ -564,7 +593,7 @@
             state.history.unshift({ id: Date.now(), type: 'Expense', name: `Tax Deduction (${document.getElementById('tax-bracket-select').value * 100}%)`, amount: computedTaxSum, date: new Date().toLocaleDateString() });
             updateAllUI();
             saveUserData();
-            alert("Tax deduction has been applied to your stash funds.");
+            alert("Tax deduction has been applied.");
         }
         clearTaxBracketView();
     }
@@ -631,7 +660,6 @@
             poolSpan.innerText = state.saved.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
         }
 
-        // Render Overview Section (Filter out Expenses)
         const expenseTable = document.getElementById('expense-table-body');
         if (expenseTable) {
             expenseTable.innerHTML = state.history.filter(h => h.type === 'Expense').map(h => `
@@ -645,16 +673,14 @@
             `).join('');
         }
 
-        // Render Comprehensive History Section inside Report Log
         const reportTable = document.getElementById('report-log-body');
         if (reportTable) {
             reportTable.innerHTML = state.history.map(h => {
-                let textType = h.type;
-                let colorAmt = h.type === 'Expense' ? 'color:#cc0000;' : 'color:#008800;';
+                let colorAmt = h.type === 'Expense' || h.type === 'SavingsTransfer' ? 'color:#cc0000;' : 'color:#008800;';
                 let prefix = h.type === 'Expense' || h.type === 'SavingsTransfer' ? '-' : '+';
                 return `
                     <tr>
-                        <td><strong>${h.name}</strong> (${textType})</td>
+                        <td><strong>${h.name}</strong> (${h.type})</td>
                         <td style="${colorAmt}">${prefix}$${h.amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
                         <td>${h.date}</td>
                         <td><button class="action-btn" onclick="deleteAction(${h.id})">Rollback</button></td>
