@@ -105,9 +105,10 @@ body {
     align-items: center; 
 }
 
+/* CHANGED ONLY THIS: Tuned down slightly from 320px for a cleaner balance */
 .main-circle {
-    width: 320px; 
-    height: 320px;
+    width: 280px; 
+    height: 280px;
     border: 12px solid var(--text-main);
     border-radius: 50%;
     display: flex; 
@@ -133,7 +134,7 @@ body {
     letter-spacing: -0.02em;
 }
 
-/* Page Control Layout Segments (Hides inactive views so they aren't all on screen) */
+/* Page Control Layout Segments */
 .page-content { 
     display: none; 
     width: 100%;
@@ -212,8 +213,24 @@ td { padding: 15px; border-bottom: 1px solid var(--border-light); font-size: 0.9
 .action-btn { color: #cc0000; text-decoration: underline; cursor: pointer; font-size: 0.8rem; border: none; background: none; }
 
 /* ==========================================================================
-   4. COLUMN 3: RIGHT SIDEBAR (The Gray Savings Card Layout)
+   4. COLUMN 3: RIGHT SIDEBAR (Savings Layout & Chart Wrapper Config)
    ========================================================================== */
+.right-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    width: 100%;
+}
+
+.chart-container {
+    width: 100%;
+    background: var(--card-white);
+    border-radius: 24px;
+    padding: 24px;
+    box-sizing: border-box;
+    border: 1px solid var(--border-light);
+}
+
 .savings-card { 
     background: #ededeb; 
     padding: 32px 24px; 
