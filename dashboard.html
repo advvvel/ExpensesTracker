@@ -3,115 +3,181 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>STASH. - Authenticate</title>
-    <link rel="stylesheet" href="style.css">
+    <title>STASH. - Dashboard</title>
+    <style>
+        :root {
+            --bg-neutral: #f4f4f2;
+            --card-white: #ffffff;
+            --text-main: #1a1a1a;
+            --text-muted: #757575;
+            --border-light: #e0e0dc;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-neutral);
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            background: var(--card-white);
+            border-radius: 24px;
+            padding: 50px;
+            min-height: 80vh;
+        }
+
+        .dashboard-layout {
+            display: grid;
+            grid-template-columns: 220px 1fr 320px;
+            gap: 40px;
+        }
+
+        /* SIDEBAR NAVIGATION */
+        .nav-links { list-style: none; padding: 0; margin: 0; }
+        .nav-links li {
+            padding: 15px 20px;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: 0.2s;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .nav-links li:hover { background: #f0f0ee; color: var(--text-main); }
+        .nav-links li.active { 
+            color: var(--text-main); 
+            background: #f0f0ee;
+            border-left: 4px solid var(--text-main); 
+        }
+
+        /* PAGE CONTENT CONTROL */
+        .page-content { display: none; }
+        .page-content.active { display: block; }
+
+        /* CENTER VISUALS */
+        .circle-container { 
+            display: flex; flex-direction: column; align-items: center; margin-bottom: 40px; 
+        }
+
+        /* EXACTLY 255PX SHRUNKEN CIRCLE SCALE */
+        .main-circle {
+            width: 255px; 
+            height: 255px;
+            border: 12px solid var(--text-main);
+            border-radius: 50%;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            margin-bottom: 30px;
+        }
+        .main-circle span { font-size: 0.7rem; text-transform: uppercase; font-weight: 800; color: var(--text-muted); }
+        .main-circle h2 { font-size: 2.5rem; margin: 5px 0; font-weight: 400; }
+
+        /* TABLES */
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { text-align: left; background: #ededeb; padding: 12px; font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); }
+        td { padding: 15px; border-bottom: 1px solid var(--border-light); font-size: 0.9rem; }
+
+        /* BUTTONS & INPUTS */
+        .add-section { background: #f9f9f7; padding: 25px; border-radius: 15px; margin-top: 30px; }
+        .btn-black { background: #1a1a1a; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: 600; }
+        input { padding: 12px; border: 1px solid var(--border-light); border-radius: 8px; margin-right: 10px; font-family: inherit; }
+
+        /* SAVINGS CARD */
+        .savings-card { background: #ededeb; padding: 30px; border-radius: 20px; align-self: start; }
+        .savings-bar { background: white; height: 12px; border-radius: 10px; margin: 15px 0; position: relative; overflow: hidden; }
+        #savings-progress { background: #1a1a1a; height: 100%; width: 0%; transition: 0.3s; }
+
+        .action-btn { color: #cc0000; text-decoration: underline; cursor: pointer; font-size: 0.8rem; border: none; background: none; }
+
+        /* TAX SELECT / TOGGLES */
+        select { padding: 12px; border: 1px solid var(--border-light); border-radius: 8px; margin-right: 10px; font-family: inherit; font-size: 0.9rem; background: white; }
+        .tax-toggle-buttons { display: flex; gap: 10px; margin-bottom: 20px; background: #f9f9f7; padding: 15px; border-radius: 12px; }
+        .tax-option-container { background: #f9f9f7; padding: 25px; border-radius: 15px; border: 1px solid var(--border-light); margin-top: 15px; }
+
+        /* LOGOUT TRIGGER INTERFACE STYLING */
+        .logout-btn { 
+            background: none; border: none; color: var(--text-muted); font-weight: 600; 
+            cursor: pointer; padding: 15px 20px; width: 100%; text-align: left; 
+            display: flex; align-items: center; gap: 10px; margin-top: 30px; border-radius: 8px; 
+            font-family: inherit; font-size: 1rem;
+        }
+        .logout-btn:hover { background: #f0f0ee; color: #cc0000; }
+    </style>
 </head>
 <body>
 
-<div class="auth-card">
-    <h1>STASH.</h1>
-    <p class="subtitle" id="auth-subtitle">Sign in to manage your available funds</p>
+<div class="container">
+    <div class="dashboard-layout">
+        
+        <aside>
+            <ul class="nav-links">
+                <li class="active" onclick="switchTab('overview')">Overview</li>
+                <li onclick="switchTab('income')">Income</li>
+                <li onclick="switchTab('savings')">Savings</li>
+                <li onclick="switchTab('reports')">Reports</li>
+            </ul>
+            <button class="logout-btn" onclick="handleLogout()">Logout</button>
+        </aside>
 
-    <div class="form-group">
-        <label>Email Address</label>
-        <input type="email" id="email" placeholder="name@example.com">
-    </div>
+        <main class="main-content">
+            <div class="circle-container">
+                <div class="main-circle">
+                    <span>Available Funds</span>
+                    <h2 id="total-funds">$0.00</h2>
+                </div>
+            </div>
 
-    <div class="form-group">
-        <label>Password</label>
-        <input type="password" id="password" placeholder="••••••••">
-    </div>
+            <div id="overview" class="page-content active">
+                <div class="add-section">
+                    <input type="number" id="deposit-amount" placeholder="Amount ($)">
+                    <button class="btn-black" onclick="addFunds()">Deposit</button>
+                </div>
+            </div>
 
-    <div class="remember-me-container" id="remember-wrapper">
-        <input type="checkbox" id="rememberMe" checked>
-        <label for="rememberMe" style="cursor:pointer; font-weight: 500;">Remember Me</label>
-    </div>
+            <div id="income" class="page-content">
+                <div class="add-section">
+                    <input type="text" id="income-source" placeholder="Source">
+                    <input type="number" id="income-amount" placeholder="Amount">
+                    <button class="btn-black">Add Income</button>
+                </div>
+            </div>
+        </main>
 
-    <button class="btn-black" id="mainBtn" onclick="window.handleAuth()">Sign In</button>
+        <aside style="display: flex; flex-direction: column; gap: 30px;">
+            
+            <div style="background: white; border: 1px solid var(--border-light); border-radius: 15px; padding: 20px;">
+                <canvas id="dashboardChart"></canvas>
+            </div>
 
-    <div class="toggle-link" id="toggleModeMsg">
-        Don't have an account? <span onclick="window.toggleAuthMode()">Create an account</span>
+            <div class="savings-card">
+                <div style="display: flex; justify-content: space-between;">
+                    <span>Goal</span>
+                    <span id="display-goal">$0</span>
+                </div>
+                
+                <div class="savings-bar">
+                    <div id="savings-progress"></div>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between;">
+                    <span>Saved</span>
+                    <span id="display-saved">$0</span>
+                </div>
+            </div>
+
+        </aside>
+
     </div>
 </div>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-    import { 
-        getAuth, 
-        signInWithEmailAndPassword, 
-        createUserWithEmailAndPassword, 
-        setPersistence, 
-        browserLocalPersistence, 
-        browserSessionPersistence,
-        onAuthStateChanged
-    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-
-    const firebaseConfig = {
-        apiKey: "AIzaSyDPz1BPnN7Xan09WgdA6UVKk9gjU0DGiKs", 
-        authDomain: "stash-tracke.firebaseapp.com",
-        projectId: "stash-tracke",
-        storageBucket: "stash-tracke.firebasestorage.app",
-        messagingSenderId: "187196565090",
-        appId: "1:187196565090:web:347de41a82978f17d5933b",
-        measurementId: "G-DPLQWMGNLC"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-
-    // ANTI-GLITCH ROUTER FOR SIGN IN PAGE
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            window.location.href = 'index.html';
-        } else {
-            // Safe to reveal login screen now
-            document.body.style.opacity = '1';
-        }
-    });
-
-    window.toggleAuthMode = () => {
-        const mainBtn = document.getElementById('mainBtn');
-        const subtitle = document.getElementById('auth-subtitle');
-        const toggleMsg = document.getElementById('toggleModeMsg');
-        const rememberWrapper = document.getElementById('remember-wrapper');
-
-        if (mainBtn.innerText === "Sign In") {
-            mainBtn.innerText = "Sign Up";
-            subtitle.innerText = "Create your secure profile credentials";
-            rememberWrapper.style.display = "none";
-            toggleMsg.innerHTML = `Already have an account? <span onclick="window.toggleAuthMode()">Sign In</span>`;
-        } else {
-            mainBtn.innerText = "Sign In";
-            subtitle.innerText = "Sign in to manage your available funds";
-            rememberWrapper.style.display = "flex";
-            toggleMsg.innerHTML = `Don't have an account? <span onclick="window.toggleAuthMode()">Create an account</span>`;
-        }
-    };
-
-    window.handleAuth = async () => {
-        const email = document.getElementById('email').value.trim();
-        const pass = document.getElementById('password').value.trim();
-        const remember = document.getElementById('rememberMe').checked;
-        const isSignUp = document.getElementById('mainBtn').innerText === "Sign Up";
-
-        if (!email || !pass) {
-            alert("Please fill in all input fields.");
-            return;
-        }
-
-        try {
-            if (!isSignUp) {
-                await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
-                await signInWithEmailAndPassword(auth, email, pass);
-            } else {
-                await createUserWithEmailAndPassword(auth, email, pass);
-                alert("Account created successfully!");
-            }
-            window.location.href = 'index.html';
-        } catch (err) {
-            alert("Authentication Error: " + err.message);
-        }
-    };
-</script>
 </body>
 </html>
