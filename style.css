@@ -1,151 +1,237 @@
 /* ==========================================================================
-   1. CORE DESIGN THEME (Your Classic Clean Layout)
+   1. ORIGINAL STASH DESKTOP DESIGN (Restored Exactly from Your Screenshot)
    ========================================================================== */
 body {
-    background-color: #f8fafc; /* Crisp, bright modern backdrop */
-    color: #0f172a;            /* Clean dark charcoal text */
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: #f4f4f4; /* Clean off-white background */
+    color: #000000;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     margin: 0;
     padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    opacity: 0; /* Managed smoothly by your Firebase anti-glitch script */
-    transition: opacity 0.2s ease-in;
-}
-
-/* Elegant Center Container Card */
-.auth-card {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 16px;
-    padding: 40px;
-    width: 100%;
-    max-width: 400px;
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
     box-sizing: border-box;
 }
 
-h1 {
-    font-size: 2.25rem;
-    font-weight: 800;
-    letter-spacing: -0.05em;
-    margin: 0 0 8px 0;
-    text-align: center;
+/* Your exact 3-column layout structure */
+.dashboard-layout {
+    display: grid;
+    grid-template-columns: 240px 1fr 360px;
+    gap: 40px;
+    padding: 60px 40px;
+    max-width: 1600px;
+    margin: 0 auto;
+    align-items: start;
 }
 
-.subtitle {
-    color: #64748b;
-    font-size: 0.95rem;
-    margin: 0 0 32px 0;
-    text-align: center;
-}
-
-/* Custom Input Alignments */
-.form-group {
+/* Left Sidebar Folders & Navigation */
+.sidebar-nav {
     display: flex;
     flex-direction: column;
     gap: 8px;
-    margin-bottom: 20px;
 }
 
-.form-group label {
-    font-size: 0.85rem;
+.sidebar-nav h1 {
+    font-size: 1.5rem;
+    font-weight: 900;
+    margin: 0 0 40px 0;
+    letter-spacing: -0.03em;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: transparent;
+    border: none;
+    color: #7e8b9b; /* Muted gray text from image */
+    padding: 14px 24px;
+    font-size: 1.05rem;
     font-weight: 600;
-    color: #334155;
+    text-align: left;
+    cursor: pointer;
+    border-radius: 12px;
+    transition: all 0.15s ease;
+}
+
+/* Your exact light gray pill with the left accent line */
+.nav-item.active {
+    background-color: #eaeaea; 
+    color: #000000;
+    font-weight: 700;
+    border-left: 5px solid #000000;
+    border-radius: 4px 12px 12px 4px;
+}
+
+/* Center Column: Total Available Funds Circle */
+.main-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 60px;
+}
+
+.funds-circle {
+    width: 340px;
+    height: 340px;
+    border: 9px solid #000000; /* Bold black outer circle */
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+}
+
+.funds-circle span {
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: #7e8b9b;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.06em;
 }
 
-input[type="email"],
-input[type="password"] {
+.funds-circle h2 {
+    font-size: 4rem; /* Giant dynamic funds text */
+    font-weight: 400;
+    margin: 4px 0 0 0;
+    letter-spacing: -0.03em;
+}
+
+/* Deposit Form Section at Bottom Center */
+.deposit-container {
+    text-align: left;
     width: 100%;
-    height: 44px;
-    padding: 0 16px;
-    background: #f1f5f9;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    font-size: 1rem;
-    color: #0f172a;
-    box-sizing: border-box;
-    transition: all 0.2s;
+    max-width: 420px;
 }
 
-input:focus {
-    outline: none;
-    border-color: #000000;
+.deposit-container h3 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin: 0 0 16px 0;
+}
+
+.form-inline {
+    display: flex;
+    gap: 12px;
+}
+
+.form-inline input {
+    flex: 1;
+    height: 48px;
+    border: 1px solid #dcdcdc;
+    border-radius: 12px;
+    padding: 0 16px;
+    font-size: 1rem;
     background: #ffffff;
 }
 
-/* Custom Checkbox Config */
-.remember-me-container {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 24px;
-    font-size: 0.9rem;
-    color: #475569;
+/* Right Sidebar: Savings Snapshot Card */
+.metric-card {
+    background-color: #eaeaea; /* Rounded gray container block */
+    border-radius: 24px;
+    padding: 32px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
-/* Premium Black Button Styling */
+.metric-card h3 {
+    font-size: 0.75rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0 0 24px 0;
+}
+
+.goal-row, .saved-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    font-size: 1.1rem;
+}
+
+.goal-row span:first-child, .saved-row span:first-child {
+    color: #555555;
+}
+
+.goal-row span:last-child, .saved-row span:last-child {
+    font-weight: 800;
+    font-size: 1.3rem;
+}
+
+/* Your bold, thick black progress line */
+.progress-bar-bg {
+    width: 100%;
+    height: 14px;
+    background-color: #1a1a1a;
+    border-radius: 7px;
+    margin: 20px 0 32px 0;
+}
+
+/* Premium Custom Buttons */
+.btn-white {
+    width: 100%;
+    height: 48px;
+    background-color: #ffffff;
+    color: #000000;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    margin-bottom: 12px;
+}
+
 .btn-black {
     width: 100%;
     height: 48px;
-    background-color: #000000;
+    background-color: #141414;
     color: #ffffff;
     border: none;
-    border-radius: 8px;
-    font-size: 1rem;
-    font-weight: 600;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 700;
     cursor: pointer;
-    transition: background 0.2s;
-}
-
-.btn-black:hover {
-    background-color: #1e293b;
-}
-
-/* Under-text Toggle Link */
-.toggle-link {
-    margin-top: 24px;
-    text-align: center;
-    font-size: 0.9rem;
-    color: #64748b;
-}
-
-.toggle-link span {
-    color: #000000;
-    font-weight: 600;
-    cursor: pointer;
-    text-decoration: underline;
 }
 
 /* ==========================================================================
-   2. IPHONE RESPONSIVE ADAPTATION (Prevents Cluttering on Mobile Screens)
+   2. HIDDEN IPHONE ENGINE (Only acts when screen scales down to a phone)
    ========================================================================== */
-@media (max-width: 480px) {
-    body {
-        padding: 20px;
-        background-color: #ffffff; /* Seamless screen blends on native screens */
+@media (max-width: 960px) {
+    .dashboard-layout {
+        grid-template-columns: 1fr; /* Stacks everything cleanly downwards */
+        padding: 24px 16px;
+        gap: 40px;
     }
 
-    .auth-card {
-        border: none;
-        box-shadow: none;
-        padding: 20px 10px;
-        max-width: 100%;
+    /* Slides folders into an easy-to-swipe top header */
+    .sidebar-nav {
+        flex-direction: row;
+        overflow-x: auto;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #e0e0e0;
     }
 
-    h1 {
-        font-size: 2rem;
+    .sidebar-nav h1 {
+        margin-bottom: 0;
+        margin-right: 24px;
     }
 
-    /* Expands click zones dynamically so it is easy to navigate on a touchscreen */
-    input[type="email"],
-    input[type="password"],
-    .btn-black {
-        height: 50px;
-        font-size: 1.05rem;
+    .nav-item {
+        padding: 10px 16px;
+        white-space: nowrap;
+    }
+
+    .nav-item.active {
+        border-left: none;
+        border-bottom: 4px solid #000000;
+        border-radius: 0;
+    }
+
+    .form-inline {
+        flex-direction: column;
+    }
+    
+    .form-inline .btn-black {
+        width: 100%;
     }
 }
