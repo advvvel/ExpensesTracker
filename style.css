@@ -1,144 +1,151 @@
 /* ==========================================================================
-   1. CORE APPLICTION GLOBAL STYLES (Preserving Your Original Design)
+   1. CORE DESIGN THEME (Your Classic Clean Layout)
    ========================================================================== */
 body {
+    background-color: #f8fafc; /* Crisp, bright modern backdrop */
+    color: #0f172a;            /* Clean dark charcoal text */
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     margin: 0;
     padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    opacity: 0; /* Managed smoothly by your Firebase anti-glitch script */
+    transition: opacity 0.2s ease-in;
 }
 
-/* Base structural containers for elements */
-.metric-card {
-    border-radius: 12px;
-    padding: 20px;
+/* Elegant Center Container Card */
+.auth-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 40px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
     box-sizing: border-box;
 }
 
-/* ==========================================================================
-   2. DESKTOP WORKSPACE LAYOUT (Preserving Your Exact Setup)
-   ========================================================================== */
-.dashboard-layout {
-    display: grid;
-    /* Keeps your standard 3-column setup on desktop viewports */
-    grid-template-columns: 220px 1fr 340px; 
-    gap: 24px;
-    padding: 24px;
-    max-width: 1440px;
-    margin: 0 auto;
-    box-sizing: border-box;
+h1 {
+    font-size: 2.25rem;
+    font-weight: 800;
+    letter-spacing: -0.05em;
+    margin: 0 0 8px 0;
+    text-align: center;
 }
 
-.sidebar-nav {
+.subtitle {
+    color: #64748b;
+    font-size: 0.95rem;
+    margin: 0 0 32px 0;
+    text-align: center;
+}
+
+/* Custom Input Alignments */
+.form-group {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #334155;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+input[type="email"],
+input[type="password"] {
+    width: 100%;
+    height: 44px;
+    padding: 0 16px;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 1rem;
+    color: #0f172a;
+    box-sizing: border-box;
+    transition: all 0.2s;
+}
+
+input:focus {
+    outline: none;
+    border-color: #000000;
+    background: #ffffff;
+}
+
+/* Custom Checkbox Config */
+.remember-me-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 24px;
+    font-size: 0.9rem;
+    color: #475569;
+}
+
+/* Premium Black Button Styling */
+.btn-black {
+    width: 100%;
+    height: 48px;
+    background-color: #000000;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-black:hover {
+    background-color: #1e293b;
+}
+
+/* Under-text Toggle Link */
+.toggle-link {
+    margin-top: 24px;
+    text-align: center;
+    font-size: 0.9rem;
+    color: #64748b;
+}
+
+.toggle-link span {
+    color: #000000;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: underline;
 }
 
 /* ==========================================================================
-   3. IPHONE & MOBILE RESPONSIVE ENGINE (The Accessibility Patch)
+   2. IPHONE RESPONSIVE ADAPTATION (Prevents Cluttering on Mobile Screens)
    ========================================================================== */
-
-/* Tablet & Smaller Screen Adaptation */
-@media (max-width: 1100px) {
-    .dashboard-layout {
-        grid-template-columns: 1fr 340px; /* Merges view, collapses left nav */
-    }
-    .sidebar-nav {
-        grid-column: span 2;
-        flex-direction: row;
-        justify-content: space-around;
-    }
-}
-
-/* iPhone / Android Smartphone Optimization */
-@media (max-width: 768px) {
-    .dashboard-layout {
-        grid-template-columns: 1fr !important; /* Forces layout into a single column feed */
-        padding: 12px !important;
-        gap: 16px !important;
+@media (max-width: 480px) {
+    body {
+        padding: 20px;
+        background-color: #ffffff; /* Seamless screen blends on native screens */
     }
 
-    /* Transforms navigation menu into an elegant swipeable top action-bar */
-    .sidebar-nav {
-        grid-column: span 1 !important;
-        flex-direction: row !important;
-        overflow-x: auto; 
-        white-space: nowrap;
-        padding-bottom: 8px;
-        gap: 8px;
+    .auth-card {
+        border: none;
+        box-shadow: none;
+        padding: 20px 10px;
+        max-width: 100%;
     }
 
-    /* Input Rows and Fields Automatic Stacking */
-    .form-row, .input-group {
-        display: flex;
-        flex-direction: column !important;
-        gap: 12px !important;
+    h1 {
+        font-size: 2rem;
     }
 
-    /* Make buttons and input inputs tap-friendly for thumbs on screen */
-    input, select, button {
-        width: 100% !important;
-        height: 44px; /* Standard iOS touch target scale */
-        box-sizing: border-box;
+    /* Expands click zones dynamically so it is easy to navigate on a touchscreen */
+    input[type="email"],
+    input[type="password"],
+    .btn-black {
+        height: 50px;
+        font-size: 1.05rem;
     }
-
-    /* Chart Auto-Resizing */
-    .chart-container {
-        width: 100% !important;
-        max-width: 290px;
-        margin: 0 auto;
-    }
-    /* ==========================================================================
-   IPHONE & MOBILE RESPONSIVE ENGINE (Add to the very bottom of style.css)
-   ========================================================================== */
-
-/* Tablet Viewport */
-@media (max-width: 1100px) {
-    .dashboard-layout {
-        grid-template-columns: 1fr 340px; 
-    }
-    .sidebar-nav {
-        grid-column: span 2;
-        flex-direction: row;
-        justify-content: space-around;
-    }
-}
-
-/* iPhone Viewport */
-@media (max-width: 768px) {
-    .dashboard-layout {
-        grid-template-columns: 1fr !important; /* Stacks all columns into a vertical feed */
-        padding: 12px !important;
-        gap: 16px !important;
-    }
-
-    .sidebar-nav {
-        grid-column: span 1 !important;
-        flex-direction: row !important;
-        overflow-x: auto; 
-        white-space: nowrap;
-        padding-bottom: 8px;
-        gap: 8px;
-    }
-
-    /* Stacks form fields vertically on mobile */
-    .form-row, .input-group {
-        display: flex;
-        flex-direction: column !important;
-        gap: 12px !important;
-    }
-
-    /* Optimizes inputs and buttons for finger taps */
-    input, select, button {
-        width: 100% !important;
-        height: 44px; 
-        box-sizing: border-box;
-    }
-
-    .chart-container {
-        width: 100% !important;
-        max-width: 290px;
-        margin: 0 auto;
-    }
-}
 }
