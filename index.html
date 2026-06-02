@@ -34,7 +34,8 @@
 
         .dashboard-layout {
             display: grid;
-            grid-template-columns: 220px 1fr 320px;
+            /* Rebalanced columns to allow clean split between Nav, Workspace, and Widgets */
+            grid-template-columns: 220px 1fr 340px;
             gap: 40px;
         }
 
@@ -73,7 +74,7 @@
             border-radius: 50%;
             display: flex; flex-direction: column;
             justify-content: center; align-items: center;
-            margin-bottom: 30px;
+            margin-bottom: 10px;
         }
         .main-circle span { font-size: 0.7rem; text-transform: uppercase; font-weight: 800; color: var(--text-muted); }
         .main-circle h2 { font-size: 2.5rem; margin: 5px 0; font-weight: 400; }
@@ -88,8 +89,26 @@
         .btn-black { background: #1a1a1a; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: 600; }
         input { padding: 12px; border: 1px solid var(--border-light); border-radius: 8px; margin-right: 10px; font-family: inherit; }
 
-        /* SAVINGS CARD */
-        .savings-card { background: #ededeb; padding: 30px; border-radius: 20px; align-self: start; }
+        /* RIGHT-SIDE SIDEBAR AND WIDGET CARDS */
+        .metrics-sidebar-column {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            align-self: start;
+        }
+        
+        .analytics-card { 
+            background: #ffffff; 
+            padding: 24px; 
+            border-radius: 20px; 
+            border: 1px solid var(--border-light);
+        }
+
+        .savings-card { 
+            background: #ededeb; 
+            padding: 30px; 
+            border-radius: 20px; 
+        }
         .savings-bar { background: white; height: 12px; border-radius: 10px; margin: 15px 0; position: relative; overflow: hidden; }
         #savings-progress { background: #1a1a1a; height: 100%; width: 0%; transition: 0.3s; }
         
@@ -136,12 +155,7 @@
                     <h2 id="display-total">$0.00</h2>
                 </div>
             </div>
-<div class="analytics-card" style="margin-bottom: 30px; background: var(--card-white); padding: 20px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
-    <h3 style="margin-top: 0; margin-bottom: 20px; color: #1a1a1a;">Financial Allocation Breakdown</h3>
-    <div style="max-width: 360px; margin: 0 auto; position: relative;">
-        <canvas id="stashAllocationChart"></canvas>
-    </div>
-</div>
+
             <div id="page-overview" class="page-content active">
                 <table>
                     <thead><tr><th>Type</th><th>Category</th><th>Amount</th><th>Date</th><th>Management</th></tr></thead>
@@ -277,21 +291,33 @@
             </div>
         </main>
 
-        <aside class="savings-card">
-            <span style="font-weight: 800; font-size: 0.7rem; text-transform: uppercase;">Savings Snapshot</span>
-            <div style="display: flex; justify-content: space-between; margin-top: 20px;">
-                <span>Goal</span><strong id="goal-text">$5,000</strong>
+        <aside class="metrics-sidebar-column">
+            
+            <div class="analytics-card">
+                <h4 style="margin-top: 0; margin-bottom: 15px; color: #1a1a1a; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px;">Allocation Breakdown</h4>
+                <div style="width: 100%; position: relative;">
+                    <canvas id="stashAllocationChart"></canvas>
+                </div>
             </div>
-            <div class="savings-bar"><div id="savings-progress"></div></div>
-            <div style="display: flex; justify-content: space-between;">
-                <span>Saved</span><strong id="saved-text">$0</strong>
+
+            <div class="savings-card">
+                <span style="font-weight: 800; font-size: 0.7rem; text-transform: uppercase;">Savings Snapshot</span>
+                <div style="display: flex; justify-content: space-between; margin-top: 20px;">
+                    <span>Goal</span><strong id="goal-text">$5,000</strong>
+                </div>
+                <div class="savings-bar"><div id="savings-progress"></div></div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span>Saved</span><strong id="saved-text">$0</strong>
+                </div>
+                <button class="btn-black" style="width: 100%; margin-top: 20px; background: white; color: black; border: 1px solid #ccc;" onclick="navigateTo('savings')">Modify Savings</button>
+                <button class="btn-black" style="width: 100%; margin-top: 10px;" onclick="addFundsToSavings()">Quick Add to Savings</button>
             </div>
-            <button class="btn-black" style="width: 100%; margin-top: 20px; background: white; color: black; border: 1px solid #ccc;" onclick="navigateTo('savings')">Modify Savings</button>
-            <button class="btn-black" style="width: 100%; margin-top: 10px;" onclick="addFundsToSavings()">Quick Add to Savings</button>
+            
         </aside>
 
     </div>
 </div>
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script type="module">
@@ -324,7 +350,6 @@
 
     const AUTH_LOGIN_FILE = 'dashboard.html'; 
 
-    // Global variable to hold our Chart instance so we can destroy/recreate it on updates
     let myStashChart = null;
 
     onAuthStateChanged(auth, async (user) => {
@@ -624,27 +649,22 @@
         }
     }
 
-    // NEW FUNCTION: Renders and refreshes the Chart dynamically
     function renderAnalyticsChart() {
         const chartCanvas = document.getElementById('stashAllocationChart');
         if (!chartCanvas) return;
 
-        // Collect labels and figures dynamically from state arrays
         const labels = ['Available Balance', 'Unallocated Savings'];
         const dataValues = [Math.max(0, state.total), Math.max(0, state.saved)];
 
-        // Append individual sub-buckets dynamically to the data arrays
         state.buckets.forEach(b => {
             labels.push(`Bucket: ${b.name}`);
             dataValues.push(b.amount);
         });
 
-        // Wipe existing instances out of memory before re-rendering to prevent overlap bugs
         if (myStashChart) {
             myStashChart.destroy();
         }
 
-        // Initialize and paint the Chart.js instance
         myStashChart = new Chart(chartCanvas, {
             type: 'doughnut',
             data: {
@@ -652,13 +672,12 @@
                 datasets: [{
                     data: dataValues,
                     backgroundColor: [
-                        '#4CAF50', // Emerald green for core funds
-                        '#2196F3', // Dynamic blue for general savings
-                        '#9C27B0', // Purple
-                        '#FF9800', // Orange
-                        '#E91E63', // Pink
-                        '#00BCD4', // Cyan
-                        '#9E9E9E'  // Grey fallback
+                        '#1a1a1a', 
+                        '#757575', 
+                        '#b8b8b4', 
+                        '#4a4a48', 
+                        '#d1d1cc', 
+                        '#2e2e2d'
                     ],
                     borderWidth: 2,
                     borderColor: '#ffffff'
@@ -671,9 +690,9 @@
                     legend: {
                         position: 'bottom',
                         labels: {
-                            boxWidth: 12,
-                            padding: 15,
-                            font: { family: 'Inter, sans-serif', size: 12 }
+                            boxWidth: 10,
+                            padding: 8,
+                            font: { family: 'Inter, sans-serif', size: 11 }
                         }
                     }
                 }
@@ -683,8 +702,15 @@
 
     function updateAllUI() {
         document.getElementById('display-total').innerText = "$" + state.total.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
-        document.getElementById('goal-text').innerText = "$" + state.goal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
-        document.getElementById('saved-text').innerText = "$" + state.saved.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        
+        // Handle all goal text displays (updates both left page outputs and sidebar components simultaneously)
+        document.querySelectorAll('#goal-text').forEach(el => {
+            el.innerText = "$" + state.goal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        });
+        
+        document.querySelectorAll('#saved-text').forEach(el => {
+            el.innerText = "$" + state.saved.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        });
         
         let progress = 0;
         if (state.goal > 0 && state.saved >= 0) {
@@ -737,7 +763,6 @@
             }).join('');
         }
 
-        // Trigger the visual chart engine update
         renderAnalyticsChart();
     }
 </script>
