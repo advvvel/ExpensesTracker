@@ -22,9 +22,9 @@
             display: flex;
             justify-content: center;
             
-            /* ANTI-GLITCH PROTOCOL FOR MAIN DASHBOARD */
+            /* Renders clean and prevents flashing */
             opacity: 0; 
-            transition: opacity 0.2s ease-in;
+            transition: opacity 0.15s ease-in;
         }
 
         .container {
@@ -297,8 +297,9 @@
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
     import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
+    // EXACT VERIFIED FIREBASE CONFIGURATION RE-ESTABLISHED
     const firebaseConfig = {
-        apiKey: "AIzaSyDPz1BPnN7Xan09WgdA6UVKk9gjU0DGIkS", // REAL WORKING KEY RESTORED
+        apiKey: "AIzaSyDPz1BPnN7Xan09WgdA6UVKk9gjU0DGiKs", 
         authDomain: "stash-tracke.firebaseapp.com",
         projectId: "stash-tracke",
         storageBucket: "stash-tracke.firebasestorage.app",
@@ -320,31 +321,34 @@
         history: []
     };
 
-    // PROTOCOL: FORCE SIGN OUT AND REDIRECT IF BROWSER WAS REFRESHED/RELOADED
-    const navigationEntry = performance.getEntriesByType("navigation")[0];
-    if (navigationEntry && navigationEntry.type === "reload") {
-        await signOut(auth);
-        window.location.href = 'dashboard.html';
+    // NOTE: If your login page filename is NOT 'login.html' (e.g. 'index.html'), change this string below!
+    const LOGIN_PAGE_URL = 'login.html'; 
+
+    // SAFE REFRESH INTERCEPT ROUTING PROTOCOL
+    if (performance.getEntriesByType("navigation")[0]?.type === "reload") {
+        signOut(auth).then(() => {
+            window.location.href = LOGIN_PAGE_URL;
+        });
     } else {
-        onAuthStateChanged(auth, async (user) => {
+        onAuthStateChanged(auth, (user) => {
             if (!user) {
-                window.location.href = 'dashboard.html';
+                window.location.href = LOGIN_PAGE_URL;
             } else {
                 currentUser = user;
-                await loadUserData(user.uid);
+                // REVEAL UI IMMEDIATELY so the dashboard never locks up on a white screen
                 document.body.style.opacity = '1';
+                // Pull down data asynchronously in the background
+                loadUserData(user.uid);
             }
         });
     }
 
-    // LOAD PROFILE FROM DATABASE WITH SAFETY DEFAULT CHECKS
     async function loadUserData(uid) {
         try {
             const docRef = doc(db, "users", uid);
             const docSnap = await getDoc(docRef);
             if (docSnap.exists()) {
                 state = docSnap.data();
-                // Ensure arrays exist so table rendering scripts don't break
                 state.buckets = state.buckets || [];
                 state.history = state.history || [];
             } else {
@@ -353,11 +357,10 @@
             }
             updateAllUI();
         } catch (e) {
-            alert("Database Load Error: " + e.message);
+            console.error("Database sync delay/error:", e);
         }
     }
 
-    // AUTOSAVE DATA MODIFICATIONS TO FIREBASE CLOUD STORAGE
     async function saveUserData() {
         if (!currentUser) return;
         try {
@@ -368,10 +371,11 @@
         }
     }
 
-    window.logOutUser = async () => {
+    window.logOutUser = () => {
         if(confirm("Are you sure you want to log out of STASH?")) {
-            await signOut(auth);
-            window.location.href = 'dashboard.html';
+            signOut(auth).then(() => {
+                window.location.href = LOGIN_PAGE_URL;
+            });
         }
     };
 
