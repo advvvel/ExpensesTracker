@@ -295,11 +295,10 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-    // IMPORT FIRESTORE DATABASE HOOKS
     import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
     const firebaseConfig = {
-        apiKey: "AIzaSyDPz1BPnN7Xan09WgdA6UVKk9gjU0DGiKs", 
+        apiKey: "AIzaSyDPz1BPnN7Xan09WgdA6UVKk9gjU0DGIkS", // REAL WORKING KEY RESTORED
         authDomain: "stash-tracke.firebaseapp.com",
         projectId: "stash-tracke",
         storageBucket: "stash-tracke.firebasestorage.app",
@@ -310,7 +309,7 @@
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
-    const db = getFirestore(app); // Initialize Firestore
+    const db = getFirestore(app);
 
     let currentUser = null;
     let state = {
@@ -321,50 +320,51 @@
         history: []
     };
 
-    // FIXED PROTOCOL: FORCE SIGN OUT AND REDIRECT IF BROWSER WAS REFRESHED/RELOADED
+    // PROTOCOL: FORCE SIGN OUT AND REDIRECT IF BROWSER WAS REFRESHED/RELOADED
     const navigationEntry = performance.getEntriesByType("navigation")[0];
     if (navigationEntry && navigationEntry.type === "reload") {
         await signOut(auth);
         window.location.href = 'dashboard.html';
     } else {
-        // Normal routing protocol for standard entry/successful redirects
         onAuthStateChanged(auth, async (user) => {
             if (!user) {
                 window.location.href = 'dashboard.html';
             } else {
                 currentUser = user;
-                await loadUserData(user.uid); // Fetch user's persistent cloud database data
+                await loadUserData(user.uid);
                 document.body.style.opacity = '1';
             }
         });
     }
 
-    // DATABASE STORAGE ENGINE: LOAD HANDLER
+    // LOAD PROFILE FROM DATABASE WITH SAFETY DEFAULT CHECKS
     async function loadUserData(uid) {
         try {
             const docRef = doc(db, "users", uid);
             const docSnap = await getDoc(docRef);
             if (docSnap.exists()) {
                 state = docSnap.data();
+                // Ensure arrays exist so table rendering scripts don't break
+                state.buckets = state.buckets || [];
+                state.history = state.history || [];
             } else {
-                // If it's a completely new account, establish an empty architecture template
                 state = { total: 0, saved: 0, goal: 5000, buckets: [], history: [] };
                 await setDoc(docRef, state);
             }
             updateAllUI();
         } catch (e) {
-            console.error("Error loading user data from cloud storage: ", e);
+            alert("Database Load Error: " + e.message);
         }
     }
 
-    // DATABASE STORAGE ENGINE: AUTOSAVE ENGINE
+    // AUTOSAVE DATA MODIFICATIONS TO FIREBASE CLOUD STORAGE
     async function saveUserData() {
         if (!currentUser) return;
         try {
             const docRef = doc(db, "users", currentUser.uid);
             await setDoc(docRef, state);
         } catch (e) {
-            console.error("Error backing up application session data to cloud: ", e);
+            alert("Database Save Error: " + e.message);
         }
     }
 
