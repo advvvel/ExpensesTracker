@@ -6,7 +6,6 @@
     --border-light: #e0e0dc;
 }
 
-/* BASE CONFIGURATIONS */
 body {
     font-family: 'Inter', sans-serif;
     background-color: var(--bg-neutral);
@@ -17,7 +16,6 @@ body {
     justify-content: center;
 }
 
-/* APP VIEWPORTS & LAYOUT OVERRIDES */
 body.auth-body-layout {
     height: 100vh;
     padding: 0;
@@ -39,7 +37,7 @@ body.auth-body-layout {
     gap: 40px;
 }
 
-/* COLUMN 1: SIDEBAR NAVIGATION */
+/* SIDEBAR NAVIGATION */
 .nav-links { list-style: none; padding: 0; margin: 0; }
 .nav-links li {
     padding: 15px 20px;
@@ -60,7 +58,11 @@ body.auth-body-layout {
     border-left: 4px solid var(--text-main); 
 }
 
-/* COLUMN 2: CENTER PIECE VISUALS */
+/* PAGE CONTENT CONTROL */
+.page-content { display: none; }
+.page-content.active { display: block; }
+
+/* CENTER VISUALS */
 .circle-container { 
     display: flex; flex-direction: column; align-items: center; margin-bottom: 40px; 
 }
@@ -75,20 +77,18 @@ body.auth-body-layout {
 .main-circle span { font-size: 0.7rem; text-transform: uppercase; font-weight: 800; color: var(--text-muted); }
 .main-circle h2 { font-size: 2.5rem; margin: 5px 0; font-weight: 400; }
 
-/* REUSABLE STYLES: FORMS, TABLES & CARDS */
-.page-content { display: none; }
-.page-content.active { display: block; }
-
+/* TABLES */
 table { width: 100%; border-collapse: collapse; margin-top: 20px; }
 th { text-align: left; background: #ededeb; padding: 12px; font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); }
 td { padding: 15px; border-bottom: 1px solid var(--border-light); font-size: 0.9rem; }
 
+/* BUTTONS & INPUTS */
 .add-section { background: #f9f9f7; padding: 25px; border-radius: 15px; margin-top: 30px; }
 .btn-black { background: #1a1a1a; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: 600; transition: opacity 0.2s; }
 .btn-black:hover { opacity: 0.9; }
 input { padding: 12px; border: 1px solid var(--border-light); border-radius: 8px; margin-right: 10px; font-family: inherit; }
 
-/* AUTHENTICATION FRAMEWORK ONLY */
+/* AUTHENTICATION SCREEN STYLES */
 .auth-card {
     width: 100%;
     max-width: 400px;
@@ -113,7 +113,7 @@ input { padding: 12px; border: 1px solid var(--border-light); border-radius: 8px
 .toggle-link { text-align: center; margin-top: 25px; font-size: 0.85rem; color: var(--text-muted); }
 .toggle-link span { color: #1a1a1a; text-decoration: underline; cursor: pointer; font-weight: 600; }
 
-/* COLUMN 3: RIGHT SIDEBAR & UTILITIES */
+/* RIGHT PANEL PANEL COMPONENT */
 .right-sidebar-column {
     display: flex;
     flex-direction: column;

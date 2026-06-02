@@ -226,6 +226,7 @@
 
     let statsChartInstance = null;
 
+    // Fixed path setup mapping back to your standalone authentication view file
     const AUTH_LOGIN_FILE = 'dashboard.html'; 
 
     onAuthStateChanged(auth, async (user) => {
@@ -496,6 +497,80 @@
         document.getElementById('tax-bracket-select').value = '';
     }
 
-    // FUNCTION ATTACHMENT: NEW RENDER GRAPH INSTANCE FOR STATS 
     function renderStatsChart() {
-        const ctx
+        const ctx = document.getElementById('statsChart').getContext('2d');
+        if (statsChartInstance) {
+            statsChartInstance.destroy();
+        }
+        statsChartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Available', 'Saved'],
+                datasets: [{
+                    data: [state.total, state.saved],
+                    backgroundColor: ['#1a1a1a', '#757575'],
+                    borderRadius: 6,
+                    borderWidth: 0,
+                    barThickness: 24
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: '#e0e0dc' }, ticks: { font: { size: 10 } } },
+                    x: { grid: { display: false }, ticks: { font: { size: 11, weight: '600' } } }
+                }
+            }
+        });
+    }
+
+    function updateAllUI() {
+        document.getElementById('display-total').innerText = '$' + state.total.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        document.getElementById('saved-text').innerText = '$' + state.saved.toLocaleString(undefined, {minimumFractionDigits: 0});
+        document.getElementById('goal-text').innerText = '$' + state.goal.toLocaleString(undefined, {minimumFractionDigits: 0});
+
+        let pct = state.goal > 0 ? (state.saved / state.goal) * 100 : 0;
+        document.getElementById('savings-progress').style.width = Math.min(pct, 100) + '%';
+
+        const tbody = document.getElementById('expense-table-body');
+        if (tbody) {
+            tbody.innerHTML = '';
+            state.history.filter(item => item.type === 'Expense').forEach(item => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>📉 Expense</td><td>${item.name}</td><td>$${item.amount.toFixed(2)}</td><td>${item.date}</td><td>-</td>`;
+                tbody.appendChild(tr);
+            });
+        }
+
+        let totalBucketAllocations = state.buckets.reduce((acc, b) => acc + b.amount, 0);
+        const leftOverPool = state.saved; 
+        const poolEl = document.getElementById('bucket-pool-available');
+        if (poolEl) poolEl.innerText = leftOverPool.toLocaleString(undefined, {minimumFractionDigits: 2});
+
+        const bucketsTbody = document.getElementById('buckets-table-body');
+        if (bucketsTbody) {
+            bucketsTbody.innerHTML = '';
+            state.buckets.forEach(b => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>📂 ${b.name}</td><td><strong>$${b.amount.toLocaleString()}</strong></td><td><button class="action-btn" onclick="deleteSavingsBucket(${b.id})">Release Allocation</button></td>`;
+                bucketsTbody.appendChild(tr);
+            });
+        }
+
+        const reportBody = document.getElementById('report-log-body');
+        if (reportBody) {
+            reportBody.innerHTML = '';
+            state.history.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${item.type} - ${item.name}</td><td>$${item.amount.toLocaleString()}</td><td>${item.date}</td><td>-</td>`;
+                reportBody.appendChild(tr);
+            });
+        }
+
+        renderStatsChart();
+    }
+</script>
+</body>
+</html>
