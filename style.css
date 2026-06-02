@@ -1,5 +1,5 @@
 /* ==========================================================================
-   1. GLOBAL VARIABLES & CONFIGURATION (Your Exact Theme)
+   1. GLOBAL ARCHITECTURE (The Exact Backdrop From Your Screenshot)
    ========================================================================== */
 :root {
     --bg-neutral: #f4f4f2;
@@ -14,127 +14,30 @@ body {
     background-color: var(--bg-neutral);
     color: var(--text-main);
     margin: 0;
-    padding: 40px;
-    display: flex;
-    justify-content: center;
-}
-
-/* ==========================================================================
-   2. AUTHENTICATION MODULE STYLES (Sign In / Sign Up)
-   ========================================================================== */
-.auth-wrapper-override {
-    height: 100vh;
-    align-items: center;
-    padding: 0;
-}
-
-.auth-card {
-    width: 100%;
-    max-width: 400px;
-    background: var(--card-white);
-    border-radius: 24px;
-    padding: 45px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+    padding: 60px 40px;
     box-sizing: border-box;
 }
 
-.auth-card-opacity-trigger {
-    opacity: 0; 
-    transition: opacity 0.2s ease-in-out;
-}
-
-h1 { 
-    font-size: 2rem; 
-    margin: 0 0 5px 0; 
-    letter-spacing: 1px; 
-    text-align: center; 
-    font-weight: 700; 
-}
-
-p.subtitle { 
-    text-align: center; 
-    color: var(--text-muted); 
-    font-size: 0.9rem; 
-    margin: 0 0 35px 0; 
-}
-
-.form-group { 
-    margin-bottom: 22px; 
-}
-
-.form-group label { 
-    display: block; 
-    margin-bottom: 8px; 
-    font-weight: 600; 
-    font-size: 0.85rem; 
-}
-
-.form-group input { 
-    width: 100%; 
-    padding: 12px 14px; 
-    border: 1px solid var(--border-light); 
-    border-radius: 8px; 
-    font-family: inherit; 
-    box-sizing: border-box; 
-    font-size: 0.95rem;
-    background: #fafaf9;
-}
-
-.form-group input:focus { 
-    outline: none; 
-    border-color: var(--text-main); 
-    background: #fff; 
-}
-
-.remember-me-container { 
-    display: flex; 
-    align-items: center; 
-    gap: 8px; 
-    margin-bottom: 25px; 
-    font-size: 0.9rem; 
-}
-
-.remember-me-container input { 
-    cursor: pointer; 
-    width: 16px; 
-    height: 16px; 
-    margin: 0; 
-}
-
-.toggle-link { 
-    text-align: center; 
-    margin-top: 25px; 
-    font-size: 0.85rem; 
-    color: var(--text-muted); 
-}
-
-.toggle-link span { 
-    color: #1a1a1a; 
-    text-decoration: underline; 
-    cursor: pointer; 
-    font-weight: 600; 
-}
-
-/* ==========================================================================
-   3. APP DASHBOARD CORE STRUCTURE (Your Main Workspace)
-   ========================================================================== */
-.container {
-    width: 100%;
-    max-width: 1200px;
-    background: var(--card-white);
-    border-radius: 24px;
-    padding: 50px;
-    min-height: 80vh;
-    box-sizing: border-box;
-}
-
+/* Three-Column Application Grid View */
 .dashboard-layout {
     display: grid;
-    grid-template-columns: 220px 1fr 320px;
-    gap: 40px;
+    grid-template-columns: 240px 1fr 340px;
+    gap: 48px;
+    max-width: 1440px;
+    margin: 0 auto;
+    align-items: start;
 }
 
-/* SIDEBAR NAVIGATION */
+/* ==========================================================================
+   2. COLUMN 1: LEFT SIDEBAR NAVIGATION ("Folders on the side")
+   ========================================================================== */
+.sidebar-container h1 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin: 0 0 32px 20px;
+    letter-spacing: -0.02em;
+}
+
 .nav-links { 
     list-style: none; 
     padding: 0; 
@@ -142,187 +45,29 @@ p.subtitle {
 }
 
 .nav-links li {
-    padding: 15px 20px;
+    padding: 14px 20px;
     font-weight: 600;
     color: var(--text-muted);
     cursor: pointer;
-    transition: 0.2s;
-    border-radius: 8px;
-    margin-bottom: 5px;
+    transition: all 0.2s;
+    border-radius: 12px;
+    margin-bottom: 6px;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
 }
 
 .nav-links li:hover { 
-    background: #f0f0ee; 
+    background: #e8e8e6; 
     color: var(--text-main); 
 }
 
+/* Light gray pill with the sharp left border marker */
 .nav-links li.active { 
     color: var(--text-main); 
-    background: #f0f0ee;
+    background: #e8e8e6;
     border-left: 4px solid var(--text-main); 
-    border-radius: 0 8px 8px 0;
-}
-
-/* PAGE CONTENT CONTROL */
-.page-content { 
-    display: none; 
-}
-
-.page-content.active { 
-    display: block; 
-}
-
-/* CENTER VISUAL BALANCES */
-.circle-container { 
-    display: flex; 
-    flex-direction: column; 
-    align-items: center; 
-    margin-bottom: 40px; 
-}
-
-.main-circle {
-    width: 280px; 
-    height: 280px;
-    border: 12px solid var(--text-main);
-    border-radius: 50%;
-    display: flex; 
-    flex-direction: column;
-    justify-content: center; 
-    align-items: center;
-    margin-bottom: 30px;
-    box-sizing: border-box;
-}
-
-.main-circle span { 
-    font-size: 0.7rem; 
-    text-transform: uppercase; 
-    font-weight: 800; 
-    color: var(--text-muted); 
-}
-
-.main-circle h2 { 
-    font-size: 2.5rem; 
-    margin: 5px 0; 
-    font-weight: 400; 
-}
-
-/* DATA INTERFACE TABLES */
-table { 
-    width: 100%; 
-    border-collapse: collapse; 
-    margin-top: 20px; 
-}
-
-th { 
-    text-align: left; 
-    background: #ededeb; 
-    padding: 12px; 
-    font-size: 0.75rem; 
-    text-transform: uppercase; 
-    color: var(--text-muted); 
-}
-
-td { 
-    padding: 15px; 
-    border-bottom: 1px solid var(--border-light); 
-    font-size: 0.9rem; 
-}
-
-/* ELEMENT ACTION COMPONENT CONTROLS */
-.add-section { 
-    background: #f9f9f7; 
-    padding: 25px; 
-    border-radius: 15px; 
-    margin-top: 30px; 
-}
-
-.btn-black { 
-    background: #1a1a1a; 
-    color: white; 
-    border: none; 
-    padding: 12px 24px; 
-    border-radius: 8px; 
-    cursor: pointer; 
-    font-weight: 600; 
-    font-size: 1rem;
-    transition: opacity 0.2s;
-}
-
-.btn-black:hover { 
-    opacity: 0.9; 
-}
-
-input { 
-    padding: 12px; 
-    border: 1px solid var(--border-light); 
-    border-radius: 8px; 
-    margin-right: 10px; 
-    font-family: inherit; 
-}
-
-.action-btn { 
-    color: #cc0000; 
-    text-decoration: underline; 
-    cursor: pointer; 
-    font-size: 0.8rem; 
-    border: none; 
-    background: none; 
-}
-
-/* RIGHT PANEL SAVINGS FRAMEWORKS */
-.savings-card { 
-    background: #ededeb; 
-    padding: 30px; 
-    border-radius: 20px; 
-    align-self: start; 
-    box-sizing: border-box;
-}
-
-.savings-bar { 
-    background: white; 
-    height: 12px; 
-    border-radius: 10px; 
-    margin: 15px 0; 
-    position: relative; 
-    overflow: hidden; 
-}
-
-#savings-progress { 
-    background: #1a1a1a; 
-    height: 100%; 
-    width: 0%; 
-    transition: 0.3s; 
-}
-
-/* FINANCIAL PREFERENCES EXTENSIONS */
-select { 
-    padding: 12px; 
-    border: 1px solid var(--border-light); 
-    border-radius: 8px; 
-    margin-right: 10px; 
-    font-family: inherit; 
-    font-size: 0.9rem; 
-    background: white; 
-}
-
-.tax-toggle-buttons { 
-    display: flex; 
-    gap: 10px; 
-    margin-bottom: 20px; 
-    background: #f9f9f7; 
-    padding: 15px; 
-    border-radius: 12px; 
-}
-
-.tax-option-container { 
-    background: #f9f9f7; 
-    padding: 25px; 
-    border-radius: 15px; 
-    border: 1px solid var(--border-light); 
-    margin-top: 15px; 
+    border-radius: 4px 12px 12px 4px;
 }
 
 .logout-btn { 
@@ -331,84 +76,211 @@ select {
     color: var(--text-muted); 
     font-weight: 600; 
     cursor: pointer; 
-    padding: 15px 20px; 
+    padding: 14px 20px; 
     width: 100%; 
     text-align: left; 
     display: flex; 
     align-items: center; 
-    gap: 10px; 
-    margin-top: 30px; 
-    border-radius: 8px; 
+    gap: 12px; 
+    margin-top: 40px; 
+    border-radius: 12px; 
     font-family: inherit; 
     font-size: 1rem;
 }
+.logout-btn:hover { background: #e8e8e6; color: #cc0000; }
 
-.logout-btn:hover { 
-    background: #f0f0ee; 
-    color: #cc0000; 
+/* ==========================================================================
+   3. COLUMN 2: CENTER VIEWPORT (The Visual Funds Display)
+   ========================================================================== */
+.main-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 48px;
+}
+
+.circle-container { 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+}
+
+.main-circle {
+    width: 320px; 
+    height: 320px;
+    border: 12px solid var(--text-main);
+    border-radius: 50%;
+    display: flex; 
+    flex-direction: column;
+    justify-content: center; 
+    align-items: center;
+    background: transparent;
+    box-sizing: border-box;
+}
+
+.main-circle span { 
+    font-size: 0.75rem; 
+    text-transform: uppercase; 
+    font-weight: 800; 
+    color: var(--text-muted); 
+    letter-spacing: 0.05em;
+}
+
+.main-circle h2 { 
+    font-size: 3.5rem; 
+    margin: 8px 0 0 0; 
+    font-weight: 500; 
+    letter-spacing: -0.02em;
+}
+
+/* Page Control Layout Segments (Hides inactive views so they aren't all on screen) */
+.page-content { 
+    display: none; 
+    width: 100%;
+    max-width: 440px;
+}
+.page-content.active { 
+    display: block; 
+}
+
+.add-section { 
+    text-align: left;
+    width: 100%;
+}
+
+.add-section h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 0 0 16px 0;
+}
+
+/* Inline execution fields */
+.form-inline {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+}
+
+.form-inline input { 
+    flex: 1;
+    padding: 12px 16px; 
+    border: 1px solid var(--border-light); 
+    border-radius: 10px; 
+    font-family: inherit;
+    font-size: 1rem;
+    background: var(--card-white);
+    box-sizing: border-box;
+}
+.form-inline input:focus { outline: none; border-color: var(--text-main); }
+
+/* Buttons */
+.btn-black { 
+    background: #121212; 
+    color: white; 
+    border: none; 
+    padding: 0 24px; 
+    height: 48px;
+    border-radius: 10px; 
+    cursor: pointer; 
+    font-weight: 600; 
+    font-size: 0.95rem;
+    white-space: nowrap;
+}
+.btn-black:hover { opacity: 0.9; }
+
+.btn-white {
+    width: 100%;
+    background: var(--card-white);
+    color: var(--text-main);
+    border: 1px solid var(--border-light);
+    padding: 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-bottom: 12px;
+}
+
+/* Data Tables */
+.table-container {
+    width: 100%;
+    margin-top: 20px;
+}
+table { width: 100%; border-collapse: collapse; }
+th { text-align: left; background: #ededeb; padding: 12px; font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); }
+td { padding: 15px; border-bottom: 1px solid var(--border-light); font-size: 0.9rem; }
+.action-btn { color: #cc0000; text-decoration: underline; cursor: pointer; font-size: 0.8rem; border: none; background: none; }
+
+/* ==========================================================================
+   4. COLUMN 3: RIGHT SIDEBAR (The Gray Savings Card Layout)
+   ========================================================================== */
+.savings-card { 
+    background: #ededeb; 
+    padding: 32px 24px; 
+    border-radius: 24px; 
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.savings-card h3 {
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: var(--text-main);
+    margin: 0 0 24px 0;
+    letter-spacing: 0.05em;
+}
+
+.card-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+.card-row span:first-child { color: #444444; font-size: 1rem; }
+.card-row span:last-child { font-weight: 700; font-size: 1.2rem; }
+
+.savings-bar { 
+    background: var(--card-white); 
+    height: 12px; 
+    border-radius: 10px; 
+    margin: 20px 0 28px 0; 
+    position: relative; 
+    overflow: hidden; 
+}
+#savings-progress { 
+    background: var(--text-main); 
+    height: 100%; 
+    width: 0%; 
+    transition: width 0.3s ease; 
 }
 
 /* ==========================================================================
-   4. HIDDEN IPHONE RESPONSIVE LAYER (Only activities on small viewports)
+   5. AUTOMATIC IPHONE ADAPTATION TRACER (Strict Screen Scaling)
    ========================================================================== */
-@media (max-width: 1024px) {
-    body {
-        padding: 16px;
-    }
+@media (max-width: 960px) {
+    body { padding: 24px 16px; }
     
-    .container {
-        padding: 24px;
-    }
-
     .dashboard-layout {
-        grid-template-columns: 1fr; /* Stacks column grids logically downward */
-        gap: 32px;
+        grid-template-columns: 1fr;
+        gap: 40px;
     }
 
-    /* Slides standard sidebar list links into a horizontal top dashboard tray */
+    .sidebar-container h1 { margin: 0 0 20px 0; text-align: center; }
+
     .nav-links {
         display: flex;
         overflow-x: auto;
         white-space: nowrap;
-        padding-bottom: 8px;
+        padding-bottom: 12px;
         gap: 8px;
         border-bottom: 1px solid var(--border-light);
     }
 
-    .nav-links li {
-        margin-bottom: 0;
-        padding: 10px 16px;
-    }
+    .nav-links li { margin-bottom: 0; padding: 10px 16px; }
+    .nav-links li.active { border-left: none; border-bottom: 4px solid var(--text-main); border-radius: 0; }
+    .logout-btn { display: none; }
 
-    .nav-links li.active {
-        border-left: none;
-        border-bottom: 4px solid var(--text-main);
-        border-radius: 0;
-    }
-
-    /* Force interactive entry components to display fully on compact width displays */
-    .add-section input, 
-    .add-section select,
-    .add-section button {
-        width: 100%;
-        margin-bottom: 12px;
-        margin-right: 0;
-        box-sizing: border-box;
-    }
-
-    .add-section button,
-    .btn-black {
-        padding: 14px;
-    }
-
-    .savings-card {
-        width: 100%;
-    }
-
-    /* Standard responsive tables adjustment for scrolling without clipping text container edges */
-    .table-wrapper {
-        width: 100%;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-    }
+    .form-inline { flex-direction: column; gap: 12px; }
+    .form-inline input, .btn-black { width: 100%; }
 }
