@@ -121,6 +121,8 @@
                 <li id="nav-overview" class="active" onclick="navigateTo('overview')">🏠 Overview</li>
                 <li id="nav-income" onclick="navigateTo('income')">💵 Income</li>
                 <li id="nav-savings" onclick="navigateTo('savings')">🏦 Savings</li>
+                <li id="nav-buckets" onclick="navigateTo('buckets')">📁 Savings Buckets</li>
+                <li id="nav-interest" onclick="navigateTo('interest')">📈 Interest Tracker</li>
                 <li id="nav-tax" onclick="navigateTo('tax')">📊 Tax Calculator</li>
                 <li id="nav-reports" onclick="navigateTo('reports')">📊 Reports</li>
             </ul>
@@ -168,6 +170,60 @@
                     <button class="btn-black" onclick="updateSavedValue()">Update Saved</button>
                 </div>
                 <p style="font-size: 0.85rem; color: var(--text-muted);">*Manual updates here do not affect your Total Available Funds circle.</p>
+            </div>
+
+            <div id="page-buckets" class="page-content">
+                <h3>Custom Savings Buckets</h3>
+                <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 20px;">
+                    Partition your savings into clear segments. Creating a bucket draws money directly away from your unallocated main savings pool ($<span id="bucket-pool-available">0.00</span> left available).
+                </p>
+                <table>
+                    <thead><tr><th>Bucket Partition Target</th><th>Allocated Share</th><th>Management</th></tr></thead>
+                    <tbody id="buckets-table-body"></tbody>
+                </table>
+                <div class="add-section">
+                    <input type="text" id="new-bucket-name" placeholder="Bucket Name (e.g. Car Fund)">
+                    <input type="number" id="new-bucket-amount" placeholder="$ Allocation Amount">
+                    <button class="btn-black" onclick="createSavingsBucket()">Allocate Bucket</button>
+                </div>
+            </div>
+
+            <div id="page-interest" class="page-content">
+                <h3>Interest Growth Setup</h3>
+                <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 20px;">Select your preferred interest calculation framework below:</p>
+                
+                <div class="tax-toggle-buttons">
+                    <button class="btn-black" id="btn-show-interest-calc" style="background:#1a1a1a;" onclick="toggleInterestView('calc')">Calculation via APY</button>
+                    <button class="btn-black" id="btn-show-interest-manual" style="background:#757575;" onclick="toggleInterestView('manual')">Input Custom Interest Amount</button>
+                </div>
+
+                <div id="interest-calc-area" class="tax-option-container">
+                    <div style="margin-bottom: 15px;">
+                        <label style="display:block; margin-bottom:8px;"><strong>Annual Percentage Yield (APY %):</strong></label>
+                        <input type="number" id="interest-rate-input" placeholder="e.g. 4.5" step="0.1" value="4.5">
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <label style="display:block; margin-bottom:8px;"><strong>Compounding Cycle Period:</strong></label>
+                        <select id="interest-period-select">
+                            <option value="12">Monthly Yield Distribution (1/12 APY)</option>
+                            <option value="1">Full Annual Yield Distribution (100% APY)</option>
+                        </select>
+                    </div>
+                    <button class="btn-black" onclick="runInterestCalculation()">Calculate Interest</button>
+                </div>
+
+                <div id="interest-manual-area" class="tax-option-container" style="display:none;">
+                    <label style="display:block; margin-bottom:10px;"><strong>Input structural dollar sum you wish to apply as interest:</strong></label>
+                    <input type="number" id="interest-manual-input" placeholder="$ Interest Amount">
+                    <button class="btn-black" onclick="runManualInterestCalculation()">Calculate Fixed Sum</button>
+                </div>
+
+                <div id="interest-decision-box" style="display:none; margin-top:20px; padding:15px; background:#ededeb; border-radius:8px;">
+                    <p id="interest-output-msg" style="margin:0 0 15px 0; font-size:0.9rem; line-height:1.4;"></p>
+                    <p style="margin:0 0 15px 0; font-weight:700; font-size:0.9rem; color:#1a1a1a;">Does this look good and do you want to apply it?</p>
+                    <button class="btn-black" onclick="commitInterestYield()">Apply Interest</button>
+                    <button class="btn-black" style="background:#757575;" onclick="clearInterestSimulationView()">Skip</button>
+                </div>
             </div>
 
             <div id="page-tax" class="page-content">
@@ -237,7 +293,7 @@
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
     const firebaseConfig = {
-        apiKey: "AIzaSyDPz1BPnN7Xan09WgdA6UVKk9gjU0DGiKs", // FIXED TYPO HERE
+        apiKey: "AIzaSyDPz1BPnN7Xan09WgdA6UVKk9gjU0DGIkS",
         authDomain: "stash-tracke.firebaseapp.com",
         projectId: "stash-tracke",
         storageBucket: "stash-tracke.firebasestorage.app",
@@ -266,10 +322,13 @@
         total: 0,
         saved: 0,
         goal: 5000,
+        buckets: [],
         history: []
     };
 
     let computedTaxSum = 0;
+    let computedInterestSum = 0;
+    let interestContextLabel = '';
 
     window.navigateTo = function(pageId) {
         document.querySelectorAll('.nav-links li').forEach(li => li.classList.remove('active'));
@@ -329,6 +388,106 @@
             updateAllUI();
             document.getElementById('new-saved-input').value = '';
         }
+    }
+
+    /* CUSTOM SAVINGS BUCKET ALLOCATION MATRIX */
+    window.createSavingsBucket = function() {
+        const name = document.getElementById('new-bucket-name').value.trim();
+        const amt = parseFloat(document.getElementById('new-bucket-amount').value);
+
+        if(!name || isNaN(amt) || amt <= 0) {
+            alert("Please input a structural name and positive dollar share amount.");
+            return;
+        }
+        if(amt > state.saved) {
+            alert("Insufficient pool balance. You cannot allocate more than your general Saved pool threshold.");
+            return;
+        }
+
+        state.saved -= amt; 
+        state.buckets.push({ id: Date.now(), name: name, amount: amt });
+        state.history.unshift({ id: Date.now(), type: 'ManualUpdate', name: `Created Savings Bucket: ${name}`, amount: amt, date: new Date().toLocaleDateString() });
+        
+        document.getElementById('new-bucket-name').value = '';
+        document.getElementById('new-bucket-amount').value = '';
+        updateAllUI();
+    }
+
+    window.deleteSavingsBucket = function(id) {
+        const targetBucket = state.buckets.find(b => b.id === id);
+        if(targetBucket) {
+            state.saved += targetBucket.amount; 
+            state.history.unshift({ id: Date.now(), type: 'ManualUpdate', name: `Dissolved Bucket Refund: ${targetBucket.name}`, amount: targetBucket.amount, date: new Date().toLocaleDateString() });
+            state.buckets = state.buckets.filter(b => b.id !== id);
+            updateAllUI();
+        }
+    }
+
+    /* SYSTEM INTERMEDIARY INTEREST CONTROLLER MODULE */
+    window.toggleInterestView = function(view) {
+        document.getElementById('interest-decision-box').style.display = 'none';
+        if(view === 'calc') {
+            document.getElementById('btn-show-interest-calc').style.background = '#1a1a1a';
+            document.getElementById('btn-show-interest-manual').style.background = '#757575';
+            document.getElementById('interest-calc-area').style.display = 'block';
+            document.getElementById('interest-manual-area').style.display = 'none';
+        } else {
+            document.getElementById('btn-show-interest-calc').style.background = '#757575';
+            document.getElementById('btn-show-interest-manual').style.background = '#1a1a1a';
+            document.getElementById('interest-calc-area').style.display = 'none';
+            document.getElementById('interest-manual-area').style.display = 'block';
+        }
+    }
+
+    window.runInterestCalculation = function() {
+        const apy = parseFloat(document.getElementById('interest-rate-input').value);
+        const cycle = parseInt(document.getElementById('interest-period-select').value);
+
+        if(isNaN(apy) || apy <= 0) {
+            alert("Please assign a valid interest asset rate percentage.");
+            return;
+        }
+        if(state.saved <= 0) {
+            alert("Your snapshot savings yield pool calculation is currently sitting at $0.00.");
+            return;
+        }
+
+        const frequencyRate = (apy / 100) / cycle;
+        computedInterestSum = state.saved * frequencyRate;
+        const layoutText = cycle === 12 ? 'Monthly' : 'Annual';
+        interestContextLabel = `${layoutText} Interest Accumulation (${apy}% APY)`;
+
+        document.getElementById('interest-output-msg').innerHTML = `Calculated Earnings: <strong>$${computedInterestSum.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong> via ${layoutText} compound parameters.`;
+        document.getElementById('interest-decision-box').style.display = 'block';
+    }
+
+    window.runManualInterestCalculation = function() {
+        const manualVal = parseFloat(document.getElementById('interest-manual-input').value);
+        if(!isNaN(manualVal) && manualVal > 0) {
+            computedInterestSum = manualVal;
+            interestContextLabel = 'Manual Interest Adjustment Entry';
+            document.getElementById('interest-output-msg').innerHTML = `Calculated Earnings: <strong>$${computedInterestSum.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong> via custom allocation injection.`;
+            document.getElementById('interest-decision-box').style.display = 'block';
+        } else {
+            alert("Please supply a valid absolute structural cash value.");
+        }
+    }
+
+    window.commitInterestYield = function() {
+        if(computedInterestSum > 0) {
+            state.saved += computedInterestSum;
+            state.history.unshift({ id: Date.now(), type: 'Deposit', name: interestContextLabel, amount: parseFloat(computedInterestSum.toFixed(2)), date: new Date().toLocaleDateString() });
+            updateAllUI();
+            alert(`Interest execution confirmed! Applied $${computedInterestSum.toFixed(2)} directly onto savings.`);
+        }
+        clearInterestSimulationView();
+    }
+
+    window.clearInterestSimulationView = function() {
+        document.getElementById('interest-manual-input').value = '';
+        document.getElementById('interest-decision-box').style.display = 'none';
+        computedInterestSum = 0;
+        interestContextLabel = '';
     }
 
     window.toggleTaxView = function(view) {
@@ -401,9 +560,9 @@
     }
 
     function updateAllUI() {
-        document.getElementById('display-total').innerText = "$" + state.total.toLocaleString();
-        document.getElementById('goal-text').innerText = "$" + state.goal.toLocaleString();
-        document.getElementById('saved-text').innerText = "$" + state.saved.toLocaleString();
+        document.getElementById('display-total').innerText = "$" + state.total.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        document.getElementById('goal-text').innerText = "$" + state.goal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        document.getElementById('saved-text').innerText = "$" + state.saved.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
         
         let progress = 0;
         if (state.goal > 0 && state.saved >= 0) {
@@ -411,12 +570,28 @@
         }
         document.getElementById('savings-progress').style.width = Math.min(progress, 100) + "%";
 
+        // Render Buckets Matrix Table
+        const bucketsTable = document.getElementById('buckets-table-body');
+        if(bucketsTable) {
+            bucketsTable.innerHTML = (state.buckets || []).map(b => `
+                <tr>
+                    <td><strong>${b.name}</strong></td>
+                    <td>$${b.amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                    <td><button class="action-btn" onclick="deleteSavingsBucket(${b.id})">Dissolve Pool</button></td>
+                </tr>
+            `).join('');
+        }
+        const poolSpan = document.getElementById('bucket-pool-available');
+        if(poolSpan) {
+            poolSpan.innerText = state.saved.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        }
+
         const expenseTable = document.getElementById('expense-table-body');
         expenseTable.innerHTML = state.history.filter(h => h.type === 'Expense').map(h => `
             <tr>
                 <td>${h.name}</td>
                 <td>Variable</td>
-                <td>$${h.amount.toLocaleString()}</td>
+                <td>$${h.amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
                 <td>${h.date}</td>
                 <td><button class="action-btn" onclick="deleteAction(${h.id})">Delete</button></td>
             </tr>
@@ -426,7 +601,7 @@
         reportTable.innerHTML = state.history.map(h => `
             <tr>
                 <td>${h.name}</td>
-                <td>$${h.amount.toLocaleString()}</td>
+                <td>$${h.amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
                 <td>${h.date}</td>
                 <td><button class="action-btn" onclick="deleteAction(${h.id})">Delete</button></td>
             </tr>
