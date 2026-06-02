@@ -1,237 +1,414 @@
 /* ==========================================================================
-   1. ORIGINAL STASH DESKTOP DESIGN (Restored Exactly from Your Screenshot)
+   1. GLOBAL VARIABLES & CONFIGURATION (Your Exact Theme)
    ========================================================================== */
+:root {
+    --bg-neutral: #f4f4f2;
+    --card-white: #ffffff;
+    --text-main: #1a1a1a;
+    --text-muted: #757575;
+    --border-light: #e0e0dc;
+}
+
 body {
-    background-color: #f4f4f4; /* Clean off-white background */
-    color: #000000;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-neutral);
+    color: var(--text-main);
     margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-/* Your exact 3-column layout structure */
-.dashboard-layout {
-    display: grid;
-    grid-template-columns: 240px 1fr 360px;
-    gap: 40px;
-    padding: 60px 40px;
-    max-width: 1600px;
-    margin: 0 auto;
-    align-items: start;
-}
-
-/* Left Sidebar Folders & Navigation */
-.sidebar-nav {
+    padding: 40px;
     display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.sidebar-nav h1 {
-    font-size: 1.5rem;
-    font-weight: 900;
-    margin: 0 0 40px 0;
-    letter-spacing: -0.03em;
-}
-
-.nav-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    background: transparent;
-    border: none;
-    color: #7e8b9b; /* Muted gray text from image */
-    padding: 14px 24px;
-    font-size: 1.05rem;
-    font-weight: 600;
-    text-align: left;
-    cursor: pointer;
-    border-radius: 12px;
-    transition: all 0.15s ease;
-}
-
-/* Your exact light gray pill with the left accent line */
-.nav-item.active {
-    background-color: #eaeaea; 
-    color: #000000;
-    font-weight: 700;
-    border-left: 5px solid #000000;
-    border-radius: 4px 12px 12px 4px;
-}
-
-/* Center Column: Total Available Funds Circle */
-.main-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
     justify-content: center;
-    gap: 60px;
-}
-
-.funds-circle {
-    width: 340px;
-    height: 340px;
-    border: 9px solid #000000; /* Bold black outer circle */
-    border-radius: 50%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: transparent;
-}
-
-.funds-circle span {
-    font-size: 0.75rem;
-    font-weight: 800;
-    color: #7e8b9b;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-}
-
-.funds-circle h2 {
-    font-size: 4rem; /* Giant dynamic funds text */
-    font-weight: 400;
-    margin: 4px 0 0 0;
-    letter-spacing: -0.03em;
-}
-
-/* Deposit Form Section at Bottom Center */
-.deposit-container {
-    text-align: left;
-    width: 100%;
-    max-width: 420px;
-}
-
-.deposit-container h3 {
-    font-size: 1.3rem;
-    font-weight: 700;
-    margin: 0 0 16px 0;
-}
-
-.form-inline {
-    display: flex;
-    gap: 12px;
-}
-
-.form-inline input {
-    flex: 1;
-    height: 48px;
-    border: 1px solid #dcdcdc;
-    border-radius: 12px;
-    padding: 0 16px;
-    font-size: 1rem;
-    background: #ffffff;
-}
-
-/* Right Sidebar: Savings Snapshot Card */
-.metric-card {
-    background-color: #eaeaea; /* Rounded gray container block */
-    border-radius: 24px;
-    padding: 32px;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-.metric-card h3 {
-    font-size: 0.75rem;
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin: 0 0 24px 0;
-}
-
-.goal-row, .saved-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
-    font-size: 1.1rem;
-}
-
-.goal-row span:first-child, .saved-row span:first-child {
-    color: #555555;
-}
-
-.goal-row span:last-child, .saved-row span:last-child {
-    font-weight: 800;
-    font-size: 1.3rem;
-}
-
-/* Your bold, thick black progress line */
-.progress-bar-bg {
-    width: 100%;
-    height: 14px;
-    background-color: #1a1a1a;
-    border-radius: 7px;
-    margin: 20px 0 32px 0;
-}
-
-/* Premium Custom Buttons */
-.btn-white {
-    width: 100%;
-    height: 48px;
-    background-color: #ffffff;
-    color: #000000;
-    border: 1px solid #e0e0e0;
-    border-radius: 12px;
-    font-size: 0.95rem;
-    font-weight: 700;
-    cursor: pointer;
-    margin-bottom: 12px;
-}
-
-.btn-black {
-    width: 100%;
-    height: 48px;
-    background-color: #141414;
-    color: #ffffff;
-    border: none;
-    border-radius: 12px;
-    font-size: 0.95rem;
-    font-weight: 700;
-    cursor: pointer;
 }
 
 /* ==========================================================================
-   2. HIDDEN IPHONE ENGINE (Only acts when screen scales down to a phone)
+   2. AUTHENTICATION MODULE STYLES (Sign In / Sign Up)
    ========================================================================== */
-@media (max-width: 960px) {
+.auth-wrapper-override {
+    height: 100vh;
+    align-items: center;
+    padding: 0;
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 400px;
+    background: var(--card-white);
+    border-radius: 24px;
+    padding: 45px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+    box-sizing: border-box;
+}
+
+.auth-card-opacity-trigger {
+    opacity: 0; 
+    transition: opacity 0.2s ease-in-out;
+}
+
+h1 { 
+    font-size: 2rem; 
+    margin: 0 0 5px 0; 
+    letter-spacing: 1px; 
+    text-align: center; 
+    font-weight: 700; 
+}
+
+p.subtitle { 
+    text-align: center; 
+    color: var(--text-muted); 
+    font-size: 0.9rem; 
+    margin: 0 0 35px 0; 
+}
+
+.form-group { 
+    margin-bottom: 22px; 
+}
+
+.form-group label { 
+    display: block; 
+    margin-bottom: 8px; 
+    font-weight: 600; 
+    font-size: 0.85rem; 
+}
+
+.form-group input { 
+    width: 100%; 
+    padding: 12px 14px; 
+    border: 1px solid var(--border-light); 
+    border-radius: 8px; 
+    font-family: inherit; 
+    box-sizing: border-box; 
+    font-size: 0.95rem;
+    background: #fafaf9;
+}
+
+.form-group input:focus { 
+    outline: none; 
+    border-color: var(--text-main); 
+    background: #fff; 
+}
+
+.remember-me-container { 
+    display: flex; 
+    align-items: center; 
+    gap: 8px; 
+    margin-bottom: 25px; 
+    font-size: 0.9rem; 
+}
+
+.remember-me-container input { 
+    cursor: pointer; 
+    width: 16px; 
+    height: 16px; 
+    margin: 0; 
+}
+
+.toggle-link { 
+    text-align: center; 
+    margin-top: 25px; 
+    font-size: 0.85rem; 
+    color: var(--text-muted); 
+}
+
+.toggle-link span { 
+    color: #1a1a1a; 
+    text-decoration: underline; 
+    cursor: pointer; 
+    font-weight: 600; 
+}
+
+/* ==========================================================================
+   3. APP DASHBOARD CORE STRUCTURE (Your Main Workspace)
+   ========================================================================== */
+.container {
+    width: 100%;
+    max-width: 1200px;
+    background: var(--card-white);
+    border-radius: 24px;
+    padding: 50px;
+    min-height: 80vh;
+    box-sizing: border-box;
+}
+
+.dashboard-layout {
+    display: grid;
+    grid-template-columns: 220px 1fr 320px;
+    gap: 40px;
+}
+
+/* SIDEBAR NAVIGATION */
+.nav-links { 
+    list-style: none; 
+    padding: 0; 
+    margin: 0; 
+}
+
+.nav-links li {
+    padding: 15px 20px;
+    font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: 0.2s;
+    border-radius: 8px;
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.nav-links li:hover { 
+    background: #f0f0ee; 
+    color: var(--text-main); 
+}
+
+.nav-links li.active { 
+    color: var(--text-main); 
+    background: #f0f0ee;
+    border-left: 4px solid var(--text-main); 
+    border-radius: 0 8px 8px 0;
+}
+
+/* PAGE CONTENT CONTROL */
+.page-content { 
+    display: none; 
+}
+
+.page-content.active { 
+    display: block; 
+}
+
+/* CENTER VISUAL BALANCES */
+.circle-container { 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    margin-bottom: 40px; 
+}
+
+.main-circle {
+    width: 280px; 
+    height: 280px;
+    border: 12px solid var(--text-main);
+    border-radius: 50%;
+    display: flex; 
+    flex-direction: column;
+    justify-content: center; 
+    align-items: center;
+    margin-bottom: 30px;
+    box-sizing: border-box;
+}
+
+.main-circle span { 
+    font-size: 0.7rem; 
+    text-transform: uppercase; 
+    font-weight: 800; 
+    color: var(--text-muted); 
+}
+
+.main-circle h2 { 
+    font-size: 2.5rem; 
+    margin: 5px 0; 
+    font-weight: 400; 
+}
+
+/* DATA INTERFACE TABLES */
+table { 
+    width: 100%; 
+    border-collapse: collapse; 
+    margin-top: 20px; 
+}
+
+th { 
+    text-align: left; 
+    background: #ededeb; 
+    padding: 12px; 
+    font-size: 0.75rem; 
+    text-transform: uppercase; 
+    color: var(--text-muted); 
+}
+
+td { 
+    padding: 15px; 
+    border-bottom: 1px solid var(--border-light); 
+    font-size: 0.9rem; 
+}
+
+/* ELEMENT ACTION COMPONENT CONTROLS */
+.add-section { 
+    background: #f9f9f7; 
+    padding: 25px; 
+    border-radius: 15px; 
+    margin-top: 30px; 
+}
+
+.btn-black { 
+    background: #1a1a1a; 
+    color: white; 
+    border: none; 
+    padding: 12px 24px; 
+    border-radius: 8px; 
+    cursor: pointer; 
+    font-weight: 600; 
+    font-size: 1rem;
+    transition: opacity 0.2s;
+}
+
+.btn-black:hover { 
+    opacity: 0.9; 
+}
+
+input { 
+    padding: 12px; 
+    border: 1px solid var(--border-light); 
+    border-radius: 8px; 
+    margin-right: 10px; 
+    font-family: inherit; 
+}
+
+.action-btn { 
+    color: #cc0000; 
+    text-decoration: underline; 
+    cursor: pointer; 
+    font-size: 0.8rem; 
+    border: none; 
+    background: none; 
+}
+
+/* RIGHT PANEL SAVINGS FRAMEWORKS */
+.savings-card { 
+    background: #ededeb; 
+    padding: 30px; 
+    border-radius: 20px; 
+    align-self: start; 
+    box-sizing: border-box;
+}
+
+.savings-bar { 
+    background: white; 
+    height: 12px; 
+    border-radius: 10px; 
+    margin: 15px 0; 
+    position: relative; 
+    overflow: hidden; 
+}
+
+#savings-progress { 
+    background: #1a1a1a; 
+    height: 100%; 
+    width: 0%; 
+    transition: 0.3s; 
+}
+
+/* FINANCIAL PREFERENCES EXTENSIONS */
+select { 
+    padding: 12px; 
+    border: 1px solid var(--border-light); 
+    border-radius: 8px; 
+    margin-right: 10px; 
+    font-family: inherit; 
+    font-size: 0.9rem; 
+    background: white; 
+}
+
+.tax-toggle-buttons { 
+    display: flex; 
+    gap: 10px; 
+    margin-bottom: 20px; 
+    background: #f9f9f7; 
+    padding: 15px; 
+    border-radius: 12px; 
+}
+
+.tax-option-container { 
+    background: #f9f9f7; 
+    padding: 25px; 
+    border-radius: 15px; 
+    border: 1px solid var(--border-light); 
+    margin-top: 15px; 
+}
+
+.logout-btn { 
+    background: none; 
+    border: none; 
+    color: var(--text-muted); 
+    font-weight: 600; 
+    cursor: pointer; 
+    padding: 15px 20px; 
+    width: 100%; 
+    text-align: left; 
+    display: flex; 
+    align-items: center; 
+    gap: 10px; 
+    margin-top: 30px; 
+    border-radius: 8px; 
+    font-family: inherit; 
+    font-size: 1rem;
+}
+
+.logout-btn:hover { 
+    background: #f0f0ee; 
+    color: #cc0000; 
+}
+
+/* ==========================================================================
+   4. HIDDEN IPHONE RESPONSIVE LAYER (Only activities on small viewports)
+   ========================================================================== */
+@media (max-width: 1024px) {
+    body {
+        padding: 16px;
+    }
+    
+    .container {
+        padding: 24px;
+    }
+
     .dashboard-layout {
-        grid-template-columns: 1fr; /* Stacks everything cleanly downwards */
-        padding: 24px 16px;
-        gap: 40px;
+        grid-template-columns: 1fr; /* Stacks column grids logically downward */
+        gap: 32px;
     }
 
-    /* Slides folders into an easy-to-swipe top header */
-    .sidebar-nav {
-        flex-direction: row;
+    /* Slides standard sidebar list links into a horizontal top dashboard tray */
+    .nav-links {
+        display: flex;
         overflow-x: auto;
-        padding-bottom: 12px;
-        border-bottom: 1px solid #e0e0e0;
-    }
-
-    .sidebar-nav h1 {
-        margin-bottom: 0;
-        margin-right: 24px;
-    }
-
-    .nav-item {
-        padding: 10px 16px;
         white-space: nowrap;
+        padding-bottom: 8px;
+        gap: 8px;
+        border-bottom: 1px solid var(--border-light);
     }
 
-    .nav-item.active {
+    .nav-links li {
+        margin-bottom: 0;
+        padding: 10px 16px;
+    }
+
+    .nav-links li.active {
         border-left: none;
-        border-bottom: 4px solid #000000;
+        border-bottom: 4px solid var(--text-main);
         border-radius: 0;
     }
 
-    .form-inline {
-        flex-direction: column;
-    }
-    
-    .form-inline .btn-black {
+    /* Force interactive entry components to display fully on compact width displays */
+    .add-section input, 
+    .add-section select,
+    .add-section button {
         width: 100%;
+        margin-bottom: 12px;
+        margin-right: 0;
+        box-sizing: border-box;
+    }
+
+    .add-section button,
+    .btn-black {
+        padding: 14px;
+    }
+
+    .savings-card {
+        width: 100%;
+    }
+
+    /* Standard responsive tables adjustment for scrolling without clipping text container edges */
+    .table-wrapper {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
     }
 }

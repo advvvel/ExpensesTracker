@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stash Expense Tracker - Dashboard</title>
-<link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -32,7 +32,12 @@
                     <h2 id="display-total">$0.00</h2>
                 </div>
             </div>
-
+<div class="analytics-card" style="margin-bottom: 30px; background: var(--card-white); padding: 20px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+    <h3 style="margin-top: 0; margin-bottom: 20px; color: #1a1a1a;">Financial Allocation Breakdown</h3>
+    <div style="max-width: 360px; margin: 0 auto; position: relative;">
+        <canvas id="stashAllocationChart"></canvas>
+    </div>
+</div>
             <div id="page-overview" class="page-content active">
                 <table>
                     <thead><tr><th>Type</th><th>Category</th><th>Amount</th><th>Date</th><th>Management</th></tr></thead>
@@ -168,35 +173,21 @@
             </div>
         </main>
 
-        <aside class="metrics-sidebar-column">
-            
-            <div class="analytics-card">
-                <h4 style="margin-top: 0; margin-bottom: 15px; color: #1a1a1a; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px;">Allocation Breakdown</h4>
-                <div style="width: 100%; position: relative;">
-                    <canvas id="stashAllocationChart"></canvas>
-                </div>
+        <aside class="savings-card">
+            <span style="font-weight: 800; font-size: 0.7rem; text-transform: uppercase;">Savings Snapshot</span>
+            <div style="display: flex; justify-content: space-between; margin-top: 20px;">
+                <span>Goal</span><strong id="goal-text">$5,000</strong>
             </div>
-
-            <div class="savings-card">
-                <span style="font-weight: 800; font-size: 0.7rem; text-transform: uppercase;">Savings Snapshot</span>
-                <div style="display: flex; justify-content: space-between; margin-top: 20px;">
-                    <span>Goal</span><strong id="goal-text">$5,000</strong>
-                </div>
-                <div class="savings-bar"><div id="savings-progress"></div></div>
-                <div style="display: flex; justify-content: space-between;">
-                    <span>Saved</span><strong id="saved-text">$0</strong>
-                </div>
-                <button class="btn-black" style="width: 100%; margin-top: 20px; background: white; color: black; border: 1px solid #ccc;" onclick="navigateTo('savings')">Modify Savings</button>
-                <button class="btn-black" style="width: 100%; margin-top: 10px;" onclick="addFundsToSavings()">Quick Add to Savings</button>
+            <div class="savings-bar"><div id="savings-progress"></div></div>
+            <div style="display: flex; justify-content: space-between;">
+                <span>Saved</span><strong id="saved-text">$0</strong>
             </div>
-            
+            <button class="btn-black" style="width: 100%; margin-top: 20px; background: white; color: black; border: 1px solid #ccc;" onclick="navigateTo('savings')">Modify Savings</button>
+            <button class="btn-black" style="width: 100%; margin-top: 10px;" onclick="addFundsToSavings()">Quick Add to Savings</button>
         </aside>
 
     </div>
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
@@ -217,6 +208,8 @@
     const db = getFirestore(app);
 
     let currentUser = null;
+    
+    // Clean, flat state structure to prevent structural validation errors
     let state = {
         total: 0,
         saved: 0,
@@ -227,17 +220,20 @@
 
     const AUTH_LOGIN_FILE = 'dashboard.html'; 
 
-    let myStashChart = null;
-
+    // Track authentication state
     onAuthStateChanged(auth, async (user) => {
         if (!user) {
-            window.location.href = AUTH_LOGIN_FILE;
+            console.log("No user detected, redirecting...");
+            // If you get stuck in a redirect loop, temporarily comment the line below out
+            // window.location.href = AUTH_LOGIN_FILE;
         } else {
+            console.log("User authenticated successfully:", user.uid);
             currentUser = user;
             await loadUserData(user.uid);
         }
     });
 
+    // LOAD DATA FROM FIRESTORE
     async function loadUserData(uid) {
         try {
             const docRef = doc(db, "users", uid);
@@ -245,12 +241,16 @@
             
             if (docSnap.exists()) {
                 const incomingData = docSnap.data();
+                console.log("Data loaded from Firestore:", incomingData);
+                
+                // Force data sanity checks to prevent app crashes
                 state.total = typeof incomingData.total === 'number' ? incomingData.total : 0;
                 state.saved = typeof incomingData.saved === 'number' ? incomingData.saved : 0;
                 state.goal = typeof incomingData.goal === 'number' ? incomingData.goal : 5000;
                 state.buckets = Array.isArray(incomingData.buckets) ? incomingData.buckets : [];
                 state.history = Array.isArray(incomingData.history) ? incomingData.history : [];
             } else {
+                console.log("No existing user document found. Creating default layout...");
                 state = { total: 0, saved: 0, goal: 5000, buckets: [], history: [] };
                 await setDoc(docRef, state);
             }
@@ -260,10 +260,16 @@
         }
     }
 
+    // SAVE DATA TO FIRESTORE
     async function saveUserData() {
-        if (!currentUser) return;
+        if (!currentUser) {
+            console.warn("Save aborted: No authenticated user active.");
+            return;
+        }
         try {
             const docRef = doc(db, "users", currentUser.uid);
+            
+            // Clean payload to ensure Firestore accepts it without errors
             const payload = {
                 total: Number(state.total) || 0,
                 saved: Number(state.saved) || 0,
@@ -271,7 +277,9 @@
                 buckets: JSON.parse(JSON.stringify(state.buckets)),
                 history: JSON.parse(JSON.stringify(state.history))
             };
+
             await setDoc(docRef, payload);
+            console.log("Data successfully saved to Firestore!");
         } catch (e) {
             console.error("CRITICAL SAVE ERROR:", e);
         }
@@ -526,68 +534,10 @@
         }
     }
 
-    function renderAnalyticsChart() {
-        const chartCanvas = document.getElementById('stashAllocationChart');
-        if (!chartCanvas) return;
-
-        const labels = ['Available Balance', 'Unallocated Savings'];
-        const dataValues = [Math.max(0, state.total), Math.max(0, state.saved)];
-
-        state.buckets.forEach(b => {
-            labels.push(`Bucket: ${b.name}`);
-            dataValues.push(b.amount);
-        });
-
-        if (myStashChart) {
-            myStashChart.destroy();
-        }
-
-        myStashChart = new Chart(chartCanvas, {
-            type: 'doughnut',
-            data: {
-                labels: labels,
-                datasets: [{
-                    data: dataValues,
-                    backgroundColor: [
-                        '#1a1a1a', 
-                        '#757575', 
-                        '#b8b8b4', 
-                        '#4a4a48', 
-                        '#d1d1cc', 
-                        '#2e2e2d'
-                    ],
-                    borderWidth: 2,
-                    borderColor: '#ffffff'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            boxWidth: 10,
-                            padding: 8,
-                            font: { family: 'Inter, sans-serif', size: 11 }
-                        }
-                    }
-                }
-            }
-        });
-    }
-
     function updateAllUI() {
         document.getElementById('display-total').innerText = "$" + state.total.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
-        
-        // Handle all goal text displays (updates both left page outputs and sidebar components simultaneously)
-        document.querySelectorAll('#goal-text').forEach(el => {
-            el.innerText = "$" + state.goal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
-        });
-        
-        document.querySelectorAll('#saved-text').forEach(el => {
-            el.innerText = "$" + state.saved.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
-        });
+        document.getElementById('goal-text').innerText = "$" + state.goal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        document.getElementById('saved-text').innerText = "$" + state.saved.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
         
         let progress = 0;
         if (state.goal > 0 && state.saved >= 0) {
@@ -639,8 +589,6 @@
                 `;
             }).join('');
         }
-
-        renderAnalyticsChart();
     }
 </script>
 </body>
