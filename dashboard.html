@@ -22,10 +22,6 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            
-            /* ANTI-GLITCH PROTOCOL FOR SIGN IN */
-            opacity: 0; 
-            transition: opacity 0.2s ease-in-out;
         }
 
         .auth-card {
@@ -93,6 +89,7 @@
 </div>
 
 <script type="module">
+    // Fixed: Standardized SDK imports to preserve module functions cleanly
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
     import { 
         getAuth, 
@@ -105,7 +102,7 @@
     } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
     const firebaseConfig = {
-        apiKey: "AIzaSyDPz1BPnN7Xan09WgdA6UVKk9gjU0DGiKs", 
+        apiKey: "AIzaSyDPz1BPnN7Xan09WgdA6UVKk9gjU0DGIks",
         authDomain: "stash-tracke.firebaseapp.com",
         projectId: "stash-tracke",
         storageBucket: "stash-tracke.firebasestorage.app",
@@ -117,13 +114,9 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    // ANTI-GLITCH ROUTER FOR SIGN IN PAGE
     onAuthStateChanged(auth, (user) => {
         if (user) {
             window.location.href = 'index.html';
-        } else {
-            // Safe to reveal login screen now
-            document.body.style.opacity = '1';
         }
     });
 
