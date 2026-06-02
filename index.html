@@ -4,111 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stash Expense Tracker - Dashboard</title>
-    <style>
-        :root {
-            --bg-neutral: #f4f4f2;
-            --card-white: #ffffff;
-            --text-main: #1a1a1a;
-            --text-muted: #757575;
-            --border-light: #e0e0dc;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-neutral);
-            color: var(--text-main);
-            margin: 0;
-            padding: 40px;
-            display: flex;
-            justify-content: center;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 1200px;
-            background: var(--card-white);
-            border-radius: 24px;
-            padding: 50px;
-            min-height: 80vh;
-        }
-
-        .dashboard-layout {
-            display: grid;
-            grid-template-columns: 220px 1fr 320px;
-            gap: 40px;
-        }
-
-        /* SIDEBAR NAVIGATION */
-        .nav-links { list-style: none; padding: 0; margin: 0; }
-        .nav-links li {
-            padding: 15px 20px;
-            font-weight: 600;
-            color: var(--text-muted);
-            cursor: pointer;
-            transition: 0.2s;
-            border-radius: 8px;
-            margin-bottom: 5px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .nav-links li:hover { background: #f0f0ee; color: var(--text-main); }
-        .nav-links li.active { 
-            color: var(--text-main); 
-            background: #f0f0ee;
-            border-left: 4px solid var(--text-main); 
-        }
-
-        /* PAGE CONTENT CONTROL */
-        .page-content { display: none; }
-        .page-content.active { display: block; }
-
-        /* CENTER VISUALS */
-        .circle-container { 
-            display: flex; flex-direction: column; align-items: center; margin-bottom: 40px; 
-        }
-        .main-circle {
-            width: 280px; height: 280px;
-            border: 12px solid var(--text-main);
-            border-radius: 50%;
-            display: flex; flex-direction: column;
-            justify-content: center; align-items: center;
-            margin-bottom: 30px;
-        }
-        .main-circle span { font-size: 0.7rem; text-transform: uppercase; font-weight: 800; color: var(--text-muted); }
-        .main-circle h2 { font-size: 2.5rem; margin: 5px 0; font-weight: 400; }
-
-        /* TABLES */
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th { text-align: left; background: #ededeb; padding: 12px; font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); }
-        td { padding: 15px; border-bottom: 1px solid var(--border-light); font-size: 0.9rem; }
-
-        /* BUTTONS & INPUTS */
-        .add-section { background: #f9f9f7; padding: 25px; border-radius: 15px; margin-top: 30px; }
-        .btn-black { background: #1a1a1a; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: 600; }
-        input { padding: 12px; border: 1px solid var(--border-light); border-radius: 8px; margin-right: 10px; font-family: inherit; }
-
-        /* SAVINGS CARD */
-        .savings-card { background: #ededeb; padding: 30px; border-radius: 20px; align-self: start; }
-        .savings-bar { background: white; height: 12px; border-radius: 10px; margin: 15px 0; position: relative; overflow: hidden; }
-        #savings-progress { background: #1a1a1a; height: 100%; width: 0%; transition: 0.3s; }
-        
-        .action-btn { color: #cc0000; text-decoration: underline; cursor: pointer; font-size: 0.8rem; border: none; background: none; }
-
-        /* TAX SELECT / TOGGLES */
-        select { padding: 12px; border: 1px solid var(--border-light); border-radius: 8px; margin-right: 10px; font-family: inherit; font-size: 0.9rem; background: white; }
-        .tax-toggle-buttons { display: flex; gap: 10px; margin-bottom: 20px; background: #f9f9f7; padding: 15px; border-radius: 12px; }
-        .tax-option-container { background: #f9f9f7; padding: 25px; border-radius: 15px; border: 1px solid var(--border-light); margin-top: 15px; }
-
-        /* LOGOUT TRIGGER INTERFACE STYLING */
-        .logout-btn { 
-            background: none; border: none; color: var(--text-muted); font-weight: 600; 
-            cursor: pointer; padding: 15px 20px; width: 100%; text-align: left; 
-            display: flex; align-items: center; gap: 10px; margin-top: 30px; border-radius: 8px; 
-            font-family: inherit; font-size: 1rem;
-        }
-        .logout-btn:hover { background: #f0f0ee; color: #cc0000; }
-    </style>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
@@ -272,17 +169,28 @@
             </div>
         </main>
 
-        <aside class="savings-card">
-            <span style="font-weight: 800; font-size: 0.7rem; text-transform: uppercase;">Savings Snapshot</span>
-            <div style="display: flex; justify-content: space-between; margin-top: 20px;">
-                <span>Goal</span><strong id="goal-text">$5,000</strong>
+        <aside class="right-sidebar-column">
+            
+            <div class="chart-card">
+                <span style="font-weight: 800; font-size: 0.7rem; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 15px;">Funds Analytics</span>
+                <div style="width: 100%; height: 140px; position: relative;">
+                    <canvas id="statsChart"></canvas>
+                </div>
             </div>
-            <div class="savings-bar"><div id="savings-progress"></div></div>
-            <div style="display: flex; justify-content: space-between;">
-                <span>Saved</span><strong id="saved-text">$0</strong>
+
+            <div class="savings-card">
+                <span style="font-weight: 800; font-size: 0.7rem; text-transform: uppercase;">Savings Snapshot</span>
+                <div style="display: flex; justify-content: space-between; margin-top: 20px;">
+                    <span>Goal</span><strong id="goal-text">$5,000</strong>
+                </div>
+                <div class="savings-bar"><div id="savings-progress"></div></div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span>Saved</span><strong id="saved-text">$0</strong>
+                </div>
+                <button class="btn-black" style="width: 100%; margin-top: 20px; background: white; color: black; border: 1px solid #ccc;" onclick="navigateTo('savings')">Modify Savings</button>
+                <button class="btn-black" style="width: 100%; margin-top: 10px;" onclick="addFundsToSavings()">Quick Add to Savings</button>
             </div>
-            <button class="btn-black" style="width: 100%; margin-top: 20px; background: white; color: black; border: 1px solid #ccc;" onclick="navigateTo('savings')">Modify Savings</button>
-            <button class="btn-black" style="width: 100%; margin-top: 10px;" onclick="addFundsToSavings()">Quick Add to Savings</button>
+
         </aside>
 
     </div>
@@ -316,7 +224,8 @@
         history: []
     };
 
-    // ROUTING CONFIGURATION: Set this value to the file name of your login prompt window
+    let statsChartInstance = null;
+
     const AUTH_LOGIN_FILE = 'dashboard.html'; 
 
     onAuthStateChanged(auth, async (user) => {
@@ -328,7 +237,6 @@
         }
     });
 
-    // SECURITY SEGREGATION: Saves records accurately under user's specific authenticated account reference
     async function loadUserData(uid) {
         try {
             const docRef = doc(db, "users", uid);
@@ -509,29 +417,26 @@
         if(!isNaN(manualVal) && manualVal > 0) {
             computedInterestSum = manualVal;
             interestContextLabel = 'Manual Interest Adjustment Entry';
-            document.getElementById('interest-output-msg').innerHTML = `Calculated Earnings: <strong>$${computedInterestSum.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong> via custom allocation injection.`;
+            document.getElementById('interest-output-msg').innerHTML = `Calculated Earnings: <strong>$${computedInterestSum.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong> via fixed allocation parameter manual entries.`;
             document.getElementById('interest-decision-box').style.display = 'block';
-        } else {
-            alert("Please supply a valid absolute structural cash value.");
         }
     }
 
     window.commitInterestYield = function() {
         if(computedInterestSum > 0) {
             state.saved += computedInterestSum;
-            state.history.unshift({ id: Date.now(), type: 'Deposit', name: interestContextLabel, amount: parseFloat(computedInterestSum.toFixed(2)), date: new Date().toLocaleDateString() });
+            state.history.unshift({ id: Date.now(), type: 'InterestYield', name: interestContextLabel, amount: computedInterestSum, date: new Date().toLocaleDateString() });
+            clearInterestSimulationView();
             updateAllUI();
             saveUserData();
-            alert(`Interest execution confirmed! Applied $${computedInterestSum.toFixed(2)} directly onto savings.`);
         }
-        clearInterestSimulationView();
     }
 
     window.clearInterestSimulationView = function() {
-        document.getElementById('interest-manual-input').value = '';
-        document.getElementById('interest-decision-box').style.display = 'none';
         computedInterestSum = 0;
         interestContextLabel = '';
+        document.getElementById('interest-decision-box').style.display = 'none';
+        document.getElementById('interest-manual-input').value = '';
     }
 
     window.toggleTaxView = function(view) {
@@ -550,111 +455,47 @@
     }
 
     window.runBracketCalculation = function() {
-        const pct = parseFloat(document.getElementById('tax-bracket-select').value);
-        if(isNaN(pct)) {
-            alert("Please pick an income bracket first.");
+        const rate = parseFloat(document.getElementById('tax-bracket-select').value);
+        if(!rate) {
+            alert("Please select a tax bracket context.");
             return;
         }
-        computedTaxSum = state.total * pct;
-        document.getElementById('tax-output-msg').innerHTML = `Applied Tax Rate: <strong>${pct * 100}%</strong><br>Approximate amount that would be removed: <strong>$${computedTaxSum.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong>`;
+        if(state.total <= 0) {
+            alert("Your Available Funds pool must be above $0.00 to process bracket reductions.");
+            return;
+        }
+        computedTaxSum = state.total * rate;
+        document.getElementById('tax-output-msg').innerHTML = `Calculated Obligation: <strong>$${computedTaxSum.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</strong> (${rate * 100}% of available liquidity).`;
         document.getElementById('tax-decision-box').style.display = 'block';
     }
 
     window.commitTaxDeduction = function() {
         if(computedTaxSum > 0) {
             state.total -= computedTaxSum;
-            state.history.unshift({ id: Date.now(), type: 'Expense', name: `Tax Deduction (${document.getElementById('tax-bracket-select').value * 100}%)`, amount: computedTaxSum, date: new Date().toLocaleDateString() });
+            state.history.unshift({ id: Date.now(), type: 'TaxWithholding', name: 'Withholding Tax Payment Allocation', amount: computedTaxSum, date: new Date().toLocaleDateString() });
+            clearTaxBracketView();
             updateAllUI();
             saveUserData();
-            alert("Tax deduction has been applied to your stash funds.");
         }
-        clearTaxBracketView();
-    }
-
-    window.clearTaxBracketView = function() {
-        document.getElementById('tax-bracket-select').value = '';
-        document.getElementById('tax-decision-box').style.display = 'none';
-        computedTaxSum = 0;
     }
 
     window.commitManualTaxDeduction = function() {
-        const val = parseFloat(document.getElementById('tax-manual-input').value);
-        if(!isNaN(val) && val > 0) {
-            state.total -= val;
-            state.history.unshift({ id: Date.now(), type: 'Expense', name: 'Manual Tax Entry Deduction', amount: val, date: new Date().toLocaleDateString() });
-            updateAllUI();
-            saveUserData();
+        const amt = parseFloat(document.getElementById('tax-manual-input').value);
+        if(!isNaN(amt) && amt > 0) {
+            state.total -= amt;
+            state.history.unshift({ id: Date.now(), type: 'TaxWithholding', name: 'Withholding Tax Payment Allocation (Manual)', amount: amt, date: new Date().toLocaleDateString() });
             document.getElementById('tax-manual-input').value = '';
-            alert("Custom tax value removed successfully.");
-        } else {
-            alert("Please input a valid dollar amount.");
-        }
-    }
-
-    window.deleteAction = function(id) {
-        const item = state.history.find(h => h.id === id);
-        if(item) {
-            if(item.type === 'Expense') state.total += item.amount;
-            else if(item.type === 'Deposit') state.total -= item.amount;
-            else if(item.type === 'SavingsTransfer') {
-                state.total += item.amount;
-                state.saved -= item.amount;
-            }
-            state.history = state.history.filter(h => h.id !== id);
             updateAllUI();
             saveUserData();
         }
     }
 
-    function updateAllUI() {
-        document.getElementById('display-total').innerText = "$" + state.total.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
-        document.getElementById('goal-text').innerText = "$" + state.goal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
-        document.getElementById('saved-text').innerText = "$" + state.saved.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
-        
-        let progress = 0;
-        if (state.goal > 0 && state.saved >= 0) {
-            progress = (state.saved / state.goal) * 100;
-        }
-        document.getElementById('savings-progress').style.width = Math.min(progress, 100) + "%";
-
-        const bucketsTable = document.getElementById('buckets-table-body');
-        if(bucketsTable) {
-            bucketsTable.innerHTML = (state.buckets || []).map(b => `
-                <tr>
-                    <td><strong>${b.name}</strong></td>
-                    <td>$${b.amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-                    <td><button class="action-btn" onclick="deleteSavingsBucket(${b.id})">Dissolve Pool</button></td>
-                </tr>
-            `).join('');
-        }
-        const poolSpan = document.getElementById('bucket-pool-available');
-        if(poolSpan) {
-            poolSpan.innerText = state.saved.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
-        }
-
-        const expenseTable = document.getElementById('expense-table-body');
-        expenseTable.innerHTML = state.history.filter(h => h.type === 'Expense').map(h => `
-            <tr>
-                <td>${h.name}</td>
-                <td>Variable</td>
-                <td>$${h.amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-                <td>${h.date}</td>
-                <td><button class="action-btn" onclick="deleteAction(${h.id})">Delete</button></td>
-            </tr>
-        `).join('');
-
-        const reportTable = document.getElementById('report-log-body');
-        reportTable.innerHTML = state.history.map(h => `
-            <tr>
-                <td>${h.name}</td>
-                <td>$${h.amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-                <td>${h.date}</td>
-                <td><button class="action-btn" onclick="deleteAction(${h.id})">Delete</button></td>
-            </tr>
-        `).join('');
+    window.clearTaxBracketView = function() {
+        computedTaxSum = 0;
+        document.getElementById('tax-decision-box').style.display = 'none';
+        document.getElementById('tax-bracket-select').value = '';
     }
 
-    updateAllUI();
-</script>
-</body>
-</html>
+    // FUNCTION ATTACHMENT: NEW RENDER GRAPH INSTANCE FOR STATS 
+    function renderStatsChart() {
+        const ctx

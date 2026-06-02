@@ -4,63 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>STASH. - Authenticate</title>
-    <style>
-        :root {
-            --bg-neutral: #f4f4f2;
-            --card-white: #ffffff;
-            --text-main: #1a1a1a;
-            --text-muted: #757575;
-            --border-light: #e0e0dc;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-neutral);
-            color: var(--text-main);
-            margin: 0;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .auth-card {
-            width: 100%;
-            max-width: 400px;
-            background: var(--card-white);
-            border-radius: 24px;
-            padding: 45px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
-            box-sizing: border-box;
-        }
-
-        h1 { font-size: 2rem; margin: 0 0 5px 0; letter-spacing: 1px; text-align: center; font-weight: 700; }
-        p.subtitle { text-align: center; color: var(--text-muted); font-size: 0.9rem; margin: 0 0 35px 0; }
-
-        .form-group { margin-bottom: 22px; }
-        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.85rem; }
-        .form-group input { 
-            width: 100%; padding: 12px 14px; border: 1px solid var(--border-light); 
-            border-radius: 8px; font-family: inherit; box-sizing: border-box; font-size: 0.95rem;
-            background: #fafaf9;
-        }
-        .form-group input:focus { outline: none; border-color: var(--text-main); background: #fff; }
-
-        .remember-me-container { display: flex; align-items: center; gap: 8px; margin-bottom: 25px; font-size: 0.9rem; }
-        .remember-me-container input { cursor: pointer; width: 16px; height: 16px; margin: 0; }
-        
-        .btn-black { 
-            width: 100%; background: #1a1a1a; color: white; border: none; 
-            padding: 14px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 1rem;
-            transition: opacity 0.2s;
-        }
-        .btn-black:hover { opacity: 0.9; }
-
-        .toggle-link { text-align: center; margin-top: 25px; font-size: 0.85rem; color: var(--text-muted); }
-        .toggle-link span { color: #1a1a1a; text-decoration: underline; cursor: pointer; font-weight: 600; }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="auth-body-layout">
 
 <div class="auth-card">
     <h1>STASH.</h1>
@@ -89,7 +35,6 @@
 </div>
 
 <script type="module">
-    // Fixed: Standardized SDK imports to preserve module functions cleanly
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
     import { 
         getAuth, 
