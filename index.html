@@ -309,15 +309,21 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    // ANTI-GLITCH ROUTER FOR INTERIOR DASHBOARD
-    onAuthStateChanged(auth, (user) => {
-        if (!user) {
-            window.location.href = 'dashboard.html';
-        } else {
-            // Safe to reveal dashboard layout now
-            document.body.style.opacity = '1';
-        }
-    });
+    // FIXED PROTOCOL: FORCE SIGN OUT AND REDIRECT IF BROWSER WAS REFRESHED/RELOADED
+    const navigationEntry = performance.getEntriesByType("navigation")[0];
+    if (navigationEntry && navigationEntry.type === "reload") {
+        await signOut(auth);
+        window.location.href = 'dashboard.html';
+    } else {
+        // Normal routing protocol for standard entry/successful redirects
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                window.location.href = 'dashboard.html';
+            } else {
+                document.body.style.opacity = '1';
+            }
+        });
+    }
 
     window.logOutUser = async () => {
         if(confirm("Are you sure you want to log out of STASH?")) {
