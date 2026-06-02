@@ -136,7 +136,12 @@
                     <h2 id="display-total">$0.00</h2>
                 </div>
             </div>
-
+<div class="analytics-card" style="margin-bottom: 30px; background: var(--card-white); padding: 20px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+    <h3 style="margin-top: 0; margin-bottom: 20px; color: #1a1a1a;">Financial Allocation Breakdown</h3>
+    <div style="max-width: 360px; margin: 0 auto; position: relative;">
+        <canvas id="stashAllocationChart"></canvas>
+    </div>
+</div>
             <div id="page-overview" class="page-content active">
                 <table>
                     <thead><tr><th>Type</th><th>Category</th><th>Amount</th><th>Date</th><th>Management</th></tr></thead>
@@ -287,6 +292,8 @@
 
     </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
@@ -307,8 +314,6 @@
     const db = getFirestore(app);
 
     let currentUser = null;
-    
-    // Clean, flat state structure to prevent structural validation errors
     let state = {
         total: 0,
         saved: 0,
@@ -319,20 +324,18 @@
 
     const AUTH_LOGIN_FILE = 'dashboard.html'; 
 
-    // Track authentication state
+    // Global variable to hold our Chart instance so we can destroy/recreate it on updates
+    let myStashChart = null;
+
     onAuthStateChanged(auth, async (user) => {
         if (!user) {
-            console.log("No user detected, redirecting...");
-            // If you get stuck in a redirect loop, temporarily comment the line below out
-            // window.location.href = AUTH_LOGIN_FILE;
+            window.location.href = AUTH_LOGIN_FILE;
         } else {
-            console.log("User authenticated successfully:", user.uid);
             currentUser = user;
             await loadUserData(user.uid);
         }
     });
 
-    // LOAD DATA FROM FIRESTORE
     async function loadUserData(uid) {
         try {
             const docRef = doc(db, "users", uid);
@@ -340,16 +343,12 @@
             
             if (docSnap.exists()) {
                 const incomingData = docSnap.data();
-                console.log("Data loaded from Firestore:", incomingData);
-                
-                // Force data sanity checks to prevent app crashes
                 state.total = typeof incomingData.total === 'number' ? incomingData.total : 0;
                 state.saved = typeof incomingData.saved === 'number' ? incomingData.saved : 0;
                 state.goal = typeof incomingData.goal === 'number' ? incomingData.goal : 5000;
                 state.buckets = Array.isArray(incomingData.buckets) ? incomingData.buckets : [];
                 state.history = Array.isArray(incomingData.history) ? incomingData.history : [];
             } else {
-                console.log("No existing user document found. Creating default layout...");
                 state = { total: 0, saved: 0, goal: 5000, buckets: [], history: [] };
                 await setDoc(docRef, state);
             }
@@ -359,16 +358,10 @@
         }
     }
 
-    // SAVE DATA TO FIRESTORE
     async function saveUserData() {
-        if (!currentUser) {
-            console.warn("Save aborted: No authenticated user active.");
-            return;
-        }
+        if (!currentUser) return;
         try {
             const docRef = doc(db, "users", currentUser.uid);
-            
-            // Clean payload to ensure Firestore accepts it without errors
             const payload = {
                 total: Number(state.total) || 0,
                 saved: Number(state.saved) || 0,
@@ -376,9 +369,7 @@
                 buckets: JSON.parse(JSON.stringify(state.buckets)),
                 history: JSON.parse(JSON.stringify(state.history))
             };
-
             await setDoc(docRef, payload);
-            console.log("Data successfully saved to Firestore!");
         } catch (e) {
             console.error("CRITICAL SAVE ERROR:", e);
         }
@@ -633,6 +624,63 @@
         }
     }
 
+    // NEW FUNCTION: Renders and refreshes the Chart dynamically
+    function renderAnalyticsChart() {
+        const chartCanvas = document.getElementById('stashAllocationChart');
+        if (!chartCanvas) return;
+
+        // Collect labels and figures dynamically from state arrays
+        const labels = ['Available Balance', 'Unallocated Savings'];
+        const dataValues = [Math.max(0, state.total), Math.max(0, state.saved)];
+
+        // Append individual sub-buckets dynamically to the data arrays
+        state.buckets.forEach(b => {
+            labels.push(`Bucket: ${b.name}`);
+            dataValues.push(b.amount);
+        });
+
+        // Wipe existing instances out of memory before re-rendering to prevent overlap bugs
+        if (myStashChart) {
+            myStashChart.destroy();
+        }
+
+        // Initialize and paint the Chart.js instance
+        myStashChart = new Chart(chartCanvas, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: dataValues,
+                    backgroundColor: [
+                        '#4CAF50', // Emerald green for core funds
+                        '#2196F3', // Dynamic blue for general savings
+                        '#9C27B0', // Purple
+                        '#FF9800', // Orange
+                        '#E91E63', // Pink
+                        '#00BCD4', // Cyan
+                        '#9E9E9E'  // Grey fallback
+                    ],
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            boxWidth: 12,
+                            padding: 15,
+                            font: { family: 'Inter, sans-serif', size: 12 }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
     function updateAllUI() {
         document.getElementById('display-total').innerText = "$" + state.total.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
         document.getElementById('goal-text').innerText = "$" + state.goal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
@@ -688,6 +736,9 @@
                 `;
             }).join('');
         }
+
+        // Trigger the visual chart engine update
+        renderAnalyticsChart();
     }
 </script>
 </body>
