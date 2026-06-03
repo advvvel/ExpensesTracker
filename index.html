@@ -225,7 +225,6 @@
     };
 
     let statsChartInstance = null;
-    // Tracks whether the user wants to see the full list or just the top 20 entries
     let showAllHistoryLogs = false;
 
     // Fixed path setup mapping back to your standalone authentication view file
@@ -323,6 +322,15 @@
         window.updateAllUI();
         saveUserData();
         amtInput.value = '';
+    }
+
+    // New globally scoped feature: Processes quick one-tap micro-deposits
+    window.quickDeposit = function(amount) {
+        if (typeof amount !== 'number' || amount <= 0) return;
+        state.total += amount;
+        state.history.unshift({ id: Date.now(), type: 'Deposit', name: `Micro-Deposit (+$${amount})`, amount: amount, date: new Date().toLocaleDateString() });
+        window.updateAllUI();
+        saveUserData();
     }
 
     window.addFundsToSavings = function() {
@@ -557,10 +565,41 @@
         }
     }
 
-    // New globally scoped feature: Toggles the show all view state for reporting lines
     window.toggleHistoryViewLimit = function() {
         showAllHistoryLogs = !showAllHistoryLogs;
         window.updateAllUI();
+    }
+
+    // New globally scoped feature: Inverts app branding design properties for light/dark mode customizer
+    window.toggleAppTheme = function() {
+        const currentTheme = document.body.getAttribute('data-theme');
+        if (currentTheme === 'light') {
+            document.body.removeAttribute('data-theme');
+        } else {
+            document.body.setAttribute('data-theme', 'light');
+        }
+    }
+
+    // New globally scoped feature: Compiles structured system logs into a download-ready Excel/CSV file layout
+    window.exportLedgerToCSV = function() {
+        if (!state.history || state.history.length === 0) {
+            alert("There are no history records in your ledger to export.");
+            return;
+        }
+        
+        let csvContent = "data:text/csv;charset=utf-8,Type,Name,Amount,Date\n";
+        state.history.forEach(item => {
+            const sanitizedName = item.name.replace(/,/g, " "); 
+            csvContent += `${item.type},${sanitizedName},${item.amount},${item.date}\n`;
+        });
+        
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `STASH_Financial_Ledger_${new Date().toLocaleDateString().replace(/\//g, '_')}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     }
 
     window.renderStatsChart = function() {
@@ -609,13 +648,25 @@
         const progressEl = document.getElementById('savings-progress');
         if (progressEl) progressEl.style.width = Math.min(pct, 100) + '%';
 
+        // Direct mathematical manipulation framework updating the target vector path properties of the SVG progress ring
+        const targetRingCircumference = 534; // 2 * Math.PI * r (radius 85)
+        const progressCircleEl = document.querySelector('.progress-ring__circle');
+        if (progressCircleEl) {
+            const boundedPercentage = Math.min(Math.max(pct, 0), 100);
+            const offsetCalculation = targetRingCircumference - (boundedPercentage / 100) * targetRingCircumference;
+            progressCircleEl.style.strokeDasharray = `${targetRingCircumference}`;
+            progressCircleEl.style.strokeDashoffset = `${offsetCalculation}`;
+            
+            const percentageTextEl = document.getElementById('ring-percentage-label');
+            if (percentageTextEl) percentageTextEl.innerText = `${Math.round(pct)}% of Goal`;
+        }
+
         const tbody = document.getElementById('expense-table-body');
         if (tbody) {
             tbody.innerHTML = '';
             const expensesList = state.history.filter(item => item.type === 'Expense');
             
             if (expensesList.length === 0) {
-                // Visual placeholder state
                 tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#757575; padding:20px; font-style:italic;">No expenses tracked yet. Use the fields above to add your first transaction.</td></tr>`;
             } else {
                 expensesList.forEach(item => {
@@ -635,7 +686,6 @@
         if (bucketsTbody) {
             bucketsTbody.innerHTML = '';
             if (state.buckets.length === 0) {
-                // Visual placeholder state
                 bucketsTbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#757575; padding:20px; font-style:italic;">No active sub-savings buckets found. Allocate a goal portion above.</td></tr>`;
             } else {
                 state.buckets.forEach(b => {
@@ -651,10 +701,8 @@
             reportBody.innerHTML = '';
             
             if (state.history.length === 0) {
-                // Visual placeholder state
                 reportBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#757575; padding:20px; font-style:italic;">Modification ledger empty. Financial updates will construct logs here.</td></tr>`;
             } else {
-                // Conditionally truncates array logs depending on toggle view configurations
                 const visibleLogs = showAllHistoryLogs ? state.history : state.history.slice(0, 20);
                 
                 visibleLogs.forEach(item => {
@@ -681,7 +729,6 @@
                 });
             }
 
-            // Updates the tracking control button label to guide users if element exists in page HTML
             const toggleButtonEl = document.getElementById('show-more-btn');
             if (toggleButtonEl) {
                 if (state.history.length <= 20) {
@@ -689,7 +736,6 @@
                 } else {
                     toggleButtonEl.style.display = 'inline-block';
                     toggleButtonEl.innerText = showAllHistoryLogs ? 'Show Less (Limit View)' : `Show All History (${state.history.length} Logs)`;
-                    // Attaches handler natively in case it wasn't bound directly via inline HTML markup tags
                     toggleButtonEl.onclick = window.toggleHistoryViewLimit;
                 }
             }
