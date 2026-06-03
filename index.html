@@ -324,15 +324,6 @@
         amtInput.value = '';
     }
 
-    // [Micro-Deposits] Handle rapid, single-click additions to available liquid balances
-    window.quickDeposit = function(amount) {
-        if (typeof amount !== 'number' || amount <= 0) return;
-        state.total += amount;
-        state.history.unshift({ id: Date.now(), type: 'Deposit', name: `Micro-Deposit (+$${amount})`, amount: amount, date: new Date().toLocaleDateString() });
-        window.updateAllUI();
-        saveUserData();
-    }
-
     window.addFundsToSavings = function() {
         const amt = parseFloat(prompt("Enter amount to transfer from available funds to savings:"));
         if(isNaN(amt) || amt <= 0) {
@@ -570,7 +561,11 @@
         window.updateAllUI();
     }
 
-    // [Theme Customizer] Toggle document data attributes cleanly
+    // ==========================================
+    // SEPARATE DECK: VISUALS, CONTROLS & THEMES
+    // ==========================================
+
+    // 1. Theme Customizer (Toggle Light/Dark Theme Wrapper)
     window.toggleAppTheme = function() {
         const currentTheme = document.body.getAttribute('data-theme');
         if (currentTheme === 'light') {
@@ -580,7 +575,25 @@
         }
     }
 
-    // [CSV Ledger Builder] Convert internal tracking array fields directly into downloadable raw string buffers
+    // 2. Full Color Customizer Core (Allows color-coding website elements to any hex shade parameter)
+    window.changeWebsiteColorAccent = function(hexColorCode) {
+        if(/^#[0-9A-F]{6}$/i.test(hexColorCode)) {
+            document.documentElement.style.setProperty('--accent-brand-color', hexColorCode);
+        } else {
+            console.warn("Invalid hexadecimal structural configuration parameter passed.");
+        }
+    }
+
+    // 3. Micro-Deposits Module
+    window.quickDeposit = function(amount) {
+        if (typeof amount !== 'number' || amount <= 0) return;
+        state.total += amount;
+        state.history.unshift({ id: Date.now(), type: 'Deposit', name: `Micro-Deposit (+$${amount})`, amount: amount, date: new Date().toLocaleDateString() });
+        window.updateAllUI();
+        saveUserData();
+    }
+
+    // 4. CSV Ledger Builder Data Exporter
     window.exportLedgerToCSV = function() {
         if (!state.history || state.history.length === 0) {
             alert("There are no history records in your ledger to export.");
@@ -648,7 +661,7 @@
         const progressEl = document.getElementById('savings-progress');
         if (progressEl) progressEl.style.width = Math.min(pct, 100) + '%';
 
-        // [Visual Progress Ring] Translate scalar percentage targets to perimeter offsets
+        // targetRingCircumference Calculation Vector Intercept
         const targetRingCircumference = 534; 
         const progressCircleEl = document.querySelector('.progress-ring__circle');
         if (progressCircleEl) {
