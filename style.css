@@ -1,8 +1,8 @@
 :root {
     /* Dramatic Deep Dark Mode Profile (Default Configuration state) */
-    --bg-neutral: #0a0a0a;          /* Total deep velvet obsidian background */
-    --card-white: #141414;          /* High contrast dark structural cards */
-    --text-main: #ffffff;           /* Ultra high contrast pristine white text */
+    --bg-neutral: #242323;          /* Total deep velvet obsidian background */
+    --card-white: #282626;          /* High contrast dark structural cards */
+    --text-main: #dfd9d9;           /* Ultra high contrast pristine white text */
     --text-muted: #88888b;          /* Soft slate balancing grey */
     --border-light: #262626;         /* Clear structural panel separation lines */
     
@@ -67,7 +67,7 @@ body.auth-body-layout {
     align-items: center;
     gap: 10px;
 }
-.nav-links li:hover { background: #f0f0ee; color: var(--text-main); }
+.nav-links li:hover { background: #9e9e99; color: var(--text-main); }
 .nav-links li.active { 
     color: var(--text-main); 
     background: #f0f0ee;
