@@ -1,307 +1,271 @@
 :root {
-    --accent-color: #1565c0;
-    --bg-color: #f4f6f9;
-    --card-bg: #ffffff;
-    --text-color: #1a1a1a;
-    --border-color: #e0e0e0;
+    /* --- Your original token maps --- */
+    --bg-neutral: #f4f4f2;
+    --card-white: #ffffff;
+    --text-main: #1a1a1a;
+    --text-muted: #757575;
+    --border-light: #e0e0dc;
+    
+    /* Dedicated Variable Anchor Hooks for Quick Design Customizations */
+    --accent-brand-color: #1a1a1a; 
 }
 
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+/* 🌗 Dedicated Light Theme Inversion Maps */
+body[data-theme="light"] {
+    --bg-neutral: #ffffff;
+    --card-white: #f4f4f2;
+    --text-main: #1a1a1a;
+    --text-muted: #606060;
+    --border-light: #dcdcd8;
+    --accent-brand-color: #4a4a4a;
+}
+
+/* 🕶️ NEW: HIGH-CONTRAST EXTREME DARK MODE MAPS */
+body[data-theme="dark"] {
+    --bg-neutral: #0a0b0d;      /* Deep pitch black-blue */
+    --card-white: #12141a;      /* Solid stark dark slate gray */
+    --text-main: #f5f6fa;       /* Bright readable canvas white text */
+    --text-muted: #9aa0a6;      /* High contrast secondary gray text */
+    --border-light: #242933;    /* Sharp crisp borders */
 }
 
 body {
-    background-color: var(--bg-color);
-    color: var(--text-color);
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-neutral);
+    color: var(--text-main);
+    margin: 0;
+    padding: 40px;
     display: flex;
-    min-height: 100vh;
-    transition: background-color 0.3s, color 0.3s;
+    justify-content: center;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* --- High-Contrast Extreme Dark Mode Overrides --- */
-body.dark-mode {
-    background-color: #0d0e12 !important;
-    color: #f5f6fa !important;
+body.auth-body-layout {
+    height: 100vh;
+    padding: 0;
+    align-items: center;
 }
 
-body.dark-mode .sidebar, 
-body.dark-mode .card, 
-body.dark-mode table,
-body.dark-mode .modal-content,
-body.dark-mode .savings-snapshot-card {
-    background-color: #16181d !important;
-    color: #f5f6fa !important;
-    border-color: #242933 !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5) !important;
+.container {
+    width: 100%;
+    max-width: 1200px;
+    background: var(--card-white);
+    border-radius: 24px;
+    padding: 50px;
+    min-height: 80vh;
+    transition: background 0.3s ease;
 }
 
-body.dark-mode input, 
-body.dark-mode select, 
-body.dark-mode textarea {
-    background-color: #1e222b !important;
-    color: #ffffff !important;
-    border: 1px solid #3d4455 !important;
+.dashboard-layout {
+    display: grid;
+    grid-template-columns: 220px 1fr 320px;
+    gap: 40px;
 }
 
-body.dark-mode td, 
-body.dark-mode th {
-    border-bottom: 1px solid #242933 !important;
-    color: #e3e6ed !important;
-}
-
-body.dark-mode th {
-    background-color: #1e222b !important;
-}
-
-body.dark-mode .progress-ring__background {
-    stroke: #242933 !important;
-}
-
-body.dark-mode .menu-item:hover, 
-body.dark-mode .menu-item.active {
-    background-color: #242933 !important;
-}
-
-body.dark-mode p,
-body.dark-mode .progress-ring-labels .title,
-body.dark-mode .progress-ring-labels .pct-label,
-body.dark-mode .snapshot-row span {
-    color: #b0b5c1 !important;
-}
-
-/* --- Main Structure Layout --- */
-.sidebar {
-    width: 260px;
-    background: #ffffff;
-    border-right: 1px solid var(--border-color);
-    padding: 30px 20px;
+/* SIDEBAR NAVIGATION */
+.nav-links { list-style: none; padding: 0; margin: 0; }
+.nav-links li {
+    padding: 15px 20px;
+    font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: 0.2s;
+    border-radius: 8px;
+    margin-bottom: 5px;
     display: flex;
-    flex-direction: column;
+    align-items: center;
     gap: 10px;
 }
-
-.menu-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 15px;
-    cursor: pointer;
-    border-radius: 8px;
-    font-weight: 500;
-    color: #616161;
-    transition: all 0.2s;
-    text-decoration: none;
+/* Micro-interaction theme tuning */
+.nav-links li:hover { 
+    background: rgba(128,128,128,0.08); 
+    color: var(--text-main); 
+}
+.nav-links li.active { 
+    color: var(--text-main); 
+    background: rgba(128,128,128,0.08);
+    border-left: 4px solid var(--accent-brand-color); 
 }
 
-.menu-item:hover, .menu-item.active {
-    background-color: #f0f4f8;
-    color: var(--accent-color);
+/* PAGE CONTENT CONTROL */
+.page-content { display: none; }
+.page-content.active { display: block; }
+
+/* ⭕ UPGRADED: CENTER VISUALS (PROGRESS RING HOOKS) */
+.circle-container { 
+    display: flex; flex-direction: column; align-items: center; margin-bottom: 40px; 
 }
 
-.main-content {
-    flex: 1;
-    padding: 40px;
-    max-width: 1200px;
-    margin: 0 auto;
-    width: 100%;
-}
-
-.view-section {
-    display: none;
-}
-
-.view-section.active {
-    display: block;
-}
-
-.card {
-    background: #ffffff;
-    border-radius: 12px;
-    padding: 25px;
-    margin-bottom: 25px;
-    border: 1px solid var(--border-color);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-}
-
-h2 { margin-bottom: 10px; font-size: 24px; }
-h3 { margin-bottom: 15px; font-size: 18px; }
-p { color: #616161; margin-bottom: 20px; line-height: 1.5; }
-
-/* --- Enlarged Progress Ring Layout --- */
-.progress-ring-wrapper {
+/* Enlarged wrapper framework to guarantee spacious layout breathing room */
+.main-circle-ring-wrapper {
     position: relative;
-    width: 240px; 
-    height: 240px;
-    margin: 20px auto;
+    width: 320px;  /* Increased frame size to prevent cramped layout metrics */
+    height: 320px;
     display: flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
+    margin-bottom: 30px;
 }
 
-.progress-ring-svg {
-    transform: rotate(-90deg);
-    width: 240px;
-    height: 240px;
+.main-circle-ring-wrapper svg {
     position: absolute;
     top: 0;
     left: 0;
+    transform: rotate(-90deg); /* Starts circle draw clockwise from top center */
+    width: 320px;
+    height: 320px;
 }
 
-.progress-ring-labels {
-    position: relative;
-    z-index: 2;
-    text-align: center;
-    padding: 10px;
+/* Targets the animating border track hook inside your script update loops */
+.progress-ring__circle {
+    stroke: var(--accent-brand-color);
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.3s ease, stroke 0.3s ease;
 }
 
-.progress-ring-labels .title {
-    font-size: 13px;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    margin-bottom: 4px;
-    color: #757575;
+/* Sizing adjusted intentionally to match the expanded spacious framework */
+.main-circle {
+    width: 260px; /* Scaled up safely */
+    height: 260px;
+    border: none; 
+    border-radius: 50%;
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    z-index: 5;
 }
+.main-circle span { font-size: 0.75rem; text-transform: uppercase; font-weight: 800; color: var(--text-muted); }
+.main-circle h2 { font-size: 2.8rem; margin: 5px 0; font-weight: 400; }
 
-.progress-ring-labels .amount {
-    font-size: 32px; 
-    font-weight: 700;
-    margin: 2px 0;
+/* TABLES */
+table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+th { text-align: left; background: rgba(128,128,128,0.06); padding: 12px; font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); }
+td { padding: 15px; border-bottom: 1px solid var(--border-light); font-size: 0.9rem; }
+
+/* BUTTONS & INPUTS */
+.add-section { background: rgba(128,128,128,0.03); padding: 25px; border-radius: 15px; margin-top: 30px; }
+.btn-black { 
+    background: var(--accent-brand-color); 
+    color: var(--card-white); /* Keeps contrast flawless across color variable swaps */
+    border: none; 
+    padding: 12px 24px; 
+    border-radius: 8px; 
+    cursor: pointer; 
+    font-weight: 600; 
+    transition: opacity 0.2s, background-color 0.3s ease; 
 }
+.btn-black:hover { opacity: 0.9; }
+input { padding: 12px; border: 1px solid var(--border-light); border-radius: 8px; margin-right: 10px; font-family: inherit; color: var(--text-main); background: var(--card-white); }
 
-.progress-ring-labels .pct-label {
-    font-size: 14px;
-    font-weight: 500;
-    color: #616161;
-}
-
-/* --- Split Grid Framework --- */
-.dashboard-grid {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 25px;
-    align-items: start;
-}
-
-/* --- Theme Accenting Layout --- */
-.accent-picker-row {
-    display: flex; 
-    align-items: center; 
-    gap: 15px; 
+/* ⚡ MICRO-DEPOSIT FLEX INTERFACES */
+.micro-deposit-row {
+    display: flex;
+    gap: 8px;
     margin-top: 10px;
 }
-
-.theme-dots-container {
-    display: flex;
-    gap: 10px;
+.btn-micro-pill {
+    background: transparent;
+    border: 1px solid var(--border-light);
+    color: var(--text-muted);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.btn-micro-pill:hover {
+    border-color: var(--text-main);
+    color: var(--text-main);
+    background: rgba(128,128,128,0.04);
 }
 
-.theme-dot {
-    width: 30px;
-    height: 30px;
+/* AUTHENTICATION SCREEN STYLES */
+.auth-card {
+    width: 100%;
+    max-width: 400px;
+    background: var(--card-white);
+    border-radius: 24px;
+    padding: 45px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+    box-sizing: border-box;
+}
+.auth-card h1 { font-size: 2rem; margin: 0 0 5px 0; letter-spacing: 1px; text-align: center; font-weight: 700; }
+.auth-card p.subtitle { text-align: center; color: var(--text-muted); font-size: 0.9rem; margin: 0 0 35px 0; }
+.form-group { margin-bottom: 22px; }
+.form-group label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.85rem; }
+.form-group input { 
+    width: 100%; padding: 12px 14px; border: 1px solid var(--border-light); 
+    border-radius: 8px; font-family: inherit; box-sizing: border-box; font-size: 0.95rem;
+    background: rgba(128,128,128,0.02);
+}
+.form-group input:focus { outline: none; border-color: var(--text-main); background: var(--card-white); }
+.remember-me-container { display: flex; align-items: center; gap: 8px; margin-bottom: 25px; font-size: 0.9rem; }
+.remember-me-container input { cursor: pointer; width: 16px; height: 16px; margin: 0; }
+.toggle-link { text-align: center; margin-top: 25px; font-size: 0.85rem; color: var(--text-muted); }
+.toggle-link span { color: var(--text-main); text-decoration: underline; cursor: pointer; font-weight: 600; }
+
+/* RIGHT PANEL PANEL COMPONENT */
+.right-sidebar-column {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+.chart-card {
+    background: var(--card-white);
+    border: 1px solid var(--border-light);
+    border-radius: 20px;
+    padding: 24px;
+    box-sizing: border-box;
+}
+.savings-card { background: rgba(128,128,128,0.06); padding: 30px; border-radius: 20px; align-self: auto; }
+.savings-bar { background: var(--card-white); height: 12px; border-radius: 10px; margin: 15px 0; position: relative; overflow: hidden; }
+#savings-progress { background: var(--accent-brand-color); height: 100%; width: 0%; transition: 0.3s; }
+
+.action-btn { color: #cc0000; text-decoration: underline; cursor: pointer; font-size: 0.8rem; border: none; background: none; }
+select { padding: 12px; border: 1px solid var(--border-light); border-radius: 8px; margin-right: 10px; font-family: inherit; font-size: 0.9rem; color: var(--text-main); background: var(--card-white); }
+.tax-toggle-buttons { display: flex; gap: 10px; margin-bottom: 20px; background: rgba(128,128,128,0.03); padding: 15px; border-radius: 12px; }
+.tax-option-container { background: rgba(128,128,128,0.03); padding: 25px; border-radius: 15px; border: 1px solid var(--border-light); margin-top: 15px; }
+
+/* ⚙️ VISUAL CONTROL DECK GRID FOR COLOR SELECTION AND CONFIGS */
+.aesthetics-deck {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+}
+.color-picker-grid {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 5px;
+}
+.color-swatch-dot {
+    width: 24px;
+    height: 24px;
     border-radius: 50%;
     cursor: pointer;
     border: 2px solid transparent;
-    transition: transform 0.2s;
+    transition: 0.15s;
 }
+.color-swatch-dot:hover { transform: scale(1.15); }
 
-.theme-dot:hover {
-    transform: scale(1.15);
-}
-
-.custom-picker-container {
-    display: flex; 
-    align-items: center; 
-    gap: 8px; 
-    border-left: 1px solid var(--border-color); 
-    padding-left: 15px;
-}
-
-.native-color-picker {
-    border: none; 
-    width: 40px; 
-    height: 40px; 
-    border-radius: 50%; 
-    cursor: pointer; 
-    background: transparent;
-}
-
-/* --- UI Controls & Data Tables --- */
-.action-btn {
-    background: var(--accent-color);
-    color: white;
+/* Custom Gradient Picker input styling */
+.custom-gradient-picker {
     border: none;
-    padding: 12px 20px;
-    border-radius: 8px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
     cursor: pointer;
-    font-weight: 600;
-    width: 100%;
-    transition: background 0.2s;
-}
-
-.action-btn:hover {
-    filter: brightness(0.9);
-}
-
-.secondary-btn {
     background: transparent;
-    border: 1px solid var(--border-color);
-    color: var(--text-color);
-    padding: 12px 20px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-    width: 100%;
-    margin-bottom: 10px;
+    padding: 0;
 }
+.custom-gradient-picker::-webkit-color-swatch-wrapper { padding: 0; }
+.custom-gradient-picker::-webkit-color-swatch { border: 1px solid var(--border-light); border-radius: 50%; }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 15px;
+.logout-btn { 
+    background: none; border: none; color: var(--text-muted); font-weight: 600; 
+    cursor: pointer; padding: 15px 20px; width: 100%; text-align: left; 
+    display: flex; align-items: center; gap: 10px; margin-top: 30px; border-radius: 8px; 
+    font-family: inherit; font-size: 1rem;
 }
-
-th, td {
-    padding: 12px 15px;
-    text-align: left;
-    border-bottom: 1px solid var(--border-color);
-}
-
-th { 
-    font-weight: 600; 
-    background-color: rgba(0,0,0,0.01); 
-}
-
-.savings-snapshot-card {
-    background: #ededf2;
-    border-radius: 16px;
-    padding: 25px;
-}
-
-.snapshot-header {
-    font-size: 11px; 
-    text-transform: uppercase; 
-    letter-spacing: 0.5px; 
-    margin-bottom: 15px; 
-    color: #616161;
-}
-
-.snapshot-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-}
-
-.snapshot-row span { 
-    font-weight: 500; 
-    color: #424242; 
-}
-
-.snapshot-row strong { 
-    font-size: 20px; 
-    font-weight: 700; 
-}
+.logout-btn:hover { background: rgba(128,128,128,0.06); color: #cc0000; }

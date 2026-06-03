@@ -3,249 +3,815 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Financial Tracker Platform</title>
-    <link rel="stylesheet" href="style.css">
+    <title>STASH Financial Ledger & Wealth Analytics</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-color: #f7f7f5;
+            --card-bg: #ffffff;
+            --text-main: #1a1a1a;
+            --text-muted: #757575;
+            --border-color: #e0e0dc;
+            --primary: #1a1a1a;
+            --accent-green: #2e7d32;
+            --accent-red: #cc0000;
+            --radius: 8px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding: 40px 20px;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 20px;
+        }
+
+        header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: var(--radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+        }
+
+        /* Dashboard Grid System */
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .card-title {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+
+        .metric {
+            font-size: 36px;
+            font-weight: 700;
+            letter-spacing: -1px;
+        }
+
+        /* Forms & Interactive Controls */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        input, select {
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            font-size: 14px;
+            outline: none;
+            background: #fafafa;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--text-main);
+            background: #fff;
+        }
+
+        .horizontal-inputs {
+            display: grid;
+            grid-template-columns: 2fr 1fr auto;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        /* Tabular Data Structures */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        th {
+            color: var(--text-muted);
+            font-weight: 600;
+            padding: 10px 12px;
+            border-bottom: 2px solid var(--border-color);
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Visual Progress Ring Components */
+        .progress-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            gap: 20px;
+        }
+
+        .progress-ring {
+            position: relative;
+            width: 200px;
+            height: 200px;
+        }
+
+        .progress-ring__circle {
+            transition: stroke-dashoffset 0.35s;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+
+        .ring-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        /* Chart Canvas Containers */
+        .chart-container {
+            position: relative;
+            height: 220px;
+            width: 100%;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            color: var(--accent-red);
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .action-btn:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
 
-    <div class="sidebar">
-        <a href="#" class="menu-item" onclick="switchView('savings')">🏢 Savings</a>
-        <a href="#" class="menu-item" onclick="switchView('buckets')">📂 Savings Buckets</a>
-        <a href="#" class="menu-item" onclick="switchView('interest')">📈 Interest Tracker</a>
-        <a href="#" class="menu-item" onclick="switchView('tax')">📊 Tax Calculator</a>
-        <a href="#" class="menu-item" onclick="switchView('reports')">📊 Reports</a>
-        <a href="#" class="menu-item active" onclick="switchView('aesthetics')">🎨 Aesthetics & Theme</a>
-        <a href="#" class="menu-item" style="margin-top: auto; color: #cc0000;">🚪 Log Out</a>
+<div class="container">
+    <header>
+        <div>
+            <h1>STASH Financial Ledger</h1>
+            <p style="color: var(--text-muted); font-size: 14px;">Institutional Wealth Management & Projections Platform</p>
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <button class="btn btn-secondary" onclick="window.exportLedgerToCSV()">Export Ledger to CSV</button>
+            <button class="btn" style="background: var(--accent-red);" onclick="window.resetLedgerData()">Reset Sandbox</button>
+        </div>
+    </header>
+
+    <div class="grid-3">
+        <div class="card">
+            <span class="card-title">Available Cash Position</span>
+            <div class="metric" id="display-total">$0.00</div>
+            <div class="chart-container">
+                <canvas id="statsChart"></canvas>
+            </div>
+        </div>
+
+        <div class="card">
+            <span class="card-title">Target Goal Trajectory</span>
+            <div class="progress-box">
+                <div class="progress-ring">
+                    <svg width="200" height="200">
+                        <circle stroke="#e0e0dc" stroke-width="12" fill="transparent" r="85" cx="100" cy="100"/>
+                        <circle class="progress-ring__circle" stroke="#1a1a1a" stroke-width="12" fill="transparent" r="85" cx="100" cy="100"/>
+                    </svg>
+                    <div class="ring-text">
+                        <div id="ring-percentage-label" style="font-size: 18px; font-weight:700;">0%</div>
+                        <div style="font-size: 11px; color: var(--text-muted);">Allocated</div>
+                    </div>
+                </div>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 13px;">
+                <span>Saved Pool: <strong id="saved-text">$0</strong></span>
+                <span>Target Barrier: <strong id="goal-text">$0</strong></span>
+            </div>
+        </div>
+
+        <div class="card">
+            <span class="card-title">System Configurations</span>
+            <div class="form-group">
+                <label>Adjust Master Target Goal Barrier ($)</label>
+                <input type="number" id="input-goal" placeholder="e.g. 50000" onchange="window.updateGoalConfig(this.value)">
+            </div>
+            <hr style="border: none; border-top: 1px solid var(--border-color);">
+            <div class="form-group">
+                <label>Transfer Cash to Saved Pool ($)</label>
+                <div style="display: flex; gap: 8px;">
+                    <input type="number" id="input-stash-amount" placeholder="Amount" style="width: 100%;">
+                    <button class="btn" onclick="window.executeStashTransfer()">Stash</button>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="main-content">
-        
-        <div id="view-aesthetics" class="view-section active">
-            <div class="dashboard-grid">
-                
-                <div class="left-column">
-                    <h2>Aesthetics & Design Settings</h2>
-                    <p>Personalize your tracker layout settings using the options below:</p>
-
-                    <div class="card">
-                        <h3>App Visual Light Profile:</h3>
-                        <button class="action-btn" onclick="toggleLightDarkMode()">🌓 Toggle Light / Dark Mode</button>
-                    </div>
-
-                    <div class="card">
-                        <h3>Website Theme Accenting:</h3>
-                        <p>Select a color profile swap parameter below or choose a custom hue to change brand styles immediately:</p>
-                        
-                        <div class="accent-picker-row">
-                            <div class="theme-dots-container">
-                                <span class="theme-dot" style="background:#1a1a1a;" onclick="setThemeColor('#1a1a1a')"></span>
-                                <span class="theme-dot" style="background:#2e7d32;" onclick="setThemeColor('#2e7d32')"></span>
-                                <span class="theme-dot" style="background:#1565c0;" onclick="setThemeColor('#1565c0')"></span>
-                                <span class="theme-dot" style="background:#c62828;" onclick="setThemeColor('#c62828')"></span>
-                                <span class="theme-dot" style="background:#6a1b9a;" onclick="setThemeColor('#6a1b9a')"></span>
-                            </div>
-                            
-                            <div class="custom-picker-container">
-                                <label for="custom-color-picker" style="font-size: 14px; font-weight: 500;">Custom Hue:</label>
-                                <input type="color" id="custom-color-picker" value="#1565c0" oninput="setThemeColor(this.value)" class="native-color-picker">
-                            </div>
-                        </div>
-                    </div>
+    <div class="grid-2">
+        <div class="card">
+            <span class="card-title">Append Financial Ledger Inflow / Outflow</span>
+            <div class="horizontal-inputs">
+                <div class="form-group">
+                    <label>Transaction Descriptor</label>
+                    <input type="text" id="tx-name" placeholder="e.g., Q3 Consulting Retainer">
                 </div>
-
-                <div class="right-column">
-                    <div class="progress-ring-wrapper">
-                        <svg class="progress-ring-svg">
-                            <circle class="progress-ring__background" stroke="#e0e0e0" stroke-width="10" fill="transparent" r="105" cx="120" cy="120"/>
-                            <circle class="progress-ring__circle" stroke="var(--accent-color)" stroke-width="12" stroke-linecap="round" fill="transparent" r="105" cx="120" cy="120"/>
-                        </svg>
-                        <div class="progress-ring-labels">
-                            <div class="title">Total Available Funds</div>
-                            <div class="amount" id="ring-funds-label">$0.00</div>
-                            <div class="pct-label" id="ring-percentage-label">0% of Goal</div>
-                        </div>
-                    </div>
-
-                    <div class="savings-snapshot-card">
-                        <h4 class="snapshot-header">Savings Snapshot</h4>
-                        <div class="snapshot-row">
-                            <span>Goal</span>
-                            <strong id="snapshot-goal-text">$0</strong>
-                        </div>
-                        <div class="snapshot-row" style="margin-bottom: 20px;">
-                            <span>Saved</span>
-                            <strong id="snapshot-saved-text">$0</strong>
-                        </div>
-                        <button class="secondary-btn">Modify Savings</button>
-                        <button class="action-btn">Quick Add to Savings</button>
-                    </div>
+                <div class="form-group">
+                    <label>Amount ($)</label>
+                    <input type="number" id="tx-amount" placeholder="0.00">
                 </div>
-
+                <div class="form-group">
+                    <label>Classification</label>
+                    <select id="tx-type">
+                        <option value="Deposit">Deposit (Inflow)</option>
+                        <option value="Expense">Expense (Outflow)</option>
+                    </select>
+                </div>
             </div>
+            <button class="btn" style="width: 100%; margin-top: 8px;" onclick="window.processTransactionForm()">Inject Transaction Records into Ledger</button>
         </div>
 
-        <div id="view-savings" class="view-section">
-            <h2>🏢 Savings Dashboard</h2>
-            <div class="card">
-                <p>Savings records and balance metrics display module.</p>
+        <div class="card">
+            <span class="card-title">Sub-Savings Target Allocation Buckets</span>
+            <div class="horizontal-inputs">
+                <div class="form-group">
+                    <label>Target Sub-Bucket Label</label>
+                    <input type="text" id="bucket-name" placeholder="e.g., Capital Reserves">
+                </div>
+                <div class="form-group">
+                    <label>Allocation ($)</label>
+                    <input type="number" id="bucket-amount" placeholder="0.00">
+                </div>
+                <button class="btn" onclick="window.createSavingsBucket()">Carve</button>
             </div>
-        </div>
-
-        <div id="view-buckets" class="view-section">
-            <h2>📂 Savings Buckets Allocation</h2>
-            <div class="card">
-                <p>Available Unallocated Pool: $<strong><span id="bucket-pool-available">0.00</span></strong></p>
+            <p style="font-size: 12px; color: var(--text-muted);">
+                Total Stashed Liquidity Available for Buckets: <strong>$<span id="bucket-pool-available">0.00</span></strong>
+            </p>
+            <div style="max-height: 140px; overflow-y: auto;">
                 <table>
                     <thead>
                         <tr>
                             <th>Bucket Name</th>
-                            <th>Allocated Amount</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="buckets-table-body">
-                        </tbody>
-                </table>
-            </div>
-        </div>
-
-        <div id="view-interest" class="view-section">
-            <h2>📈 Interest Tracker & Forecasts</h2>
-            <div class="card">
-                <p>Compound and yield simulation matrix logging systems.</p>
-            </div>
-        </div>
-
-        <div id="view-tax" class="view-section">
-            <h2>📊 Tax Calculator & Pay Withholding</h2>
-            <div class="card">
-                <p>Tax withholding tables and structural net estimations.</p>
-            </div>
-        </div>
-
-        <div id="view-reports" class="view-section">
-            <h2>📊 Transaction Ledger Reports</h2>
-            <div class="card">
-                <h3>Modification Ledger Logs</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Transaction Details</th>
-                            <th>Amount Impact</th>
-                            <th>Date Logged</th>
+                            <th>Allocated Holding</th>
                             <th>Action</th>
                         </tr>
                     </thead>
-                    <tbody id="report-log-body">
-                        </tbody>
+                    <tbody id="buckets-table-body"></tbody>
                 </table>
-                <button id="show-more-btn" class="secondary-btn" style="display:none; margin-top:15px;"></button>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid-2">
+        <div class="card">
+            <span class="card-title">Dynamic Yield Matrix Projections (Compound Growth)</span>
+            <div class="horizontal-inputs" style="grid-template-columns: repeat(3, 1fr);">
+                <div class="form-group">
+                    <label>Yield Rate (APY %)</label>
+                    <input type="number" id="projection-rate" value="5.0" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label>Horizon (Years)</label>
+                    <input type="number" id="projection-years" value="10">
+                </div>
+                <div class="form-group">
+                    <label>Compounding Matrix</label>
+                    <select id="projection-frequency">
+                        <option value="12" selected>Monthly (12/yr)</option>
+                        <option value="1">Annually (1/yr)</option>
+                        <option value="365">Daily (365/yr)</option>
+                    </select>
+                </div>
             </div>
             
-            <div class="card" style="margin-top: 20px;">
-                <h3>Expense Breakdown Ledger</h3>
+            <div style="max-height: 220px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: var(--radius);">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Timeline Interval</th>
+                            <th>Principal Base</th>
+                            <th>Interest Accrued</th>
+                            <th>Compound Balance Target</th>
+                        </tr>
+                    </thead>
+                    <tbody id="yield-projection-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <span class="card-title">Compound Interest Yield Curve Over Time</span>
+            <div class="chart-container" style="height: 100%; min-height: 280px;">
+                <canvas id="yieldChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid-2">
+        <div class="card">
+            <span class="card-title">Ledger Expenses Ledger Extract</span>
+            <div style="max-height: 260px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: var(--radius);">
                 <table>
                     <thead>
                         <tr>
                             <th>Type</th>
-                            <th>Description</th>
-                            <th>Value</th>
-                            <th>Date</th>
-                            <th>Status</th>
+                            <th>Descriptor</th>
+                            <th>Quantum Outflow</th>
+                            <th>Timestamp</th>
+                            <th>Flags</th>
                         </tr>
                     </thead>
-                    <tbody id="expense-table-body">
-                        </tbody>
+                    <tbody id="expense-table-body"></tbody>
                 </table>
             </div>
         </div>
 
+        <div class="card">
+            <span class="card-title">Tax Bracket Insights Matrix (Marginal Estimator)</span>
+            <div class="horizontal-inputs" style="grid-template-columns: 2fr 1fr;">
+                <div class="form-group">
+                    <label>Filing Status Architecture Matrix</label>
+                    <select id="tax-filing-status">
+                        <option value="single" selected>Single Taxpayer Matrix</option>
+                        <option value="married">Married Filing Jointly Vector</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Estimated Deductions ($)</label>
+                    <input type="number" id="tax-deductions" value="15000">
+                </div>
+            </div>
+            <div style="font-size: 13px; color: var(--text-muted); display:flex; justify-content:space-between; margin-top:-5px;">
+                <span>Total Cash Liquid: <strong id="tax-calc-gross">$0.00</strong></span>
+                <span>Taxable Frame Basis: <strong id="tax-calc-taxable">$0.00</strong></span>
+            </div>
+            <div style="max-height: 180px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: var(--radius);">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Marginal Rate</th>
+                            <th>Bracket Range Vector</th>
+                            <th>Tax Liability Segment</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tax-bracket-matrix-body"></tbody>
+                </table>
+            </div>
+            <div style="font-size: 14px; font-weight: 700; display: flex; justify-content: space-between; border-top: 1px solid var(--border-color); padding-top: 8px;">
+                <span>Cumulative Tax Exposure Liability:</span>
+                <span id="tax-matrix-total-liability" style="color: var(--accent-red);">$0.00</span>
+            </div>
+        </div>
     </div>
 
+    <div class="card">
+        <span class="card-title">Stash Analytics Modification & Validation Audit Ledger Logs</span>
+        <div style="overflow-x: auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Transaction Registry Mutation Signature Log Event</th>
+                        <th>Quantum Balance Delta Impact</th>
+                        <th>System Event Real-time Check Stamp</th>
+                        <th>Administrative Action Override</th>
+                    </tr>
+                </thead>
+                <tbody id="report-log-body"></tbody>
+            </table>
+        </div>
+        <div style="text-align: center; margin-top: 10px;">
+            <button id="show-more-btn" class="btn btn-secondary" style="display: none;"></button>
+        </div>
+    </div>
+</div>
+
 <script>
-    // --- System Architecture Global States (Kept Perfectly Intact) ---
+    // --- APP-WIDE FINANCIAL STATE ---
     let state = {
-        saved: 1000,
-        goal: 50000,
-        history: [
-            { id: 1, type: 'Deposit', name: 'Initial Transfer', amount: 1000, date: '2026-06-01' },
-            { id: 2, type: 'Expense', name: 'Server Asset Sync', amount: 160, date: '2026-06-02' }
-        ],
+        total: 124500.00,  // Initial Liquidity Pool Cash Position
+        saved: 34000.00,   // Cash Allocated inside Savings Trajectory System
+        goal: 100000.00,   // Target Barrier Variable Value
         buckets: [
-            { id: 101, name: 'Emergency Contingency', amount: 500 },
-            { id: 102, name: 'Tech Capital Hardware', amount: 300 }
+            { id: 1, name: 'Capital Protection Pool', amount: 20000 },
+            { id: 2, name: 'Liquidity Fund', amount: 14000 }
         ],
-        themeColor: '#1565c0'
+        history: [
+            { id: 101, type: 'Deposit', name: 'Corporate Consulting Inbound Retainer', amount: 145000.00, date: '5/12/2026' },
+            { id: 102, type: 'Expense', name: 'Strategic Technology Infrastructure Node deployment', amount: 20500.00, date: '5/18/2026' }
+        ]
     };
 
     let showAllHistoryLogs = false;
-    
-    // Exact sizing configurations matching newly updated 240px SVG dimensions
-    const targetRingRadius = 105;
-    const targetRingCircumference = 2 * Math.PI * targetRingRadius; // ~659.73px
+    let statsChartInstance = null;
+    let yieldChartInstance = null;
 
-    function switchView(viewId) {
-        document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-        document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active'));
-        
-        if (document.getElementById(`view-${viewId}`)) {
-            document.getElementById(`view-${viewId}`).classList.add('active');
-        } else {
-            document.getElementById(`view-aesthetics`).classList.add('active');
+    // --- DATA TRANSFORMS & STORAGE PERSISTENCE HANDLERS ---
+    function loadUserData() {
+        const localData = localStorage.getItem('STASH_financial_ledger_state_v2');
+        if (localData) {
+            try {
+                state = JSON.parse(localData);
+            } catch (e) {
+                console.error("Local Storage Parsing Validation Failure, using default engine vectors.", e);
+            }
         }
-        event.currentTarget.classList.add('active');
     }
 
-    window.setThemeColor = function(colorHex) {
-        document.documentElement.style.setProperty('--accent-color', colorHex);
-        const picker = document.getElementById('custom-color-picker');
-        if (picker) picker.value = colorHex;
-        state.themeColor = colorHex;
+    function saveUserData() {
+        localStorage.setItem('STASH_financial_ledger_state_v2', JSON.stringify(state));
+    }
+
+    // --- TRANSACTION MUTATORS ---
+    window.processTransactionForm = function() {
+        const nameEl = document.getElementById('tx-name');
+        const amountEl = document.getElementById('tx-amount');
+        const typeEl = document.getElementById('tx-type');
+        
+        const name = nameEl.value.trim() || "Unspecified Ledger Inflow/Outflow Event";
+        const amount = parseFloat(amountEl.value);
+        const type = typeEl.value;
+
+        if (isNaN(amount) || amount <= 0) {
+            alert("Transactional amount parameters must resolve to positive digits.");
+            return;
+        }
+
+        if (type === 'Expense' && amount > state.total) {
+            alert("Outflow rejection: System liquid cash reserves insufficient for execution framework.");
+            return;
+        }
+
+        if (type === 'Deposit') {
+            state.total += amount;
+        } else {
+            state.total -= amount;
+        }
+
+        state.history.unshift({
+            id: Date.now(),
+            type: type,
+            name: name,
+            amount: amount,
+            date: new Date().toLocaleDateString()
+        });
+
+        nameEl.value = '';
+        amountEl.value = '';
+        
+        saveUserData();
+        window.updateAllUI();
     };
 
-    window.toggleLightDarkMode = function() {
-        const isDark = document.body.classList.toggle('dark-mode');
-        localStorage.setItem('extremeDarkModeActive', isDark ? 'enabled' : 'disabled');
+    window.executeStashTransfer = function() {
+        const amountEl = document.getElementById('input-stash-amount');
+        const amount = parseFloat(amountEl.value);
+
+        if (isNaN(amount) || amount <= 0) {
+            alert("Execution halted: Parameter input format matrix exception.");
+            return;
+        }
+
+        if (amount > state.total) {
+            alert("Rejection: Allocation vector bounds exceed base liquid cash positions.");
+            return;
+        }
+
+        state.total -= amount;
+        state.saved += amount;
+
+        state.history.unshift({
+            id: Date.now(),
+            type: 'Deposit',
+            name: `Internal Transfer -> Saved Allocation Vault Block`,
+            amount: amount,
+            date: new Date().toLocaleDateString()
+        });
+
+        amountEl.value = '';
+        saveUserData();
+        window.updateAllUI();
     };
 
-    window.toggleHistoryViewLimit = function() {
-        showAllHistoryLogs = !showAllHistoryLogs;
-        updateAllUI();
+    window.updateGoalConfig = function(val) {
+        const parseGoal = parseFloat(val);
+        if (!isNaN(parseGoal) && parseGoal >= 0) {
+            state.goal = parseGoal;
+            saveUserData();
+            window.updateAllUI();
+        }
+    };
+
+    window.createSavingsBucket = function() {
+        const nameEl = document.getElementById('bucket-name');
+        const amountEl = document.getElementById('bucket-amount');
+        const name = nameEl.value.trim() || "Sub-Allocation Segment Pool";
+        const amount = parseFloat(amountEl.value);
+
+        if (isNaN(amount) || amount <= 0) {
+            alert("System sub-allocations parameters must be numeric metrics.");
+            return;
+        }
+
+        let currentAllocations = state.buckets.reduce((acc, b) => acc + b.amount, 0);
+        if (currentAllocations + amount > state.saved) {
+            alert("Rejection: Requested bucket volume size scales past total saved pool framework boundaries.");
+            return;
+        }
+
+        state.buckets.push({
+            id: Date.now(),
+            name: name,
+            amount: amount
+        });
+
+        nameEl.value = '';
+        amountEl.value = '';
+        saveUserData();
+        window.updateAllUI();
     };
 
     window.deleteSavingsBucket = function(id) {
         state.buckets = state.buckets.filter(b => b.id !== id);
-        updateAllUI();
+        saveUserData();
+        window.updateAllUI();
     };
 
     window.deleteLogEntry = function(id) {
-        state.history = state.history.filter(item => item.id !== id);
-        updateAllUI();
+        const index = state.history.findIndex(item => item.id === id);
+        if (index !== -1) {
+            const entry = state.history[index];
+            // Revert core transaction adjustments dynamically upon ledger log excision
+            if (entry.type === 'Deposit') {
+                state.total -= entry.amount;
+            } else if (entry.type === 'Expense') {
+                state.total += entry.amount;
+            } else if (entry.name.includes("Internal Transfer")) {
+                state.total += entry.amount;
+                state.saved -= entry.amount;
+            }
+            
+            state.history.splice(index, 1);
+            saveUserData();
+            window.updateAllUI();
+        }
     };
 
-    window.renderStatsChart = function() {
-        // Operational Chart Hooks Preserved
+    window.toggleHistoryViewLimit = function() {
+        showAllHistoryLogs = !showAllHistoryLogs;
+        window.updateAllUI();
     };
 
-    // Load initial dark mode profile setting state from persistence storage
-    if (localStorage.getItem('extremeDarkModeActive') === 'enabled') {
-        document.body.classList.add('dark-mode');
-    }
+    window.resetLedgerData = function() {
+        if(confirm("Confirm destructive modification wipe request? This flushes all local ledger data cache chains.")) {
+            localStorage.removeItem('STASH_financial_ledger_state_v2');
+            state = {
+                total: 100000.00,
+                saved: 25000.00,
+                goal: 100000.00,
+                buckets: [],
+                history: []
+            };
+            window.updateAllUI();
+        }
+    };
 
-    // --- Core User Rendering System Engine (Full Code Added Back Unaltered) ---
-    function updateAllUI() {
-        let totalAvailable = state.saved;
-        let pct = (totalAvailable / state.goal) * 100;
-
-        const fundsLabel = document.getElementById('ring-funds-label');
-        if (fundsLabel) fundsLabel.innerText = `$${totalAvailable.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+    // --- ANALYTICS: DYNAMIC COMPOUND INTEREST PROJECTIONS ENGINE ---
+    window.calculateCompoundYield = function() {
+        const rate = parseFloat(document.getElementById('projection-rate').value) / 100 || 0;
+        const years = parseInt(document.getElementById('projection-years').value) || 0;
+        const freq = parseInt(document.getElementById('projection-frequency').value) || 12;
+        const tbody = document.getElementById('yield-projection-body');
         
-        const snapGoal = document.getElementById('snapshot-goal-text');
-        if (snapGoal) snapGoal.innerText = `$${state.goal.toLocaleString()}`;
-        
-        const snapSaved = document.getElementById('snapshot-saved-text');
-        if (snapSaved) snapSaved.innerText = `$${state.saved.toLocaleString()}`;
+        if (!tbody) return;
+        tbody.innerHTML = '';
 
+        let principal = state.total; 
+        let accumulatedInterest = 0;
+        
+        let chartLabels = ['Year 0'];
+        let chartDataPoints = [principal.toFixed(2)];
+
+        for (let y = 1; y <= years; y++) {
+            let previousYearEndBalance = principal + accumulatedInterest;
+            // Compound Formulas: $A = P \times (1 + \frac{r}{n})^{n \times t}$
+            let newTotal = previousYearEndBalance * Math.pow((1 + (rate / freq)), freq * 1);
+            let interestEarnedThisPeriod = newTotal - previousYearEndBalance;
+            accumulatedInterest += interestEarnedThisPeriod;
+
+            let displayPrincipal = principal; 
+            let displayCombinedTotal = principal + accumulatedInterest;
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>Year Interval ${y}</td>
+                <td>$${displayPrincipal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                <td style="color: var(--accent-green);">+$${accumulatedInterest.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                <td><strong>$${displayCombinedTotal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong></td>
+            `;
+            tbody.appendChild(tr);
+
+            chartLabels.push(`Year ${y}`);
+            chartDataPoints.push(displayCombinedTotal.toFixed(2));
+        }
+
+        // Render dynamic asset growth line plot
+        const ctx = document.getElementById('yieldChart');
+        if (!ctx) return;
+
+        if (yieldChartInstance) {
+            yieldChartInstance.destroy();
+        }
+
+        yieldChartInstance = new Chart(ctx.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: chartLabels,
+                datasets: [{
+                    label: 'Projected Wealth Curve Assets',
+                    data: chartDataPoints,
+                    borderColor: '#1a1a1a',
+                    borderWidth: 2,
+                    backgroundColor: 'rgba(26,26,26,0.04)',
+                    fill: true,
+                    tension: 0.1,
+                    pointRadius: 4,
+                    pointBackgroundColor: '#1a1a1a'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { grid: { color: '#e0e0dc' }, ticks: { font: { size: 10 } } },
+                    x: { grid: { display: false }, ticks: { font: { size: 10 } } }
+                }
+            }
+        });
+    };
+
+    // --- ANALYTICS: TAX BRACKET MATRIX EVALUATOR ENGINE ---
+    window.calculateTaxBracketMatrix = function() {
+        const filingStatus = document.getElementById('tax-filing-status').value;
+        const deductions = parseFloat(document.getElementById('tax-deductions').value) || 0;
+        const tbody = document.getElementById('tax-bracket-matrix-body');
+        
+        const grossIncome = state.total; // Mapping available cash pool configuration directly to taxable frames
+        const taxableIncome = Math.max(0, grossIncome - deductions);
+
+        document.getElementById('tax-calc-gross').innerText = '$' + grossIncome.toLocaleString(undefined, {minimumFractionDigits: 2});
+        document.getElementById('tax-calc-taxable').innerText = '$' + taxableIncome.toLocaleString(undefined, {minimumFractionDigits: 2});
+
+        if (!tbody) return;
+        tbody.innerHTML = '';
+
+        // Dynamic 2026/Future Proof Progressive Tax Tier Structures
+        const brackets = {
+            single: [
+                { rate: 0.10, limit: 11600 },
+                { rate: 0.12, limit: 47150 },
+                { rate: 0.22, limit: 100525 },
+                { rate: 0.24, limit: 191950 },
+                { rate: 0.32, limit: 243725 },
+                { rate: 0.35, limit: 609350 },
+                { rate: 0.37, limit: Infinity }
+            ],
+            married: [
+                { rate: 0.10, limit: 23200 },
+                { rate: 0.12, limit: 94300 },
+                { rate: 0.22, limit: 201050 },
+                { rate: 0.24, limit: 383900 },
+                { rate: 0.32, limit: 487450 },
+                { rate: 0.35, limit: 731200 },
+                { rate: 0.37, limit: Infinity }
+            ]
+        };
+
+        const currentBrackets = brackets[filingStatus];
+        let remainingIncome = taxableIncome;
+        let cumulativeTaxLiability = 0;
+        let previousLimit = 0;
+
+        currentBrackets.forEach(bracket => {
+            if (taxableIncome > previousLimit) {
+                let currentTierRangeSpan = bracket.limit - previousLimit;
+                let taxableAmountInThisTier = Math.min(remainingIncome, currentTierRangeSpan);
+                let tierCalculatedTaxLiability = taxableAmountInThisTier * bracket.rate;
+                
+                cumulativeTaxLiability += tierCalculatedTaxLiability;
+                remainingIncome -= taxableAmountInThisTier;
+
+                let rangeText = bracket.limit === Infinity ? 
+                    `$${previousLimit.toLocaleString()}+` : 
+                    `$${previousLimit.toLocaleString()} - $${bracket.limit.toLocaleString()}`;
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${(bracket.rate * 100)}%</strong></td>
+                    <td>${rangeText}</td>
+                    <td style="color:${taxableAmountInThisTier > 0 ? 'var(--accent-red)' : 'var(--text-muted)'};">
+                        $${tierCalculatedTaxLiability.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                    </td>
+                `;
+                tbody.appendChild(tr);
+                previousLimit = bracket.limit;
+            }
+        });
+
+        document.getElementById('tax-matrix-total-liability').innerText = '$' + cumulativeTaxLiability.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    };
+
+    // --- SYSTEM UI REFLECTION SYNCHRONIZATION ENGINE ---
+    window.updateAllUI = function() {
+        // Cash metrics tracking outputs
+        const displayTotal = document.getElementById('display-total');
+        if (displayTotal) displayTotal.innerText = '$' + state.total.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        
+        const savedText = document.getElementById('saved-text');
+        if (savedText) savedText.innerText = '$' + state.saved.toLocaleString(undefined, {minimumFractionDigits: 0});
+        
+        const goalText = document.getElementById('goal-text');
+        if (goalText) goalText.innerText = '$' + state.goal.toLocaleString(undefined, {minimumFractionDigits: 0});
+
+        const inputGoalEl = document.getElementById('input-goal');
+        if (inputGoalEl && !inputGoalEl.value) inputGoalEl.placeholder = state.goal;
+
+        // Radial progress vector processing mechanics
+        let pct = state.goal > 0 ? (state.saved / state.goal) * 100 : 0;
+        const targetRingCircumference = 534; // $2 \pi r = 2 \times 3.14159 \times 85 \approx 534$
         const progressCircleEl = document.querySelector('.progress-ring__circle');
         if (progressCircleEl) {
             const boundedPercentage = Math.min(Math.max(pct, 0), 100);
@@ -254,25 +820,27 @@
             progressCircleEl.style.strokeDashoffset = `${offsetCalculation}`;
             
             const percentageTextEl = document.getElementById('ring-percentage-label');
-            if (percentageTextEl) percentageTextEl.innerText = `${Math.round(pct)}% of Goal`;
+            if (percentageTextEl) percentageTextEl.innerText = `${Math.round(pct)}%`;
         }
 
+        // Table array compilation pipelines: Expenses Filter Extractor
         const tbody = document.getElementById('expense-table-body');
         if (tbody) {
             tbody.innerHTML = '';
             const expensesList = state.history.filter(item => item.type === 'Expense');
             
             if (expensesList.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#757575; padding:20px; font-style:italic;">No expenses tracked yet. Use the fields above to add your first transaction.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-muted); padding:20px; font-style:italic;">No expenditures logged. Use data inputs to append operations.</td></tr>`;
             } else {
                 expensesList.forEach(item => {
                     const tr = document.createElement('tr');
-                    tr.innerHTML = `<td>📉 Expense</td><td>${item.name}</td><td>$${item.amount.toFixed(2)}</td><td>${item.date}</td><td>-</td>`;
+                    tr.innerHTML = `<td>📉 Expense</td><td>${item.name}</td><td style="color:var(--accent-red); font-weight:500;">-$${item.amount.toFixed(2)}</td><td>${item.date}</td><td><span style="background:#f0f0f0; padding:2px 6px; border-radius:4px; font-size:11px;">Debit</span></td>`;
                     tbody.appendChild(tr);
                 });
             }
         }
 
+        // Allocation segment layout matrix updates
         let totalBucketAllocations = state.buckets.reduce((acc, b) => acc + b.amount, 0);
         const leftOverPool = state.saved - totalBucketAllocations; 
         const poolEl = document.getElementById('bucket-pool-available');
@@ -282,44 +850,41 @@
         if (bucketsTbody) {
             bucketsTbody.innerHTML = '';
             if (state.buckets.length === 0) {
-                bucketsTbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#757575; padding:20px; font-style:italic;">No active sub-savings buckets found. Allocate a goal portion above.</td></tr>`;
+                bucketsTbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:var(--text-muted); padding:20px; font-style:italic;">No active sub-savings allocations detected.</td></tr>`;
             } else {
                 state.buckets.forEach(b => {
                     const tr = document.createElement('tr');
-                    tr.innerHTML = `<td>📂 ${b.name}</td><td><strong>$${b.amount.toLocaleString()}</strong></td><td><button class="action-btn" style="padding: 6px 12px; width: auto;" onclick="deleteSavingsBucket(${b.id})">Release Allocation</button></td>`;
+                    tr.innerHTML = `<td>📂 ${b.name}</td><td><strong>$${b.amount.toLocaleString()}</strong></td><td><button class="action-btn" onclick="window.deleteSavingsBucket(${b.id})">Release Pool</button></td>`;
                     bucketsTbody.appendChild(tr);
                 });
             }
         }
 
+        // Global master modification logs parser
         const reportBody = document.getElementById('report-log-body');
         if (reportBody) {
             reportBody.innerHTML = '';
-            
             if (state.history.length === 0) {
-                reportBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#757575; padding:20px; font-style:italic;">Modification ledger empty. Financial updates will construct logs here.</td></tr>`;
+                reportBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--text-muted); padding:20px; font-style:italic;">No systemic trace modifications exist in standard index structures.</td></tr>`;
             } else {
                 const visibleLogs = showAllHistoryLogs ? state.history : state.history.slice(0, 20);
-                
                 visibleLogs.forEach(item => {
                     const tr = document.createElement('tr');
-                    const itemId = item.id || Date.now();
-                    
-                    let colorStyle = 'color: #1a1a1a;'; 
+                    let colorStyle = 'color: var(--text-main);'; 
                     let prefixes = '';
-                    if(item.type === 'Expense' || item.type === 'TaxWithholding') {
-                        colorStyle = 'color: #cc0000; font-weight: 500;';
+                    if(item.type === 'Expense') {
+                        colorStyle = 'color: var(--accent-red); font-weight: 500;';
                         prefixes = '-';
-                    } else if(item.type === 'Deposit' || item.type === 'InterestYield') {
-                        colorStyle = 'color: #2e7d32; font-weight: 500;';
+                    } else if(item.type === 'Deposit') {
+                        colorStyle = 'color: var(--accent-green); font-weight: 500;';
                         prefixes = '+';
                     }
 
                     tr.innerHTML = `
-                        <td>${item.type} - ${item.name}</td>
+                        <td><strong>${item.type}</strong> - ${item.name}</td>
                         <td style="${colorStyle}">${prefixes}$${item.amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
                         <td>${item.date}</td>
-                        <td><button class="action-btn" style="background:#cc0000; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; width:auto;" onclick="deleteLogEntry(${itemId})">Delete</button></td>
+                        <td><button class="action-btn" onclick="window.deleteLogEntry(${item.id})">Purge</button></td>
                     `;
                     reportBody.appendChild(tr);
                 });
@@ -331,18 +896,80 @@
                     toggleButtonEl.style.display = 'none';
                 } else {
                     toggleButtonEl.style.display = 'inline-block';
-                    toggleButtonEl.innerText = showAllHistoryLogs ? 'Show Less (Limit View)' : `Show All History (${state.history.length} Logs)`;
-                    toggleButtonEl.onclick = window.toggleHistoryViewLimit;
+                    toggleButtonEl.innerText = showAllHistoryLogs ? 'Collapse Ledger View Trace' : `Expand Ledger Base Traces (${state.history.length} Entries)`;
                 }
             }
         }
 
+        // Refresh underlying math analytics suites
+        window.calculateCompoundYield();
+        window.calculateTaxBracketMatrix();
         window.renderStatsChart();
-    }
+    };
 
-    // Initialize layout views on load
-    document.addEventListener("DOMContentLoaded", () => {
-        updateAllUI();
+    window.exportLedgerToCSV = function() {
+        if (!state.history || state.history.length === 0) {
+            alert("No transactional metrics data arrays exist for extraction workflows.");
+            return;
+        }
+        let csvContent = "data:text/csv;charset=utf-8,Mutation Classification,System Descriptor,Amount Parameter,Event Timestamp\n";
+        state.history.forEach(item => {
+            const sanitizedName = item.name.replace(/,/g, " "); 
+            csvContent += `${item.type},${sanitizedName},${item.amount},${item.date}\n`;
+        });
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `STASH_Wealth_System_Audit_${new Date().toLocaleDateString().replace(/\//g, '_')}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
+    window.renderStatsChart = function() {
+        const chartEl = document.getElementById('statsChart');
+        if (!chartEl) return;
+        const ctx = chartEl.getContext('2d');
+        if (statsChartInstance) { statsChartInstance.destroy(); }
+        statsChartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Liquid Position Base', 'Stashed Accumulations'],
+                datasets: [{
+                    data: [state.total, state.saved],
+                    backgroundColor: ['#1a1a1a', '#757575'],
+                    borderRadius: 4,
+                    barThickness: 32
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: '#e0e0dc' }, ticks: { font: { size: 9 } } },
+                    x: { grid: { display: false }, ticks: { font: { size: 11, weight: '600' } } }
+                }
+            }
+        });
+    };
+
+    // --- APPLICATION BOOT ENGINE INITIALIZATION ---
+    document.addEventListener("DOMContentLoaded", function() {
+        loadUserData();
+        
+        // Wire listeners into analytics variable arrays dynamically
+        ['projection-rate', 'projection-years', 'projection-frequency'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('change', window.calculateCompoundYield);
+        });
+
+        ['tax-filing-status', 'tax-deductions'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('change', window.calculateTaxBracketMatrix);
+        });
+
+        window.updateAllUI();
     });
 </script>
 </body>
