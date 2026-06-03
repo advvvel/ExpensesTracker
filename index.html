@@ -189,7 +189,7 @@
                 </div>
             </div>
 
-<div id="page-aesthetics" class="page-content">
+            <div id="page-aesthetics" class="page-content">
                 <h3>Aesthetics & Design Settings</h3>
                 <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 25px;">Personalize your tracker layout settings using the options below:</p>
                 
@@ -200,25 +200,23 @@
 
                 <div class="tax-option-container">
                     <label style="display:block; margin-bottom:6px;"><strong>Website Theme Accenting:</strong></label>
-                    <p style="color: var(--text-muted); font-size: 0.8rem; margin: 0 0 15px 0;">Select a color profile swap parameter below or select a custom gradient color to save:</p>
+                    <p style="color: var(--text-muted); font-size: 0.8rem; margin: 0 0 15px 0;">Select a color profile swap parameter below to change brand styles immediately:</p>
                     <div class="aesthetics-deck">
-                        <div class="color-picker-grid" style="align-items: center; flex-wrap: wrap;">
-                            <div class="color-swatch-dot" style="background: #1a1a1a;" onclick="changeWebsiteColorAccent('#1a1a1a')"></div>
-                            <div class="color-swatch-dot" style="background: #2e7d32;" onclick="changeWebsiteColorAccent('#2e7d32')"></div>
-                            <div class="color-swatch-dot" style="background: #1565c0;" onclick="changeWebsiteColorAccent('#1565c0')"></div>
-                            <div class="color-swatch-dot" style="background: #c62828;" onclick="changeWebsiteColorAccent('#c62828')"></div>
-                            <div class="color-swatch-dot" style="background: #6a1b9a;" onclick="changeWebsiteColorAccent('#6a1b9a')"></div>
-                            
-                            <div id="custom-saved-slots" style="display: flex; gap: 10px;"></div>
-
-                            <div style="width: 1px; height: 20px; background: var(--border-light); margin: 0 5px;"></div>
-                            
-                            <div class="custom-color-picker-wrapper" style="display: flex; align-items: center; gap: 8px;">
-                                <input type="color" id="custom-accent-picker" value="#e5e5e7" oninput="changeWebsiteColorAccent(this.value)" style="padding:0; width:28px; height:28px; border:none; border-radius:50%; cursor:pointer; background:transparent;">
-                                <button class="btn-black" style="padding: 6px 12px; font-size: 0.75rem;" onclick="window.saveCustomAccentColor()">💾 Save Color</button>
-                            </div>
-                        </div>
-                    </div>
+    <div class="color-picker-grid" style="align-items: center;">
+        <div class="color-swatch-dot" style="background: #1a1a1a;" onclick="changeWebsiteColorAccent('#1a1a1a')"></div>
+        <div class="color-swatch-dot" style="background: #2e7d32;" onclick="changeWebsiteColorAccent('#2e7d32')"></div>
+        <div class="color-swatch-dot" style="background: #1565c0;" onclick="changeWebsiteColorAccent('#1565c0')"></div>
+        <div class="color-swatch-dot" style="background: #c62828;" onclick="changeWebsiteColorAccent('#c62828')"></div>
+        <div class="color-swatch-dot" style="background: #6a1b9a;" onclick="changeWebsiteColorAccent('#6a1b9a')"></div>
+        
+        <div style="width: 1px; height: 20px; background: var(--border-light); margin: 0 5px;"></div>
+        
+        <div class="custom-color-picker-wrapper" style="position: relative; display: flex; align-items: center; gap: 8px;">
+            <input type="color" id="custom-accent-picker" value="#1a1a1a" oninput="changeWebsiteColorAccent(this.value)" style="padding:0; width:28px; height:28px; border:none; border-radius:50%; cursor:pointer; background:transparent;">
+            <label for="custom-accent-picker" style="font-size: 0.8rem; font-weight: 600; cursor: pointer; color: var(--text-muted);">Custom Color</label>
+        </div>
+    </div>
+</div>
                 </div>
             </div>
         </main>

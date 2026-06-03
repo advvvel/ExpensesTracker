@@ -91,10 +91,7 @@ body.auth-body-layout {
     justify-content: center;
 }
 
-.circle-text-wrapper {
-    position: absolute;
-    text-align: center;
-}
+
 /* Holds the SVG progress vector and overlays balance strings dead-center */
 .main-circle-ring-wrapper {
     position: relative;
