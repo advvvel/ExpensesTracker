@@ -22,15 +22,23 @@
                 <li id="nav-interest" onclick="navigateTo('interest')">📈 Interest Tracker</li>
                 <li id="nav-tax" onclick="navigateTo('tax')">📊 Tax Calculator</li>
                 <li id="nav-reports" onclick="navigateTo('reports')">📊 Reports</li>
+                <li id="nav-aesthetics" onclick="navigateTo('aesthetics')">🎨 Aesthetics & Theme</li>
             </ul>
             <button class="logout-btn" onclick="window.logOutUser()">🚪 Log Out</button>
         </aside>
 
         <main>
             <div class="circle-container">
-                <div class="main-circle">
-                    <span>Total Available Funds</span>
-                    <h2 id="display-total">$0.00</h2>
+                <div class="main-circle-ring-wrapper">
+                    <svg width="280" height="280">
+                        <circle stroke="#e0e0dc" stroke-width="12" fill="transparent" r="85" cx="140" cy="140"/>
+                        <circle class="progress-ring__circle" stroke-width="12" fill="transparent" r="85" cx="140" cy="140"/>
+                    </svg>
+                    <div class="main-circle">
+                        <span>Total Available Funds</span>
+                        <h2 id="display-total">$0.00</h2>
+                        <span id="ring-percentage-label" style="font-size: 0.65rem; margin-top: 4px; font-weight: 600;">0% of Goal</span>
+                    </div>
                 </div>
             </div>
 
@@ -50,6 +58,13 @@
                 <h3>Deposit Money</h3>
                 <input type="number" id="deposit-amt" placeholder="1000">
                 <button class="btn-black" onclick="depositFunds()">Add to Funds</button>
+                
+                <h4 style="margin-top: 30px; margin-bottom: 10px;">Quick Micro-Deposits</h4>
+                <div class="micro-deposit-row">
+                    <button class="btn-micro-pill" onclick="quickDeposit(10)">+$10</button>
+                    <button class="btn-micro-pill" onclick="quickDeposit(50)">+$50</button>
+                    <button class="btn-micro-pill" onclick="quickDeposit(100)">+$100</button>
+                </div>
             </div>
 
             <div id="page-savings" class="page-content">
@@ -161,11 +176,41 @@
             </div>
 
             <div id="page-reports" class="page-content">
-                <h3 style="text-transform: uppercase; font-size: 0.8rem; color: var(--text-muted);">Modification History</h3>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <h3 style="text-transform: uppercase; font-size: 0.8rem; color: var(--text-muted); margin: 0;">Modification History</h3>
+                    <button class="btn-black" style="padding: 6px 14px; font-size: 0.8rem;" onclick="exportLedgerToCSV()">📥 Export Ledger to CSV</button>
+                </div>
                 <table>
                     <thead><tr><th>Action</th><th>Amount</th><th>Date</th><th>Management</th></tr></thead>
                     <tbody id="report-log-body"></tbody>
                 </table>
+                <div style="margin-top: 15px; text-align: center;">
+                    <button id="show-more-btn" class="btn-black" style="background: #757575; font-size: 0.85rem; display: none;"></button>
+                </div>
+            </div>
+
+            <div id="page-aesthetics" class="page-content">
+                <h3>Aesthetics & Design Settings</h3>
+                <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 25px;">Personalize your tracker layout settings using the options below:</p>
+                
+                <div class="tax-option-container" style="margin-bottom: 20px;">
+                    <label style="display:block; margin-bottom:12px;"><strong>App Visual Light Profile:</strong></label>
+                    <button class="btn-black" onclick="toggleAppTheme()">🌗 Toggle Light / Dark Mode</button>
+                </div>
+
+                <div class="tax-option-container">
+                    <label style="display:block; margin-bottom:6px;"><strong>Website Theme Accenting:</strong></label>
+                    <p style="color: var(--text-muted); font-size: 0.8rem; margin: 0 0 15px 0;">Select a color profile swap parameter below to change brand styles immediately:</p>
+                    <div class="aesthetics-deck">
+                        <div class="color-picker-grid">
+                            <div class="color-swatch-dot" style="background: #1a1a1a;" onclick="changeWebsiteColorAccent('#1a1a1a')"></div>
+                            <div class="color-swatch-dot" style="background: #2e7d32;" onclick="changeWebsiteColorAccent('#2e7d32')"></div>
+                            <div class="color-swatch-dot" style="background: #1565c0;" onclick="changeWebsiteColorAccent('#1565c0')"></div>
+                            <div class="color-swatch-dot" style="background: #c62828;" onclick="changeWebsiteColorAccent('#c62828')"></div>
+                            <div class="color-swatch-dot" style="background: #6a1b9a;" onclick="changeWebsiteColorAccent('#6a1b9a')"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </main>
 
@@ -227,7 +272,6 @@
     let statsChartInstance = null;
     let showAllHistoryLogs = false;
 
-    // Fixed path setup mapping back to your standalone authentication view file
     const AUTH_LOGIN_FILE = 'dashboard.html'; 
 
     onAuthStateChanged(auth, async (user) => {
@@ -565,7 +609,6 @@
     // SEPARATE DECK: VISUALS, CONTROLS & THEMES
     // ==========================================
 
-    // 1. Theme Customizer (Toggle Light/Dark Theme Wrapper)
     window.toggleAppTheme = function() {
         const currentTheme = document.body.getAttribute('data-theme');
         if (currentTheme === 'light') {
@@ -575,7 +618,6 @@
         }
     }
 
-    // 2. Full Color Customizer Core (Allows color-coding website elements to any hex shade parameter)
     window.changeWebsiteColorAccent = function(hexColorCode) {
         if(/^#[0-9A-F]{6}$/i.test(hexColorCode)) {
             document.documentElement.style.setProperty('--accent-brand-color', hexColorCode);
@@ -584,7 +626,6 @@
         }
     }
 
-    // 3. Micro-Deposits Module
     window.quickDeposit = function(amount) {
         if (typeof amount !== 'number' || amount <= 0) return;
         state.total += amount;
@@ -593,7 +634,6 @@
         saveUserData();
     }
 
-    // 4. CSV Ledger Builder Data Exporter
     window.exportLedgerToCSV = function() {
         if (!state.history || state.history.length === 0) {
             alert("There are no history records in your ledger to export.");
