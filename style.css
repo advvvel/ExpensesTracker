@@ -1,5 +1,4 @@
 :root {
-    /* --- Your original token maps --- */
     --bg-neutral: #f4f4f2;
     --card-white: #ffffff;
     --text-main: #1a1a1a;
@@ -10,7 +9,7 @@
     --accent-brand-color: #1a1a1a; 
 }
 
-/* 🌗 Dedicated Light Theme Inversion Maps */
+/* 🌗 Dedicated Light Theme Inversion Maps (Controls Dark/Light Theme Switching) */
 body[data-theme="light"] {
     --bg-neutral: #ffffff;
     --card-white: #f4f4f2;
@@ -18,15 +17,6 @@ body[data-theme="light"] {
     --text-muted: #606060;
     --border-light: #dcdcd8;
     --accent-brand-color: #4a4a4a;
-}
-
-/* 🕶️ NEW: HIGH-CONTRAST EXTREME DARK MODE MAPS */
-body[data-theme="dark"] {
-    --bg-neutral: #0a0b0d;      /* Deep pitch black-blue */
-    --card-white: #12141a;      /* Solid stark dark slate gray */
-    --text-main: #f5f6fa;       /* Bright readable canvas white text */
-    --text-muted: #9aa0a6;      /* High contrast secondary gray text */
-    --border-light: #242933;    /* Sharp crisp borders */
 }
 
 body {
@@ -76,14 +66,10 @@ body.auth-body-layout {
     align-items: center;
     gap: 10px;
 }
-/* Micro-interaction theme tuning */
-.nav-links li:hover { 
-    background: rgba(128,128,128,0.08); 
-    color: var(--text-main); 
-}
+.nav-links li:hover { background: #f0f0ee; color: var(--text-main); }
 .nav-links li.active { 
     color: var(--text-main); 
-    background: rgba(128,128,128,0.08);
+    background: #f0f0ee;
     border-left: 4px solid var(--accent-brand-color); 
 }
 
@@ -96,11 +82,11 @@ body.auth-body-layout {
     display: flex; flex-direction: column; align-items: center; margin-bottom: 40px; 
 }
 
-/* Enlarged wrapper framework to guarantee spacious layout breathing room */
+/* Holds the SVG progress vector and overlays balance strings dead-center */
 .main-circle-ring-wrapper {
     position: relative;
-    width: 320px;  /* Increased frame size to prevent cramped layout metrics */
-    height: 320px;
+    width: 280px;
+    height: 280px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -112,40 +98,36 @@ body.auth-body-layout {
     top: 0;
     left: 0;
     transform: rotate(-90deg); /* Starts circle draw clockwise from top center */
-    width: 320px;
-    height: 320px;
 }
 
-/* Targets the animating border track hook inside your script update loops */
+/* Targets the animating border track hook inside the script update loops */
 .progress-ring__circle {
     stroke: var(--accent-brand-color);
     stroke-linecap: round;
     transition: stroke-dashoffset 0.3s ease, stroke 0.3s ease;
 }
 
-/* Sizing adjusted intentionally to match the expanded spacious framework */
 .main-circle {
-    width: 260px; /* Scaled up safely */
-    height: 260px;
-    border: none; 
+    width: 240px; height: 240px;
+    border: none; /* Removed thick legacy static border line */
     border-radius: 50%;
     display: flex; flex-direction: column;
     justify-content: center; align-items: center;
     z-index: 5;
 }
-.main-circle span { font-size: 0.75rem; text-transform: uppercase; font-weight: 800; color: var(--text-muted); }
-.main-circle h2 { font-size: 2.8rem; margin: 5px 0; font-weight: 400; }
+.main-circle span { font-size: 0.7rem; text-transform: uppercase; font-weight: 800; color: var(--text-muted); }
+.main-circle h2 { font-size: 2.5rem; margin: 5px 0; font-weight: 400; }
 
 /* TABLES */
 table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-th { text-align: left; background: rgba(128,128,128,0.06); padding: 12px; font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); }
+th { text-align: left; background: #ededeb; padding: 12px; font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); }
 td { padding: 15px; border-bottom: 1px solid var(--border-light); font-size: 0.9rem; }
 
 /* BUTTONS & INPUTS */
-.add-section { background: rgba(128,128,128,0.03); padding: 25px; border-radius: 15px; margin-top: 30px; }
+.add-section { background: #f9f9f7; padding: 25px; border-radius: 15px; margin-top: 30px; }
 .btn-black { 
     background: var(--accent-brand-color); 
-    color: var(--card-white); /* Keeps contrast flawless across color variable swaps */
+    color: white; 
     border: none; 
     padding: 12px 24px; 
     border-radius: 8px; 
@@ -154,9 +136,9 @@ td { padding: 15px; border-bottom: 1px solid var(--border-light); font-size: 0.9
     transition: opacity 0.2s, background-color 0.3s ease; 
 }
 .btn-black:hover { opacity: 0.9; }
-input { padding: 12px; border: 1px solid var(--border-light); border-radius: 8px; margin-right: 10px; font-family: inherit; color: var(--text-main); background: var(--card-white); }
+input { padding: 12px; border: 1px solid var(--border-light); border-radius: 8px; margin-right: 10px; font-family: inherit; }
 
-/* ⚡ MICRO-DEPOSIT FLEX INTERFACES */
+/* ⚡ NEW: FAST MICRO-DEPOSIT FLEX INTERFACES */
 .micro-deposit-row {
     display: flex;
     gap: 8px;
@@ -176,7 +158,7 @@ input { padding: 12px; border: 1px solid var(--border-light); border-radius: 8px
 .btn-micro-pill:hover {
     border-color: var(--text-main);
     color: var(--text-main);
-    background: rgba(128,128,128,0.04);
+    background: rgba(0,0,0,0.02);
 }
 
 /* AUTHENTICATION SCREEN STYLES */
@@ -196,13 +178,13 @@ input { padding: 12px; border: 1px solid var(--border-light); border-radius: 8px
 .form-group input { 
     width: 100%; padding: 12px 14px; border: 1px solid var(--border-light); 
     border-radius: 8px; font-family: inherit; box-sizing: border-box; font-size: 0.95rem;
-    background: rgba(128,128,128,0.02);
+    background: #fafaf9;
 }
-.form-group input:focus { outline: none; border-color: var(--text-main); background: var(--card-white); }
+.form-group input:focus { outline: none; border-color: var(--text-main); background: #fff; }
 .remember-me-container { display: flex; align-items: center; gap: 8px; margin-bottom: 25px; font-size: 0.9rem; }
 .remember-me-container input { cursor: pointer; width: 16px; height: 16px; margin: 0; }
 .toggle-link { text-align: center; margin-top: 25px; font-size: 0.85rem; color: var(--text-muted); }
-.toggle-link span { color: var(--text-main); text-decoration: underline; cursor: pointer; font-weight: 600; }
+.toggle-link span { color: #1a1a1a; text-decoration: underline; cursor: pointer; font-weight: 600; }
 
 /* RIGHT PANEL PANEL COMPONENT */
 .right-sidebar-column {
@@ -217,16 +199,16 @@ input { padding: 12px; border: 1px solid var(--border-light); border-radius: 8px
     padding: 24px;
     box-sizing: border-box;
 }
-.savings-card { background: rgba(128,128,128,0.06); padding: 30px; border-radius: 20px; align-self: auto; }
-.savings-bar { background: var(--card-white); height: 12px; border-radius: 10px; margin: 15px 0; position: relative; overflow: hidden; }
+.savings-card { background: #ededeb; padding: 30px; border-radius: 20px; align-self: auto; }
+.savings-bar { background: white; height: 12px; border-radius: 10px; margin: 15px 0; position: relative; overflow: hidden; }
 #savings-progress { background: var(--accent-brand-color); height: 100%; width: 0%; transition: 0.3s; }
 
 .action-btn { color: #cc0000; text-decoration: underline; cursor: pointer; font-size: 0.8rem; border: none; background: none; }
-select { padding: 12px; border: 1px solid var(--border-light); border-radius: 8px; margin-right: 10px; font-family: inherit; font-size: 0.9rem; color: var(--text-main); background: var(--card-white); }
-.tax-toggle-buttons { display: flex; gap: 10px; margin-bottom: 20px; background: rgba(128,128,128,0.03); padding: 15px; border-radius: 12px; }
-.tax-option-container { background: rgba(128,128,128,0.03); padding: 25px; border-radius: 15px; border: 1px solid var(--border-light); margin-top: 15px; }
+select { padding: 12px; border: 1px solid var(--border-light); border-radius: 8px; margin-right: 10px; font-family: inherit; font-size: 0.9rem; background: white; }
+.tax-toggle-buttons { display: flex; gap: 10px; margin-bottom: 20px; background: #f9f9f7; padding: 15px; border-radius: 12px; }
+.tax-option-container { background: #f9f9f7; padding: 25px; border-radius: 15px; border: 1px solid var(--border-light); margin-top: 15px; }
 
-/* ⚙️ VISUAL CONTROL DECK GRID FOR COLOR SELECTION AND CONFIGS */
+/* ⚙️ NEW: VISUAL CONTROL DECK GRID FOR COLOR SELECTION AND CONFIGS */
 .aesthetics-deck {
     display: flex;
     flex-direction: column;
@@ -235,8 +217,7 @@ select { padding: 12px; border: 1px solid var(--border-light); border-radius: 8p
 }
 .color-picker-grid {
     display: flex;
-    align-items: center;
-    gap: 12px;
+    gap: 10px;
     margin-top: 5px;
 }
 .color-swatch-dot {
@@ -249,23 +230,10 @@ select { padding: 12px; border: 1px solid var(--border-light); border-radius: 8p
 }
 .color-swatch-dot:hover { transform: scale(1.15); }
 
-/* Custom Gradient Picker input styling */
-.custom-gradient-picker {
-    border: none;
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    cursor: pointer;
-    background: transparent;
-    padding: 0;
-}
-.custom-gradient-picker::-webkit-color-swatch-wrapper { padding: 0; }
-.custom-gradient-picker::-webkit-color-swatch { border: 1px solid var(--border-light); border-radius: 50%; }
-
 .logout-btn { 
     background: none; border: none; color: var(--text-muted); font-weight: 600; 
     cursor: pointer; padding: 15px 20px; width: 100%; text-align: left; 
     display: flex; align-items: center; gap: 10px; margin-top: 30px; border-radius: 8px; 
     font-family: inherit; font-size: 1rem;
 }
-.logout-btn:hover { background: rgba(128,128,128,0.06); color: #cc0000; }
+.logout-btn:hover { background: #f0f0ee; color: #cc0000; }
