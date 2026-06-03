@@ -288,61 +288,87 @@
     }
 
     window.addItem = function() {
-        const name = document.getElementById('new-name').value;
-        const amt = parseFloat(document.getElementById('new-amount').value);
-        if(name && !isNaN(amt)) {
-            state.total -= amt;
-            const entry = { id: Date.now(), type: 'Expense', name: name, amount: amt, date: new Date().toLocaleDateString() };
-            state.history.unshift(entry);
-            window.updateAllUI();
-            saveUserData();
-            document.getElementById('new-name').value = '';
-            document.getElementById('new-amount').value = '';
+        const nameInput = document.getElementById('new-name');
+        const amtInput = document.getElementById('new-amount');
+        const name = nameInput.value.trim();
+        const amt = parseFloat(amtInput.value);
+        
+        if(!name || isNaN(amt) || amt <= 0) {
+            alert("Please enter a valid expense name and positive amount.");
+            return;
         }
+
+        state.total -= amt;
+        const entry = { id: Date.now(), type: 'Expense', name: name, amount: amt, date: new Date().toLocaleDateString() };
+        state.history.unshift(entry);
+        window.updateAllUI();
+        saveUserData();
+        nameInput.value = '';
+        amtInput.value = '';
     }
 
     window.depositFunds = function() {
-        const amt = parseFloat(document.getElementById('deposit-amt').value);
-        if(!isNaN(amt)) {
-            state.total += amt;
-            state.history.unshift({ id: Date.now(), type: 'Deposit', name: 'Income Deposit', amount: amt, date: new Date().toLocaleDateString() });
-            window.updateAllUI();
-            saveUserData();
-            document.getElementById('deposit-amt').value = '';
+        const amtInput = document.getElementById('deposit-amt');
+        const amt = parseFloat(amtInput.value);
+        
+        if(isNaN(amt) || amt <= 0) {
+            alert("Please enter a valid positive deposit amount.");
+            return;
         }
+
+        state.total += amt;
+        state.history.unshift({ id: Date.now(), type: 'Deposit', name: 'Income Deposit', amount: amt, date: new Date().toLocaleDateString() });
+        window.updateAllUI();
+        saveUserData();
+        amtInput.value = '';
     }
 
     window.addFundsToSavings = function() {
         const amt = parseFloat(prompt("Enter amount to transfer from available funds to savings:"));
-        if(!isNaN(amt)) {
-            state.total -= amt;
-            state.saved += amt;
-            state.history.unshift({ id: Date.now(), type: 'SavingsTransfer', name: 'Transfer to Savings', amount: amt, date: new Date().toLocaleString() });
-            window.updateAllUI();
-            saveUserData();
+        if(isNaN(amt) || amt <= 0) {
+            if (!isNaN(amt)) alert("Please enter a positive transaction amount.");
+            return;
         }
+        if(amt > state.total) {
+            alert("Insufficient available funds to complete this transfer.");
+            return;
+        }
+
+        state.total -= amt;
+        state.saved += amt;
+        state.history.unshift({ id: Date.now(), type: 'SavingsTransfer', name: 'Transfer to Savings', amount: amt, date: new Date().toLocaleString() });
+        window.updateAllUI();
+        saveUserData();
     }
 
     window.updateGoalValue = function() {
-        const val = parseFloat(document.getElementById('new-goal-input').value);
-        if(!isNaN(val)) {
-            state.goal = val;
-            state.history.unshift({ id: Date.now(), type: 'ManualUpdate', name: 'Goal Set to $' + val, amount: val, date: new Date().toLocaleString() });
-            window.updateAllUI();
-            saveUserData();
-            document.getElementById('new-goal-input').value = '';
+        const valInput = document.getElementById('new-goal-input');
+        const val = parseFloat(valInput.value);
+        if(isNaN(val) || val < 0) {
+            alert("Please provide a clean, positive target savings goal.");
+            return;
         }
+
+        state.goal = val;
+        state.history.unshift({ id: Date.now(), type: 'ManualUpdate', name: 'Goal Set to $' + val, amount: val, date: new Date().toLocaleString() });
+        window.updateAllUI();
+        saveUserData();
+        valInput.value = '';
     }
 
     window.updateSavedValue = function() {
-        const val = parseFloat(document.getElementById('new-saved-input').value);
-        if(!isNaN(val)) {
-            state.saved = val;
-            state.history.unshift({ id: Date.now(), type: 'ManualUpdate', name: 'Saved Amount Set to $' + val, amount: val, date: new Date().toLocaleString() });
-            window.updateAllUI();
-            saveUserData();
-            document.getElementById('new-saved-input').value = '';
+        const valInput = document.getElementById('new-saved-input');
+        const val = parseFloat(valInput.value);
+        if(isNaN(val) || val < 0) {
+            alert("Please provide a clean, positive baseline savings asset value.");
+            return;
         }
+
+        state.saved = val;
+        state.history.unshift({ id: Date.now(), type: 'ManualUpdate', name: 'Saved Amount Set to $' + val, amount: val, date: new Date().toLocaleString() });
+        window.updateAllUI();
+        saveUserData();
+        valInput.value = '';
     }
 
     window.createSavingsBucket = function() {
@@ -484,13 +510,16 @@
     }
 
     window.commitManualTaxDeduction = function() {
-        const amt = parseFloat(document.getElementById('tax-manual-input').value);
+        const amtInput = document.getElementById('tax-manual-input');
+        const amt = parseFloat(amtInput.value);
         if(!isNaN(amt) && amt > 0) {
             state.total -= amt;
             state.history.unshift({ id: Date.now(), type: 'TaxWithholding', name: 'Withholding Tax Payment Allocation (Manual)', amount: amt, date: new Date().toLocaleDateString() });
-            document.getElementById('tax-manual-input').value = '';
+            amtInput.value = '';
             window.updateAllUI();
             saveUserData();
+        } else {
+            alert("Please enter a valid, positive tax withholding figure.");
         }
     }
 
@@ -500,12 +529,30 @@
         document.getElementById('tax-bracket-select').value = '';
     }
 
-    // New function specifically added to safely clear targeted logs
+    // Inverted balancing logic added exactly as detailed
     window.deleteLogEntry = function(id) {
-        if(confirm("Are you sure you want to delete this history record?")) {
-            state.history = state.history.filter(item => item.id !== id);
-            window.updateAllUI();
-            saveUserData();
+        if(confirm("Are you sure you want to delete this log entry? This will reverse its financial impact on your balances.")) {
+            const entryIndex = state.history.findIndex(item => item.id === id);
+            if (entryIndex !== -1) {
+                const item = state.history[entryIndex];
+                
+                if (item.type === 'Expense') {
+                    state.total += item.amount;
+                } else if (item.type === 'Deposit') {
+                    state.total -= item.amount;
+                } else if (item.type === 'SavingsTransfer') {
+                    state.total += item.amount;
+                    state.saved -= item.amount;
+                } else if (item.type === 'InterestYield') {
+                    state.saved -= item.amount;
+                } else if (item.type === 'TaxWithholding') {
+                    state.total += item.amount;
+                }
+
+                state.history.splice(entryIndex, 1);
+                window.updateAllUI();
+                saveUserData();
+            }
         }
     }
 
@@ -583,11 +630,30 @@
         const reportBody = document.getElementById('report-log-body');
         if (reportBody) {
             reportBody.innerHTML = '';
-            state.history.forEach(item => {
+            
+            // Render limit to prevent UI thread lock
+            const visibleLogs = state.history.slice(0, 20);
+            
+            visibleLogs.forEach(item => {
                 const tr = document.createElement('tr');
-                // Ensuring we fallback to an ID if the action was created when ID tracking didn't exist
                 const itemId = item.id || Date.now();
-                tr.innerHTML = `<td>${item.type} - ${item.name}</td><td>$${item.amount.toLocaleString()}</td><td>${item.date}</td><td><button class="action-btn" style="background:#cc0000; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;" onclick="deleteLogEntry(${itemId})">Delete</button></td>`;
+                
+                let colorStyle = 'color: #1a1a1a;'; 
+                let prefixes = '';
+                if(item.type === 'Expense' || item.type === 'TaxWithholding') {
+                    colorStyle = 'color: #cc0000; font-weight: 500;';
+                    prefixes = '-';
+                } else if(item.type === 'Deposit' || item.type === 'InterestYield') {
+                    colorStyle = 'color: #2e7d32; font-weight: 500;';
+                    prefixes = '+';
+                }
+
+                tr.innerHTML = `
+                    <td>${item.type} - ${item.name}</td>
+                    <td style="${colorStyle}">${prefixes}$${item.amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                    <td>${item.date}</td>
+                    <td><button class="action-btn" style="background:#cc0000; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;" onclick="deleteLogEntry(${itemId})">Delete</button></td>
+                `;
                 reportBody.appendChild(tr);
             });
         }
