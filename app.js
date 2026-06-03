@@ -484,7 +484,8 @@ window.updateAllUI = function() {
     const progressEl = document.getElementById('savings-progress');
     if (progressEl) progressEl.style.width = Math.min(pct, 100) + '%';
 
-    const targetRingCircumference = 534; 
+    // --- INCREASING THE RADIAL CONTAINER CIRCUMFERENCE SCALING BOUNDS ---
+    const targetRingCircumference = 628; 
     const progressCircleEl = document.querySelector('.progress-ring__circle');
     if (progressCircleEl) {
         const boundedPercentage = Math.min(Math.max(pct, 0), 100);
