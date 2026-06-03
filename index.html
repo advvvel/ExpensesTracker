@@ -250,7 +250,7 @@
                 state = { total: 0, saved: 0, goal: 5000, buckets: [], history: [] };
                 await setDoc(docRef, state);
             }
-            updateAllUI();
+            window.updateAllUI();
         } catch (e) {
             console.error("Database structural validation failure:", e);
         }
@@ -279,9 +279,12 @@
 
     window.navigateTo = function(pageId) {
         document.querySelectorAll('.nav-links li').forEach(li => li.classList.remove('active'));
-        document.getElementById('nav-' + pageId).classList.add('active');
+        const navEl = document.getElementById('nav-' + pageId);
+        if (navEl) navEl.classList.add('active');
+        
         document.querySelectorAll('.page-content').forEach(page => page.classList.remove('active'));
-        document.getElementById('page-' + pageId).classList.add('active');
+        const pageEl = document.getElementById('page-' + pageId);
+        if (pageEl) pageEl.classList.add('active');
     }
 
     window.addItem = function() {
@@ -291,7 +294,7 @@
             state.total -= amt;
             const entry = { id: Date.now(), type: 'Expense', name: name, amount: amt, date: new Date().toLocaleDateString() };
             state.history.unshift(entry);
-            updateAllUI();
+            window.updateAllUI();
             saveUserData();
             document.getElementById('new-name').value = '';
             document.getElementById('new-amount').value = '';
@@ -303,7 +306,7 @@
         if(!isNaN(amt)) {
             state.total += amt;
             state.history.unshift({ id: Date.now(), type: 'Deposit', name: 'Income Deposit', amount: amt, date: new Date().toLocaleDateString() });
-            updateAllUI();
+            window.updateAllUI();
             saveUserData();
             document.getElementById('deposit-amt').value = '';
         }
@@ -315,7 +318,7 @@
             state.total -= amt;
             state.saved += amt;
             state.history.unshift({ id: Date.now(), type: 'SavingsTransfer', name: 'Transfer to Savings', amount: amt, date: new Date().toLocaleString() });
-            updateAllUI();
+            window.updateAllUI();
             saveUserData();
         }
     }
@@ -325,7 +328,7 @@
         if(!isNaN(val)) {
             state.goal = val;
             state.history.unshift({ id: Date.now(), type: 'ManualUpdate', name: 'Goal Set to $' + val, amount: val, date: new Date().toLocaleString() });
-            updateAllUI();
+            window.updateAllUI();
             saveUserData();
             document.getElementById('new-goal-input').value = '';
         }
@@ -336,7 +339,7 @@
         if(!isNaN(val)) {
             state.saved = val;
             state.history.unshift({ id: Date.now(), type: 'ManualUpdate', name: 'Saved Amount Set to $' + val, amount: val, date: new Date().toLocaleString() });
-            updateAllUI();
+            window.updateAllUI();
             saveUserData();
             document.getElementById('new-saved-input').value = '';
         }
@@ -361,7 +364,7 @@
         
         document.getElementById('new-bucket-name').value = '';
         document.getElementById('new-bucket-amount').value = '';
-        updateAllUI();
+        window.updateAllUI();
         saveUserData();
     }
 
@@ -371,7 +374,7 @@
             state.saved += targetBucket.amount; 
             state.history.unshift({ id: Date.now(), type: 'ManualUpdate', name: `Dissolved Bucket Refund: ${targetBucket.name}`, amount: targetBucket.amount, date: new Date().toLocaleDateString() });
             state.buckets = state.buckets.filter(b => b.id !== id);
-            updateAllUI();
+            window.updateAllUI();
             saveUserData();
         }
     }
@@ -427,8 +430,8 @@
         if(computedInterestSum > 0) {
             state.saved += computedInterestSum;
             state.history.unshift({ id: Date.now(), type: 'InterestYield', name: interestContextLabel, amount: computedInterestSum, date: new Date().toLocaleDateString() });
-            clearInterestSimulationView();
-            updateAllUI();
+            window.clearInterestSimulationView();
+            window.updateAllUI();
             saveUserData();
         }
     }
@@ -474,8 +477,8 @@
         if(computedTaxSum > 0) {
             state.total -= computedTaxSum;
             state.history.unshift({ id: Date.now(), type: 'TaxWithholding', name: 'Withholding Tax Payment Allocation', amount: computedTaxSum, date: new Date().toLocaleDateString() });
-            clearTaxBracketView();
-            updateAllUI();
+            window.clearTaxBracketView();
+            window.updateAllUI();
             saveUserData();
         }
     }
@@ -486,7 +489,7 @@
             state.total -= amt;
             state.history.unshift({ id: Date.now(), type: 'TaxWithholding', name: 'Withholding Tax Payment Allocation (Manual)', amount: amt, date: new Date().toLocaleDateString() });
             document.getElementById('tax-manual-input').value = '';
-            updateAllUI();
+            window.updateAllUI();
             saveUserData();
         }
     }
@@ -497,8 +500,11 @@
         document.getElementById('tax-bracket-select').value = '';
     }
 
-    function renderStatsChart() {
-        const ctx = document.getElementById('statsChart').getContext('2d');
+    window.renderStatsChart = function() {
+        const chartEl = document.getElementById('statsChart');
+        if (!chartEl) return;
+        
+        const ctx = chartEl.getContext('2d');
         if (statsChartInstance) {
             statsChartInstance.destroy();
         }
@@ -526,13 +532,19 @@
         });
     }
 
-    function updateAllUI() {
-        document.getElementById('display-total').innerText = '$' + state.total.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
-        document.getElementById('saved-text').innerText = '$' + state.saved.toLocaleString(undefined, {minimumFractionDigits: 0});
-        document.getElementById('goal-text').innerText = '$' + state.goal.toLocaleString(undefined, {minimumFractionDigits: 0});
+    window.updateAllUI = function() {
+        const displayTotal = document.getElementById('display-total');
+        if (displayTotal) displayTotal.innerText = '$' + state.total.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        
+        const savedText = document.getElementById('saved-text');
+        if (savedText) savedText.innerText = '$' + state.saved.toLocaleString(undefined, {minimumFractionDigits: 0});
+        
+        const goalText = document.getElementById('goal-text');
+        if (goalText) goalText.innerText = '$' + state.goal.toLocaleString(undefined, {minimumFractionDigits: 0});
 
         let pct = state.goal > 0 ? (state.saved / state.goal) * 100 : 0;
-        document.getElementById('savings-progress').style.width = Math.min(pct, 100) + '%';
+        const progressEl = document.getElementById('savings-progress');
+        if (progressEl) progressEl.style.width = Math.min(pct, 100) + '%';
 
         const tbody = document.getElementById('expense-table-body');
         if (tbody) {
@@ -569,7 +581,7 @@
             });
         }
 
-        renderStatsChart();
+        window.renderStatsChart();
     }
 </script>
 </body>
