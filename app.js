@@ -480,7 +480,21 @@ window.renderStatsChart = function() {
 
 window.updateAllUI = function() {
     const displayTotal = document.getElementById('display-total');
-    if (displayTotal) displayTotal.innerText = '$' + state.total.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    let formattedTotal = '$' + state.total.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    
+    if (displayTotal) {
+        displayTotal.innerText = formattedTotal;
+        
+        // Dynamic typography scaling safety check: 
+        // Reduces text slightly for large figures to keep the circle footprint perfect.
+        if (formattedTotal.length > 10) {
+            displayTotal.style.fontSize = "1.95rem";
+        } else if (formattedTotal.length > 8) {
+            displayTotal.style.fontSize = "2.2rem";
+        } else {
+            displayTotal.style.fontSize = "2.5rem";
+        }
+    }
     
     const savedText = document.getElementById('saved-text');
     if (savedText) savedText.innerText = '$' + state.saved.toLocaleString(undefined, {minimumFractionDigits: 0});

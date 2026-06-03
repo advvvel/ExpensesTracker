@@ -90,11 +90,13 @@ body.auth-body-layout {
     justify-content: center;
 }
 
-/* Holds the SVG progress vector and overlays balance strings dead-center */
+/* Holds the SVG progress vector and anchors balance strings dead-center */
 .main-circle-ring-wrapper {
     position: relative;
-    width: 280px;
-    height: 280px;
+    /* Uses min-bounds instead of strict constraints so long strings push borders out */
+    min-width: 280px;
+    min-height: 280px;
+    aspect-ratio: 1 / 1;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -105,6 +107,8 @@ body.auth-body-layout {
     position: absolute;
     top: 0;
     left: 0;
+    width: 100%;
+    height: 100%;
     transform: rotate(-90deg); /* Starts circle draw clockwise from top center */
 }
 
@@ -117,15 +121,33 @@ body.auth-body-layout {
 
 .main-circle {
     position: absolute;
-    width: 240px; height: 240px;
-    border: none; /* Removed thick legacy static border line */
+    /* Dynamic internal expansion context */
+    min-width: 240px; 
+    min-height: 240px;
+    aspect-ratio: 1 / 1;
+    padding: 30px;
+    box-sizing: border-box;
+    border: none; 
     border-radius: 50%;
-    display: flex; flex-direction: column;
-    justify-content: center; align-items: center;
+    display: flex; 
+    flex-direction: column;
+    justify-content: center; 
+    align-items: center;
     z-index: 5;
 }
-.main-circle span { font-size: 0.7rem; text-transform: uppercase; font-weight: 800; color: var(--text-muted); }
-.main-circle h2 { font-size: 2.5rem; margin: 5px 0; font-weight: 400; }
+.main-circle span { 
+    font-size: 0.7rem; 
+    text-transform: uppercase; 
+    font-weight: 800; 
+    color: var(--text-muted); 
+    white-space: nowrap;
+}
+.main-circle h2 { 
+    font-size: 2.5rem; 
+    margin: 5px 0; 
+    font-weight: 400; 
+    white-space: nowrap; /* Forces numbers onto one horizontal track */
+}
 
 /* TABLES */
 table { width: 100%; border-collapse: collapse; margin-top: 20px; }
@@ -224,6 +246,7 @@ input {
 .action-btn { color: #cc0000; text-decoration: underline; cursor: pointer; font-size: 0.8rem; border: none; background: none; }
 select { padding: 12px; border: 1px solid var(--border-light); border-radius: 8px; margin-right: 10px; font-family: inherit; font-size: 0.9rem; background: var(--card-white); color: var(--text-main); }
 .tax-toggle-buttons { display: flex; gap: 10px; margin-bottom: 20px; background: var(--bg-neutral) !important; padding: 15px; border-radius: 12px; }
+.nav-links li.active, .tax-toggle-buttons { border-left: 4px solid var(--accent-brand-color); }
 .tax-option-container { background: var(--bg-neutral) !important; padding: 25px; border-radius: 15px; border: 1px solid var(--border-light); margin-top: 15px; }
 
 /* ⚙️ VISUAL CONTROL DECK GRID FOR COLOR SELECTION AND CONFIGS */
