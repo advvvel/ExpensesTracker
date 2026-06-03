@@ -30,6 +30,12 @@ let showAllHistoryLogs = false;
 
 const AUTH_LOGIN_FILE = 'dashboard.html'; 
 
+// --- RESTORE ACCENT ON LOAD FROM LOCALSTORAGE ---
+const savedAccent = localStorage.getItem('stash_active_accent');
+if (savedAccent) {
+    document.documentElement.style.setProperty('--accent-brand-color', savedAccent);
+}
+
 onAuthStateChanged(auth, async (user) => {
     if (!user) {
         window.location.href = AUTH_LOGIN_FILE;
@@ -373,6 +379,7 @@ window.toggleAppTheme = function() {
 window.changeWebsiteColorAccent = function(hexColorCode) {
     if(/^#[0-9A-F]{6}$/i.test(hexColorCode)) {
         document.documentElement.style.setProperty('--accent-brand-color', hexColorCode);
+        localStorage.setItem('stash_active_accent', hexColorCode);
     } else {
         console.warn("Invalid hexadecimal structural configuration parameter passed.");
     }
@@ -407,7 +414,7 @@ window.exportLedgerToCSV = function() {
     document.body.removeChild(link);
 }
 
-// --- NEW: DYNAMIC CUSTOM ACCENT COLOR MEMORY STORAGE HANDLERS ---
+// --- DYNAMIC CUSTOM ACCENT COLOR MEMORY STORAGE HANDLERS ---
 let savedCustomColors = JSON.parse(localStorage.getItem('stash_saved_colors')) || [];
 
 window.saveCustomAccentColor = function() {
@@ -419,6 +426,7 @@ window.saveCustomAccentColor = function() {
         }
         savedCustomColors.push(currentPickerVal);
         localStorage.setItem('stash_saved_colors', JSON.stringify(savedCustomColors));
+        window.changeWebsiteColorAccent(currentPickerVal);
         window.renderSavedColorSwatches();
     }
 };
