@@ -500,6 +500,15 @@
         document.getElementById('tax-bracket-select').value = '';
     }
 
+    // New function specifically added to safely clear targeted logs
+    window.deleteLogEntry = function(id) {
+        if(confirm("Are you sure you want to delete this history record?")) {
+            state.history = state.history.filter(item => item.id !== id);
+            window.updateAllUI();
+            saveUserData();
+        }
+    }
+
     window.renderStatsChart = function() {
         const chartEl = document.getElementById('statsChart');
         if (!chartEl) return;
@@ -576,7 +585,9 @@
             reportBody.innerHTML = '';
             state.history.forEach(item => {
                 const tr = document.createElement('tr');
-                tr.innerHTML = `<td>${item.type} - ${item.name}</td><td>$${item.amount.toLocaleString()}</td><td>${item.date}</td><td>-</td>`;
+                // Ensuring we fallback to an ID if the action was created when ID tracking didn't exist
+                const itemId = item.id || Date.now();
+                tr.innerHTML = `<td>${item.type} - ${item.name}</td><td>$${item.amount.toLocaleString()}</td><td>${item.date}</td><td><button class="action-btn" style="background:#cc0000; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;" onclick="deleteLogEntry(${itemId})">Delete</button></td>`;
                 reportBody.appendChild(tr);
             });
         }
