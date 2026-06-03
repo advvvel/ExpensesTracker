@@ -407,6 +407,7 @@ window.exportLedgerToCSV = function() {
     document.body.removeChild(link);
 }
 
+// --- NEW: DYNAMIC CUSTOM ACCENT COLOR MEMORY STORAGE HANDLERS ---
 let savedCustomColors = JSON.parse(localStorage.getItem('stash_saved_colors')) || [];
 
 window.saveCustomAccentColor = function() {
@@ -483,9 +484,17 @@ window.updateAllUI = function() {
     const progressEl = document.getElementById('savings-progress');
     if (progressEl) progressEl.style.width = Math.min(pct, 100) + '%';
 
-    const targetRingCircumference = 628; 
+    // --- TARGET VISUAL SCALE ADJUSTMENT FOR THE HOVERING SVG CONTEXT ---
+    const targetRingCircumference = 534; 
     const progressCircleEl = document.querySelector('.progress-ring__circle');
     if (progressCircleEl) {
+        // Dynamically scales the SVG container up 1.2x to safely clear the layout typography boundaries
+        const svgContainer = progressCircleEl.closest('svg');
+        if (svgContainer) {
+            svgContainer.style.transform = 'scale(1.25)';
+            svgContainer.style.transformOrigin = 'center';
+        }
+
         const boundedPercentage = Math.min(Math.max(pct, 0), 100);
         const offsetCalculation = targetRingCircumference - (boundedPercentage / 100) * targetRingCircumference;
         progressCircleEl.style.strokeDasharray = `${targetRingCircumference}`;
