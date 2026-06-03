@@ -1,22 +1,23 @@
 :root {
-    --bg-neutral: #f4f4f2;
-    --card-white: #ffffff;
-    --text-main: #1a1a1a;
-    --text-muted: #757575;
-    --border-light: #e0e0dc;
+    /* Dramatic Deep Dark Mode Profile (Default Configuration state) */
+    --bg-neutral: #0a0a0a;          /* Total deep velvet obsidian background */
+    --card-white: #141414;          /* High contrast dark structural cards */
+    --text-main: #ffffff;           /* Ultra high contrast pristine white text */
+    --text-muted: #88888b;          /* Soft slate balancing grey */
+    --border-light: #262626;         /* Clear structural panel separation lines */
     
     /* Dedicated Variable Anchor Hooks for Quick Design Customizations */
-    --accent-brand-color: #1a1a1a; 
+    --accent-brand-color: #ffffff;  
 }
 
-/* 🌗 Dedicated Light Theme Inversion Maps (Controls Dark/Light Theme Switching) */
+/* 🌗 High-Contrast Dramatic Light Theme Inversion Map */
 body[data-theme="light"] {
-    --bg-neutral: #ffffff;
-    --card-white: #f4f4f2;
-    --text-main: #1a1a1a;
-    --text-muted: #606060;
-    --border-light: #dcdcd8;
-    --accent-brand-color: #4a4a4a;
+    --bg-neutral: #f8f9fa;          /* Pristine cool studio drop shadow layer */
+    --card-white: #ffffff;          /* Pure white high striking card structures */
+    --text-main: #000000;           /* Absolute deep zero-black text visibility */
+    --text-muted: #52525b;          /* Deep structural anchor grey text */
+    --border-light: #e4e4e7;        /* Crisp, definitive line layout dividers */
+    --accent-brand-color: #000000;
 }
 
 body {
@@ -120,14 +121,14 @@ body.auth-body-layout {
 
 /* TABLES */
 table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-th { text-align: left; background: #ededeb; padding: 12px; font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); }
+th { text-align: left; background: var(--border-light); padding: 12px; font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); }
 td { padding: 15px; border-bottom: 1px solid var(--border-light); font-size: 0.9rem; }
 
 /* BUTTONS & INPUTS */
-.add-section { background: #f9f9f7; padding: 25px; border-radius: 15px; margin-top: 30px; }
+.add-section { background: var(--bg-neutral) !important; padding: 25px; border-radius: 15px; margin-top: 30px; }
 .btn-black { 
     background: var(--accent-brand-color); 
-    color: white; 
+    color: var(--bg-neutral); 
     border: none; 
     padding: 12px 24px; 
     border-radius: 8px; 
@@ -136,7 +137,15 @@ td { padding: 15px; border-bottom: 1px solid var(--border-light); font-size: 0.9
     transition: opacity 0.2s, background-color 0.3s ease; 
 }
 .btn-black:hover { opacity: 0.9; }
-input { padding: 12px; border: 1px solid var(--border-light); border-radius: 8px; margin-right: 10px; font-family: inherit; }
+input { 
+    padding: 12px; 
+    border: 1px solid var(--border-light); 
+    border-radius: 8px; 
+    margin-right: 10px; 
+    font-family: inherit;
+    background: var(--bg-neutral);
+    color: var(--text-main);
+}
 
 /* ⚡ NEW: FAST MICRO-DEPOSIT FLEX INTERFACES */
 .micro-deposit-row {
@@ -178,13 +187,14 @@ input { padding: 12px; border: 1px solid var(--border-light); border-radius: 8px
 .form-group input { 
     width: 100%; padding: 12px 14px; border: 1px solid var(--border-light); 
     border-radius: 8px; font-family: inherit; box-sizing: border-box; font-size: 0.95rem;
-    background: #fafaf9;
+    background: var(--bg-neutral);
+    color: var(--text-main);
 }
-.form-group input:focus { outline: none; border-color: var(--text-main); background: #fff; }
+.form-group input:focus { outline: none; border-color: var(--text-main); background: var(--card-white); }
 .remember-me-container { display: flex; align-items: center; gap: 8px; margin-bottom: 25px; font-size: 0.9rem; }
 .remember-me-container input { cursor: pointer; width: 16px; height: 16px; margin: 0; }
 .toggle-link { text-align: center; margin-top: 25px; font-size: 0.85rem; color: var(--text-muted); }
-.toggle-link span { color: #1a1a1a; text-decoration: underline; cursor: pointer; font-weight: 600; }
+.toggle-link span { color: var(--text-main); text-decoration: underline; cursor: pointer; font-weight: 600; }
 
 /* RIGHT PANEL PANEL COMPONENT */
 .right-sidebar-column {
@@ -199,14 +209,14 @@ input { padding: 12px; border: 1px solid var(--border-light); border-radius: 8px
     padding: 24px;
     box-sizing: border-box;
 }
-.savings-card { background: #ededeb; padding: 30px; border-radius: 20px; align-self: auto; }
-.savings-bar { background: white; height: 12px; border-radius: 10px; margin: 15px 0; position: relative; overflow: hidden; }
+.savings-card { background: var(--border-light); color: var(--text-main); padding: 30px; border-radius: 20px; align-self: auto; }
+.savings-bar { background: var(--bg-neutral); height: 12px; border-radius: 10px; margin: 15px 0; position: relative; overflow: hidden; }
 #savings-progress { background: var(--accent-brand-color); height: 100%; width: 0%; transition: 0.3s; }
 
 .action-btn { color: #cc0000; text-decoration: underline; cursor: pointer; font-size: 0.8rem; border: none; background: none; }
-select { padding: 12px; border: 1px solid var(--border-light); border-radius: 8px; margin-right: 10px; font-family: inherit; font-size: 0.9rem; background: white; }
-.tax-toggle-buttons { display: flex; gap: 10px; margin-bottom: 20px; background: #f9f9f7; padding: 15px; border-radius: 12px; }
-.tax-option-container { background: #f9f9f7; padding: 25px; border-radius: 15px; border: 1px solid var(--border-light); margin-top: 15px; }
+select { padding: 12px; border: 1px solid var(--border-light); border-radius: 8px; margin-right: 10px; font-family: inherit; font-size: 0.9rem; background: var(--card-white); color: var(--text-main); }
+.tax-toggle-buttons { display: flex; gap: 10px; margin-bottom: 20px; background: var(--bg-neutral) !important; padding: 15px; border-radius: 12px; }
+.tax-option-container { background: var(--bg-neutral) !important; padding: 25px; border-radius: 15px; border: 1px solid var(--border-light); margin-top: 15px; }
 
 /* ⚙️ NEW: VISUAL CONTROL DECK GRID FOR COLOR SELECTION AND CONFIGS */
 .aesthetics-deck {
@@ -229,6 +239,10 @@ select { padding: 12px; border: 1px solid var(--border-light); border-radius: 8p
     transition: 0.15s;
 }
 .color-swatch-dot:hover { transform: scale(1.15); }
+
+/* Custom Native Color Picker Inner Layout Masks */
+#custom-accent-picker::-webkit-color-swatch { border: 2px solid var(--text-muted); border-radius: 50%; }
+#custom-accent-picker::-moz-color-swatch { border: 2px solid var(--text-muted); border-radius: 50%; }
 
 .logout-btn { 
     background: none; border: none; color: var(--text-muted); font-weight: 600; 
