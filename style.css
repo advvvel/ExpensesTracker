@@ -1,13 +1,14 @@
 :root {
-    /* Dramatic Deep Dark Mode Profile (Default Configuration state) */
-    --bg-neutral: #242323;          /* Total deep velvet obsidian background */
-    --card-white: #282626;          /* High contrast dark structural cards */
-    --text-main: #dfd9d9;           /* Ultra high contrast pristine white text */
+    /* Dramatic Deep Dark Mode Profile - Optimized with Softened Off-Whites */
+    --bg-neutral: #0a0a0a;          /* Deep obsidian canvas background */
+    --card-white: #141414;          /* High contrast dark structural cards */
+    --text-main: #e5e5e7;           /* Softened off-white to eliminate glare/eye strain */
     --text-muted: #88888b;          /* Soft slate balancing grey */
-    --border-light: #262626;         /* Clear structural panel separation lines */
+    --border-light: #262626;        /* Structural panel separation lines */
+    --hover-bg: #222225;            /* Distinct background tracking for sidebar hover */
     
     /* Dedicated Variable Anchor Hooks for Quick Design Customizations */
-    --accent-brand-color: #ffffff;  
+    --accent-brand-color: #e5e5e7;  
 }
 
 /* 🌗 High-Contrast Dramatic Light Theme Inversion Map */
@@ -17,6 +18,7 @@ body[data-theme="light"] {
     --text-main: #000000;           /* Absolute deep zero-black text visibility */
     --text-muted: #52525b;          /* Deep structural anchor grey text */
     --border-light: #e4e4e7;        /* Crisp, definitive line layout dividers */
+    --hover-bg: #f0f0ee;            /* Light theme tab hover tracking background */
     --accent-brand-color: #000000;
 }
 
@@ -67,10 +69,11 @@ body.auth-body-layout {
     align-items: center;
     gap: 10px;
 }
-.nav-links li:hover { background: #9e9e99; color: var(--text-main); }
+/* Fixed hover text visibility by introducing dynamic token variable background maps */
+.nav-links li:hover { background: var(--hover-bg); color: var(--text-main); }
 .nav-links li.active { 
     color: var(--text-main); 
-    background: #f0f0ee;
+    background: var(--hover-bg);
     border-left: 4px solid var(--accent-brand-color); 
 }
 
@@ -196,7 +199,7 @@ input {
 .toggle-link { text-align: center; margin-top: 25px; font-size: 0.85rem; color: var(--text-muted); }
 .toggle-link span { color: var(--text-main); text-decoration: underline; cursor: pointer; font-weight: 600; }
 
-/* RIGHT PANEL PANEL COMPONENT */
+/* RIGHT PANEL COMPONENT */
 .right-sidebar-column {
     display: flex;
     flex-direction: column;
@@ -218,7 +221,7 @@ select { padding: 12px; border: 1px solid var(--border-light); border-radius: 8p
 .tax-toggle-buttons { display: flex; gap: 10px; margin-bottom: 20px; background: var(--bg-neutral) !important; padding: 15px; border-radius: 12px; }
 .tax-option-container { background: var(--bg-neutral) !important; padding: 25px; border-radius: 15px; border: 1px solid var(--border-light); margin-top: 15px; }
 
-/* ⚙️ NEW: VISUAL CONTROL DECK GRID FOR COLOR SELECTION AND CONFIGS */
+/* ⚙️ VISUAL CONTROL DECK GRID FOR COLOR SELECTION AND CONFIGS */
 .aesthetics-deck {
     display: flex;
     flex-direction: column;
@@ -250,4 +253,4 @@ select { padding: 12px; border: 1px solid var(--border-light); border-radius: 8p
     display: flex; align-items: center; gap: 10px; margin-top: 30px; border-radius: 8px; 
     font-family: inherit; font-size: 1rem;
 }
-.logout-btn:hover { background: #f0f0ee; color: #cc0000; }
+.logout-btn:hover { background: var(--hover-bg); color: #cc0000; }

@@ -407,6 +407,37 @@ window.exportLedgerToCSV = function() {
     document.body.removeChild(link);
 }
 
+// --- NEW: DYNAMIC CUSTOM ACCENT COLOR MEMORY STORAGE HANDLERS ---
+let savedCustomColors = JSON.parse(localStorage.getItem('stash_saved_colors')) || [];
+
+window.saveCustomAccentColor = function() {
+    const currentPickerVal = document.getElementById('custom-accent-picker').value;
+    
+    if (!savedCustomColors.includes(currentPickerVal)) {
+        if (savedCustomColors.length >= 5) {
+            savedCustomColors.shift();
+        }
+        savedCustomColors.push(currentPickerVal);
+        localStorage.setItem('stash_saved_colors', JSON.stringify(savedCustomColors));
+        window.renderSavedColorSwatches();
+    }
+};
+
+window.renderSavedColorSwatches = function() {
+    const container = document.getElementById('custom-saved-slots');
+    if (!container) return;
+    
+    container.innerHTML = '';
+    savedCustomColors.forEach(color => {
+        const dot = document.createElement('div');
+        dot.className = 'color-swatch-dot';
+        dot.style.background = color;
+        dot.style.border = '1px solid var(--text-muted)';
+        dot.onclick = () => window.changeWebsiteColorAccent(color);
+        container.appendChild(dot);
+    });
+};
+
 window.renderStatsChart = function() {
     const chartEl = document.getElementById('statsChart');
     if (!chartEl) return;
@@ -432,7 +463,7 @@ window.renderStatsChart = function() {
             maintainAspectRatio: false,
             plugins: { legend: { display: false } },
             scales: {
-                y: { beginAtZero: true, grid: { color: '#e0e0dc' }, ticks: { font: { size: 10 } } },
+                y: { beginAtZero: true, grid: { color: '#262626' }, ticks: { font: { size: 10 } } },
                 x: { grid: { display: false }, ticks: { font: { size: 11, weight: '600' } } }
             }
         }
@@ -513,7 +544,7 @@ window.updateAllUI = function() {
                 const tr = document.createElement('tr');
                 const itemId = item.id || Date.now();
                 
-                let colorStyle = 'color: #1a1a1a;'; 
+                let colorStyle = 'color: var(--text-main);'; 
                 let prefixes = '';
                 if(item.type === 'Expense' || item.type === 'TaxWithholding') {
                     colorStyle = 'color: #cc0000; font-weight: 500;';
@@ -545,5 +576,6 @@ window.updateAllUI = function() {
         }
     }
 
+    window.renderSavedColorSwatches();
     window.renderStatsChart();
 }
