@@ -324,7 +324,7 @@
         amtInput.value = '';
     }
 
-    // New globally scoped feature: Processes quick one-tap micro-deposits
+    // [Micro-Deposits] Handle rapid, single-click additions to available liquid balances
     window.quickDeposit = function(amount) {
         if (typeof amount !== 'number' || amount <= 0) return;
         state.total += amount;
@@ -570,7 +570,7 @@
         window.updateAllUI();
     }
 
-    // New globally scoped feature: Inverts app branding design properties for light/dark mode customizer
+    // [Theme Customizer] Toggle document data attributes cleanly
     window.toggleAppTheme = function() {
         const currentTheme = document.body.getAttribute('data-theme');
         if (currentTheme === 'light') {
@@ -580,7 +580,7 @@
         }
     }
 
-    // New globally scoped feature: Compiles structured system logs into a download-ready Excel/CSV file layout
+    // [CSV Ledger Builder] Convert internal tracking array fields directly into downloadable raw string buffers
     window.exportLedgerToCSV = function() {
         if (!state.history || state.history.length === 0) {
             alert("There are no history records in your ledger to export.");
@@ -648,8 +648,8 @@
         const progressEl = document.getElementById('savings-progress');
         if (progressEl) progressEl.style.width = Math.min(pct, 100) + '%';
 
-        // Direct mathematical manipulation framework updating the target vector path properties of the SVG progress ring
-        const targetRingCircumference = 534; // 2 * Math.PI * r (radius 85)
+        // [Visual Progress Ring] Translate scalar percentage targets to perimeter offsets
+        const targetRingCircumference = 534; 
         const progressCircleEl = document.querySelector('.progress-ring__circle');
         if (progressCircleEl) {
             const boundedPercentage = Math.min(Math.max(pct, 0), 100);
