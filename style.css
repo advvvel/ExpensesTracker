@@ -82,8 +82,18 @@ body.auth-body-layout {
 .page-content.active { display: block; }
 
 /* ⭕ UPGRADED: CENTER VISUALS (PROGRESS RING HOOKS) */
-.circle-container { 
-    display: flex; flex-direction: column; align-items: center; margin-bottom: 40px; 
+.circle-container {
+    width: 240px;
+    height: 240px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.circle-text-wrapper {
+    position: absolute;
+    text-align: center;
 }
 
 /* Holds the SVG progress vector and overlays balance strings dead-center */
