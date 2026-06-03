@@ -407,7 +407,6 @@ window.exportLedgerToCSV = function() {
     document.body.removeChild(link);
 }
 
-// --- NEW: DYNAMIC CUSTOM ACCENT COLOR MEMORY STORAGE HANDLERS ---
 let savedCustomColors = JSON.parse(localStorage.getItem('stash_saved_colors')) || [];
 
 window.saveCustomAccentColor = function() {
@@ -484,7 +483,6 @@ window.updateAllUI = function() {
     const progressEl = document.getElementById('savings-progress');
     if (progressEl) progressEl.style.width = Math.min(pct, 100) + '%';
 
-    // --- TRACK MATRIX UPDATED TO REFLECT THE NEW HTML/CSS PROPORTIONS ---
     const targetRingCircumference = 628; 
     const progressCircleEl = document.querySelector('.progress-ring__circle');
     if (progressCircleEl) {

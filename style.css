@@ -69,7 +69,6 @@ body.auth-body-layout {
     align-items: center;
     gap: 10px;
 }
-/* Fixed hover text visibility by introducing dynamic token variable background maps */
 .nav-links li:hover { background: var(--hover-bg); color: var(--text-main); }
 .nav-links li.active { 
     color: var(--text-main); 
@@ -81,56 +80,76 @@ body.auth-body-layout {
 .page-content { display: none; }
 .page-content.active { display: block; }
 
-/* ⭕ UPGRADED: CENTER VISUALS (PROGRESS RING HOOKS) */
-.circle-container {
-    width: 240px;
-    height: 240px;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.circle-text-wrapper {
-    position: absolute;
-    text-align: center;
-}
-
-/* Holds the SVG progress vector and overlays balance strings dead-center */
+/* ⭕ FIXED & PERFECTLY CENTERED PROGRESS RING LAYOUT */
 .main-circle-ring-wrapper {
     position: relative;
-    width: 280px;
-    height: 280px;
+    width: 240px;  /* Match explicit sizing boundaries to avoid shifting */
+    height: 240px;
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-bottom: 30px;
+    margin: 0 auto 30px auto; /* Centers the whole container widget block on your dashboard */
 }
 
 .main-circle-ring-wrapper svg {
     position: absolute;
     top: 0;
     left: 0;
+    width: 240px;
+    height: 240px;
     transform: rotate(-90deg); /* Starts circle draw clockwise from top center */
+    z-index: 1;
 }
 
-/* Targets the animating border track hook inside the script update loops */
+.progress-ring__background {
+    stroke: var(--border-light);
+    opacity: 0.5;
+}
+
 .progress-ring__circle {
     stroke: var(--accent-brand-color);
     stroke-linecap: round;
     transition: stroke-dashoffset 0.3s ease, stroke 0.3s ease;
 }
 
+/* Forces everything exactly into dead-center layout coordinates */
 .main-circle {
-    width: 240px; height: 240px;
-    border: none; /* Removed thick legacy static border line */
+    position: absolute;
+    width: 190px; 
+    height: 190px;
+    border: none;
     border-radius: 50%;
-    display: flex; flex-direction: column;
-    justify-content: center; align-items: center;
+    display: flex; 
+    flex-direction: column;
+    justify-content: center; 
+    align-items: center;
+    text-align: center;
     z-index: 5;
+    box-sizing: border-box;
 }
-.main-circle span { font-size: 0.7rem; text-transform: uppercase; font-weight: 800; color: var(--text-muted); }
-.main-circle h2 { font-size: 2.5rem; margin: 5px 0; font-weight: 400; }
+
+.main-circle span { 
+    font-size: 0.7rem; 
+    text-transform: uppercase; 
+    font-weight: 800; 
+    color: var(--text-muted); 
+    letter-spacing: 0.05em;
+}
+
+.main-circle h2 { 
+    font-size: 2.3rem; 
+    margin: 6px 0; 
+    font-weight: 700; 
+    line-height: 1.1;
+    color: var(--text-main);
+}
+
+#ring-percentage-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--text-muted);
+}
 
 /* TABLES */
 table { width: 100%; border-collapse: collapse; margin-top: 20px; }
@@ -160,7 +179,7 @@ input {
     color: var(--text-main);
 }
 
-/* ⚡ NEW: FAST MICRO-DEPOSIT FLEX INTERFACES */
+/* ⚡ FAST MICRO-DEPOSIT FLEX INTERFACES */
 .micro-deposit-row {
     display: flex;
     gap: 8px;
@@ -205,62 +224,4 @@ input {
 }
 .form-group input:focus { outline: none; border-color: var(--text-main); background: var(--card-white); }
 .remember-me-container { display: flex; align-items: center; gap: 8px; margin-bottom: 25px; font-size: 0.9rem; }
-.remember-me-container input { cursor: pointer; width: 16px; height: 16px; margin: 0; }
-.toggle-link { text-align: center; margin-top: 25px; font-size: 0.85rem; color: var(--text-muted); }
-.toggle-link span { color: var(--text-main); text-decoration: underline; cursor: pointer; font-weight: 600; }
-
-/* RIGHT PANEL COMPONENT */
-.right-sidebar-column {
-    display: flex;
-    flex-direction: column;
-    gap: 30px;
-}
-.chart-card {
-    background: var(--card-white);
-    border: 1px solid var(--border-light);
-    border-radius: 20px;
-    padding: 24px;
-    box-sizing: border-box;
-}
-.savings-card { background: var(--border-light); color: var(--text-main); padding: 30px; border-radius: 20px; align-self: auto; }
-.savings-bar { background: var(--bg-neutral); height: 12px; border-radius: 10px; margin: 15px 0; position: relative; overflow: hidden; }
-#savings-progress { background: var(--accent-brand-color); height: 100%; width: 0%; transition: 0.3s; }
-
-.action-btn { color: #cc0000; text-decoration: underline; cursor: pointer; font-size: 0.8rem; border: none; background: none; }
-select { padding: 12px; border: 1px solid var(--border-light); border-radius: 8px; margin-right: 10px; font-family: inherit; font-size: 0.9rem; background: var(--card-white); color: var(--text-main); }
-.tax-toggle-buttons { display: flex; gap: 10px; margin-bottom: 20px; background: var(--bg-neutral) !important; padding: 15px; border-radius: 12px; }
-.tax-option-container { background: var(--bg-neutral) !important; padding: 25px; border-radius: 15px; border: 1px solid var(--border-light); margin-top: 15px; }
-
-/* ⚙️ VISUAL CONTROL DECK GRID FOR COLOR SELECTION AND CONFIGS */
-.aesthetics-deck {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    margin-top: 20px;
-}
-.color-picker-grid {
-    display: flex;
-    gap: 10px;
-    margin-top: 5px;
-}
-.color-swatch-dot {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    cursor: pointer;
-    border: 2px solid transparent;
-    transition: 0.15s;
-}
-.color-swatch-dot:hover { transform: scale(1.15); }
-
-/* Custom Native Color Picker Inner Layout Masks */
-#custom-accent-picker::-webkit-color-swatch { border: 2px solid var(--text-muted); border-radius: 50%; }
-#custom-accent-picker::-moz-color-swatch { border: 2px solid var(--text-muted); border-radius: 50%; }
-
-.logout-btn { 
-    background: none; border: none; color: var(--text-muted); font-weight: 600; 
-    cursor: pointer; padding: 15px 20px; width: 100%; text-align: left; 
-    display: flex; align-items: center; gap: 10px; margin-top: 30px; border-radius: 8px; 
-    font-family: inherit; font-size: 1rem;
-}
-.logout-btn:hover { background: var(--hover-bg); color: #cc0000; }
+.remember-me-container input { cursor: pointer; width: 16px; height: 16px; margin: 0;

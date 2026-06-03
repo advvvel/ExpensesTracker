@@ -3,251 +3,270 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stash Expense Tracker - Dashboard</title>
-    <link rel="stylesheet" href="style.css">
+    <title>STASH - Financial Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="container" id="main-container">
-    <div class="dashboard-layout">
-        
-        <aside>
-            <h1 style="font-size: 1.2rem; margin-bottom: 40px; letter-spacing: 1px;">STASH.</h1>
-            <ul class="nav-links">
-                <li id="nav-overview" class="active" onclick="navigateTo('overview')">🏠 Overview</li>
-                <li id="nav-income" onclick="navigateTo('income')">💵 Income</li>
-                <li id="nav-savings" onclick="navigateTo('savings')">🏦 Savings</li>
-                <li id="nav-buckets" onclick="navigateTo('buckets')">📁 Savings Buckets</li>
-                <li id="nav-interest" onclick="navigateTo('interest')">📈 Interest Tracker</li>
-                <li id="nav-tax" onclick="navigateTo('tax')">📊 Tax Calculator</li>
-                <li id="nav-reports" onclick="navigateTo('reports')">📊 Reports</li>
-                <li id="nav-aesthetics" onclick="navigateTo('aesthetics')">🎨 Aesthetics & Theme</li>
-            </ul>
-            <button class="logout-btn" onclick="window.logOutUser()">🚪 Log Out</button>
-        </aside>
+    <div class="container">
+        <div class="dashboard-layout">
+            
+            <aside>
+                <h2 style="margin-top: 0; font-weight: 800; letter-spacing: -0.5px;">STASH</h2>
+                <ul class="nav-links">
+                    <li id="nav-savings" class="active" onclick="navigateTo('savings')">🏛️ Savings</li>
+                    <li id="nav-buckets" onclick="navigateTo('buckets')">📂 Savings Buckets</li>
+                    <li id="nav-interest" onclick="navigateTo('interest')">📈 Interest Tracker</li>
+                    <li id="nav-tax" onclick="navigateTo('tax')">📊 Tax Calculator</li>
+                    <li id="nav-reports" onclick="navigateTo('reports')">📑 Reports</li>
+                    <li id="nav-aesthetics" onclick="navigateTo('aesthetics')">🎨 Aesthetics & Theme</li>
+                </ul>
+                <button class="logout-btn" onclick="logOutUser()">🚪 Log Out</button>
+            </aside>
 
-        <main>
-            <div class="circle-container">
-                <div class="main-circle-ring-wrapper">
-<svg width="240" height="240" viewBox="0 0 240 240" class="progress-ring">
-  <circle class="progress-ring__background" cx="120" cy="120" r="100" stroke-width="12" fill="transparent"/>
-  <circle class="progress-ring__circle" cx="120" cy="120" r="100" stroke-width="12" fill="transparent"/>
-</svg>
-                    <div class="main-circle">
-                        <span>Total Available Funds</span>
-                        <h2 id="display-total">$0.00</h2>
-                        <span id="ring-percentage-label" style="font-size: 0.65rem; margin-top: 4px; font-weight: 600;">0% of Goal</span>
+            <main class="content-area">
+                
+                <section style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 40px;">
+                    <div class="main-circle-ring-wrapper">
+                        <svg width="240" height="240" viewBox="0 0 240 240">
+                            <circle class="progress-ring__background" cx="120" cy="120" r="100" stroke-width="12" fill="transparent"/>
+                            <circle class="progress-ring__circle" cx="120" cy="120" r="100" stroke-width="12" fill="transparent"/>
+                        </svg>
+                        
+                        <div class="main-circle">
+                            <span>Available Liquidity</span>
+                            <h2 id="display-total">$0.00</h2>
+                            <span id="ring-percentage-label">0% of Goal</span>
+                        </div>
                     </div>
-                </div>
-            </div>
-
-            <div id="page-overview" class="page-content active">
-                <table>
-                    <thead><tr><th>Type</th><th>Category</th><th>Amount</th><th>Date</th><th>Management</th></tr></thead>
-                    <tbody id="expense-table-body"></tbody>
-                </table>
-                <div class="add-section">
-                    <input type="text" id="new-name" placeholder="Name (e.g. School)">
-                    <input type="number" id="new-amount" placeholder="$ Amount">
-                    <button class="btn-black" onclick="addItem()">Add</button>
-                </div>
-            </div>
-
-            <div id="page-income" class="page-content">
-                <h3>Deposit Money</h3>
-                <input type="number" id="deposit-amt" placeholder="1000">
-                <button class="btn-black" onclick="depositFunds()">Add to Funds</button>
-                
-                <h4 style="margin-top: 30px; margin-bottom: 10px;">Quick Micro-Deposits</h4>
-                <div class="micro-deposit-row">
-                    <button class="btn-micro-pill" onclick="quickDeposit(10)">+$10</button>
-                    <button class="btn-micro-pill" onclick="quickDeposit(50)">+$50</button>
-                    <button class="btn-micro-pill" onclick="quickDeposit(100)">+$100</button>
-                </div>
-            </div>
-
-            <div id="page-savings" class="page-content">
-                <h3>Savings Settings</h3>
-                
-                <div style="margin-bottom: 25px;">
-                    <label><strong>Modify Savings Goal:</strong></label><br><br>
-                    <input type="number" id="new-goal-input" placeholder="e.g. 5000">
-                    <button class="btn-black" onclick="updateGoalValue()">Update Goal</button>
-                </div>
-
-                <div style="margin-bottom: 25px;">
-                    <label><strong>Modify Currently Saved Amount:</strong></label><br><br>
-                    <input type="number" id="new-saved-input" placeholder="e.g. 1500">
-                    <button class="btn-black" onclick="updateSavedValue()">Update Saved</button>
-                </div>
-                <p style="font-size: 0.85rem; color: var(--text-muted);">*Manual updates here do not affect your Total Available Funds circle.</p>
-            </div>
-
-            <div id="page-buckets" class="page-content">
-                <h3>Custom Savings Buckets</h3>
-                <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 20px;">
-                    Partition your savings into clear segments. Creating a bucket draws money directly away from your unallocated main savings pool ($<span id="bucket-pool-available">0.00</span> left available).
-                </p>
-                <table>
-                    <thead><tr><th>Bucket Partition Target</th><th>Allocated Share</th><th>Management</th></tr></thead>
-                    <tbody id="buckets-table-body"></tbody>
-                </table>
-                <div class="add-section">
-                    <input type="text" id="new-bucket-name" placeholder="Bucket Name (e.g. Car Fund)">
-                    <input type="number" id="new-bucket-amount" placeholder="$ Allocation Amount">
-                    <button class="btn-black" onclick="createSavingsBucket()">Allocate Bucket</button>
-                </div>
-            </div>
-
-            <div id="page-interest" class="page-content">
-                <h3>Interest Growth Setup</h3>
-                <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 20px;">Select your preferred interest calculation framework below:</p>
-                
-                <div class="tax-toggle-buttons">
-                    <button class="btn-black" id="btn-show-interest-calc" style="background:#1a1a1a;" onclick="toggleInterestView('calc')">Calculation via APY</button>
-                    <button class="btn-black" id="btn-show-interest-manual" style="background:#757575;" onclick="toggleInterestView('manual')">Input Custom Interest Amount</button>
-                </div>
-
-                <div id="interest-calc-area" class="tax-option-container">
-                    <div style="margin-bottom: 15px;">
-                        <label style="display:block; margin-bottom:8px;"><strong>Annual Percentage Yield (APY %):</strong></label>
-                        <input type="number" id="interest-rate-input" placeholder="e.g. 4.5" step="0.1" value="4.5">
+                    
+                    <div style="display: flex; gap: 12px; width: 100%; max-width: 420px; justify-content: center;">
+                        <button class="btn-black" onclick="addFundsToSavings()">Move To Savings Pool</button>
+                        <button class="btn-black" onclick="exportLedgerToCSV()" style="background: var(--border-light); color: var(--text-main);">Export Ledger</button>
                     </div>
-                    <div style="margin-bottom: 20px;">
-                        <label style="display:block; margin-bottom:8px;"><strong>Compounding Cycle Period:</strong></label>
-                        <select id="interest-period-select">
-                            <option value="12">Monthly Yield Distribution (1/12 APY)</option>
-                            <option value="1">Full Annual Yield Distribution (100% APY)</option>
-                        </select>
+                </section>
+
+                <div id="page-savings" class="page-content active">
+                    <div class="add-section">
+                        <h3 style="margin-top:0;">Track Financial Expense</h3>
+                        <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+                            <input type="text" id="new-name" placeholder="Expense Target Description Name" style="flex: 2; margin-right: 0;">
+                            <input type="number" id="new-amount" placeholder="Amount ($)" style="flex: 1; margin-right: 0;">
+                        </div>
+                        <button class="btn-black" onclick="addItem()">Commit Expense Transaction</button>
                     </div>
-                    <button class="btn-black" onclick="runInterestCalculation()">Calculate Interest</button>
-                </div>
 
-                <div id="interest-manual-area" class="tax-option-container" style="display:none;">
-                    <label style="display:block; margin-bottom:10px;"><strong>Input structural dollar sum you wish to apply as interest:</strong></label>
-                    <input type="number" id="interest-manual-input" placeholder="$ Interest Amount">
-                    <button class="btn-black" onclick="runManualInterestCalculation()">Calculate Fixed Sum</button>
-                </div>
+                    <div class="add-section">
+                        <h3 style="margin-top:0;">Liquidity Income Injections</h3>
+                        <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+                            <input type="number" id="deposit-amt" placeholder="Deposit Sum Value ($)" style="flex: 1; margin-right: 0;">
+                        </div>
+                        <button class="btn-black" onclick="depositFunds()">Process Account Deposit</button>
+                        
+                        <div class="micro-deposit-row">
+                            <button class="btn-micro-pill" onclick="quickDeposit(10)">+$10 Micro</button>
+                            <button class="btn-micro-pill" onclick="quickDeposit(50)">+$50 Micro</button>
+                            <button class="btn-micro-pill" onclick="quickDeposit(100)">+$100 Micro</button>
+                        </div>
+                    </div>
 
-                <div id="interest-decision-box" style="display:none; margin-top:20px; padding:15px; background:#ededeb; border-radius:8px;">
-                    <p id="interest-output-msg" style="margin:0 0 15px 0; font-size:0.9rem; line-height:1.4;"></p>
-                    <p style="margin:0 0 15px 0; font-weight:700; font-size:0.9rem; color:#1a1a1a;">Does this look good and do you want to apply it?</p>
-                    <button class="btn-black" onclick="commitInterestYield()">Apply Interest</button>
-                    <button class="btn-black" style="background:#757575;" onclick="clearInterestSimulationView()">Skip</button>
-                </div>
-            </div>
-
-            <div id="page-tax" class="page-content">
-                <h3>Tax Calculation Setup</h3>
-                <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 20px;">Select your preferred tax entry method below to begin:</p>
-                
-                <div class="tax-toggle-buttons">
-                    <button class="btn-black" id="btn-show-calc" style="background:#1a1a1a;" onclick="toggleTaxView('calc')">Calculation via Bracket</button>
-                    <button class="btn-black" id="btn-show-manual" style="background:#757575;" onclick="toggleTaxView('manual')">Input Custom Tax Amount</button>
-                </div>
-
-                <div id="tax-calc-area" class="tax-option-container">
-                    <label style="display:block; margin-bottom:10px;"><strong>What is your yearly income bracket?</strong></label>
-                    <select id="tax-bracket-select" onchange="document.getElementById('tax-decision-box').style.display='none';">
-                        <option value="">-- Choose Bracket --</option>
-                        <option value="0.10">Under $11,600 (10%)</option>
-                        <option value="0.12">$11,601 – $47,150 (12%)</option>
-                        <option value="0.22">$47,151 – $100,525 (22%)</option>
-                        <option value="0.24">$100,526 – $191,950 (24%)</option>
-                        <option value="0.32">$191,951 – $243,725 (32%)</option>
-                        <option value="0.35">$243,726 – $609,350 (35%)</option>
-                        <option value="0.37">Over $609,350 (37%)</option>
-                    </select>
-                    <button class="btn-black" onclick="runBracketCalculation()">Calculate Tax</button>
-
-                    <div id="tax-decision-box" style="display:none; margin-top:20px; padding:15px; background:#ededeb; border-radius:8px;">
-                        <p id="tax-output-msg" style="margin:0 0 15px 0; font-size:0.9rem; line-height:1.4;"></p>
-                        <button class="btn-black" onclick="commitTaxDeduction()">Apply Tax</button>
-                        <button class="btn-black" style="background:#757575;" onclick="clearTaxBracketView()">Skip</button>
+                    <div style="margin-top: 35px;">
+                        <h3 style="margin-bottom: 10px;">Primary Expenses Activity Logs</h3>
+                        <table>
+                            <thead>
+                                <tr><th>Type</th><th>Description Context Name</th><th>Amount</th><th>Timestamp Date</th><th>Ref</th></tr>
+                            </thead>
+                            <tbody id="expense-table-body"></tbody>
+                        </table>
                     </div>
                 </div>
 
-                <div id="tax-manual-area" class="tax-option-container" style="display:none;">
-                    <label style="display:block; margin-bottom:10px;"><strong>Input explicit amount of money you want to remove from tax:</strong></label>
-                    <input type="number" id="tax-manual-input" placeholder="$ Amount">
-                    <button class="btn-black" onclick="commitManualTaxDeduction()">Remove Tax Amount</button>
-                </div>
-            </div>
-
-            <div id="page-reports" class="page-content">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                    <h3 style="text-transform: uppercase; font-size: 0.8rem; color: var(--text-muted); margin: 0;">Modification History</h3>
-                    <button class="btn-black" style="padding: 6px 14px; font-size: 0.8rem;" onclick="exportLedgerToCSV()">📥 Export Ledger to CSV</button>
-                </div>
-                <table>
-                    <thead><tr><th>Action</th><th>Amount</th><th>Date</th><th>Management</th></tr></thead>
-                    <tbody id="report-log-body"></tbody>
-                </table>
-                <div style="margin-top: 15px; text-align: center;">
-                    <button id="show-more-btn" class="btn-black" style="background: #757575; font-size: 0.85rem; display: none;"></button>
-                </div>
-            </div>
-
-<div id="page-aesthetics" class="page-content">
-                <h3>Aesthetics & Design Settings</h3>
-                <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 25px;">Personalize your tracker layout settings using the options below:</p>
-                
-                <div class="tax-option-container" style="margin-bottom: 20px;">
-                    <label style="display:block; margin-bottom:12px;"><strong>App Visual Light Profile:</strong></label>
-                    <button class="btn-black" onclick="toggleAppTheme()">🌗 Toggle Light / Dark Mode</button>
+                <div id="page-buckets" class="page-content">
+                    <div class="add-section">
+                        <h3 style="margin-top:0;">Sub-Savings Isolation Allocation</h3>
+                        <p style="font-size: 0.9rem; color: var(--text-muted);">Available Loose Vault Capital: $<strong><span id="bucket-pool-available">0.00</span></strong></p>
+                        <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+                            <input type="text" id="new-bucket-name" placeholder="Target Allocation Name (e.g. Tax Fund)" style="flex: 1; margin-right: 0;">
+                            <input type="number" id="new-bucket-amount" placeholder="Value Amount ($)" style="flex: 1; margin-right: 0;">
+                        </div>
+                        <button class="btn-black" onclick="createSavingsBucket()">Isolate Portfolio Share</button>
+                    </div>
+                    
+                    <div style="margin-top: 35px;">
+                        <h3>Active Portioned Saving Frames</h3>
+                        <table>
+                            <thead>
+                                <tr><th>Target Frame Allocation Purpose</th><th>Total Asset Hold</th><th>Release Management</th></tr>
+                            </thead>
+                            <tbody id="buckets-table-body"></tbody>
+                        </table>
+                    </div>
                 </div>
 
-                <div class="tax-option-container">
-                    <label style="display:block; margin-bottom:6px;"><strong>Website Theme Accenting:</strong></label>
-                    <p style="color: var(--text-muted); font-size: 0.8rem; margin: 0 0 15px 0;">Select a color profile swap parameter below or select a custom gradient color to save:</p>
-                    <div class="aesthetics-deck">
-                        <div class="color-picker-grid" style="align-items: center; flex-wrap: wrap;">
-                            <div class="color-swatch-dot" style="background: #1a1a1a;" onclick="changeWebsiteColorAccent('#1a1a1a')"></div>
-                            <div class="color-swatch-dot" style="background: #2e7d32;" onclick="changeWebsiteColorAccent('#2e7d32')"></div>
-                            <div class="color-swatch-dot" style="background: #1565c0;" onclick="changeWebsiteColorAccent('#1565c0')"></div>
-                            <div class="color-swatch-dot" style="background: #c62828;" onclick="changeWebsiteColorAccent('#c62828')"></div>
-                            <div class="color-swatch-dot" style="background: #6a1b9a;" onclick="changeWebsiteColorAccent('#6a1b9a')"></div>
-                            
-                            <div id="custom-saved-slots" style="display: flex; gap: 10px;"></div>
+                <div id="page-interest" class="page-content">
+                    <div class="add-section">
+                        <h3 style="margin-top:0;">Compound Interest Asset Accruals</h3>
+                        <div class="tax-toggle-buttons">
+                            <button class="btn-black" id="btn-show-interest-calc" onclick="toggleInterestView('calc')">APY Parameter Calculation</button>
+                            <button class="btn-black" id="btn-show-interest-manual" onclick="toggleInterestView('manual')" style="background: transparent; color: var(--text-muted);">Direct Fixed Entry</button>
+                        </div>
 
-                            <div style="width: 1px; height: 20px; background: var(--border-light); margin: 0 5px;"></div>
-                            
-                            <div class="custom-color-picker-wrapper" style="display: flex; align-items: center; gap: 8px;">
-                                <input type="color" id="custom-accent-picker" value="#e5e5e7" oninput="changeWebsiteColorAccent(this.value)" style="padding:0; width:28px; height:28px; border:none; border-radius:50%; cursor:pointer; background:transparent;">
-                                <button class="btn-black" style="padding: 6px 12px; font-size: 0.75rem;" onclick="window.saveCustomAccentColor()">💾 Save Color</button>
+                        <div id="interest-calc-area">
+                            <div class="form-group">
+                                <label>Annual Percentage Yield Rate (%)</label>
+                                <input type="number" id="interest-rate-input" step="0.01" value="4.50" style="width:100%;">
+                            </div>
+                            <div class="form-group">
+                                <label>Compounding Matrix Phase Schedule</label>
+                                <select id="interest-period-select" style="width:100%;">
+                                    <option value="12">Monthly Distribution Phase</option>
+                                    <option value="1">Annual Distribution Phase</option>
+                                </select>
+                            </div>
+                            <button class="btn-black" onclick="runInterestCalculation()">Simulate Asset Capital Returns</button>
+                        </div>
+
+                        <div id="interest-manual-area" style="display:none;">
+                            <div class="form-group">
+                                <label>Direct Return Calculation Adjustment Value ($)</label>
+                                <input type="number" id="interest-manual-input" placeholder="0.00" style="width:100%;">
+                            </div>
+                            <button class="btn-black" onclick="runManualInterestCalculation()">Evaluate Fixed Return Injection</button>
+                        </div>
+
+                        <div id="interest-decision-box" class="tax-option-container" style="display:none;">
+                            <p id="interest-output-msg" style="margin-top:0;"></p>
+                            <div style="display:flex; gap:10px;">
+                                <button class="btn-black" onclick="commitInterestYield()" style="padding: 8px 16px; font-size:0.85rem;">Inject Balance Yield</button>
+                                <button class="btn-black" onclick="clearInterestSimulationView()" style="background:var(--border-light); color:var(--text-main); padding: 8px 16px; font-size:0.85rem;">Discard Run</button>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </main>
 
-        <aside class="right-sidebar-column">
-            <div class="chart-card">
-                <span style="font-weight: 800; font-size: 0.7rem; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 15px;">Funds Analytics</span>
-                <div style="width: 100%; height: 140px; position: relative;">
-                    <canvas id="statsChart"></canvas>
-                </div>
-            </div>
+                <div id="page-tax" class="page-content">
+                    <div class="add-section">
+                        <h3 style="margin-top:0;">Tax Allocation Assessment</h3>
+                        <div class="tax-toggle-buttons">
+                            <button class="btn-black" id="btn-show-calc" onclick="toggleTaxView('calc')">Marginal Scale Brackets</button>
+                            <button class="btn-black" id="btn-show-manual" onclick="toggleTaxView('manual')" style="background: transparent; color: var(--text-muted);">Manual Ledger Posting</button>
+                        </div>
 
-            <div class="savings-card">
-                <span style="font-weight: 800; font-size: 0.7rem; text-transform: uppercase;">Savings Snapshot</span>
-                <div style="display: flex; justify-content: space-between; margin-top: 20px;">
-                    <span>Goal</span><strong id="goal-text">$5,000</strong>
-                </div>
-                <div class="savings-bar"><div id="savings-progress"></div></div>
-                <div style="display: flex; justify-content: space-between;">
-                    <span>Saved</span><strong id="saved-text">$0</strong>
-                </div>
-                <button class="btn-black" style="width: 100%; margin-top: 20px; background: white; color: black; border: 1px solid #ccc;" onclick="navigateTo('savings')">Modify Savings</button>
-                <button class="btn-black" style="width: 100%; margin-top: 10px;" onclick="addFundsToSavings()">Quick Add to Savings</button>
-            </div>
-        </aside>
+                        <div id="tax-calc-area">
+                            <div class="form-group">
+                                <label>Target Income Marginal Bracket Scale</label>
+                                <select id="tax-bracket-select" style="width:100%;">
+                                    <option value="">-- Choose Applicable Bracket Matrix --</option>
+                                    <option value="0.10">Low Reduction Scale (10%)</option>
+                                    <option value="0.22">Baseline Reduction Scale (22%)</option>
+                                    <option value="0.32">Upper Reduction Scale (32%)</option>
+                                </select>
+                            </div>
+                            <button class="btn-black" onclick="runBracketCalculation()">Process Liability Projection</button>
+                            
+                            <div id="tax-decision-box" class="tax-option-container" style="display:none;">
+                                <p id="tax-output-msg" style="margin-top:0;"></p>
+                                <button class="btn-black" onclick="commitTaxDeduction()" style="padding: 8px 16px; font-size:0.85rem;">Authorize Deduction Transaction</button>
+                            </div>
+                        </div>
 
+                        <div id="tax-manual-area" style="display:none;">
+                            <div class="form-group">
+                                <label>Fixed Tax Allocation Obligation Value ($)</label>
+                                <input type="number" id="tax-manual-input" placeholder="0.00" style="width:100%;">
+                            </div>
+                            <button class="btn-black" onclick="commitManualTaxDeduction()">Post Manual Deduction</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="page-reports" class="page-content">
+                    <div class="chart-card" style="height: 320px; margin-bottom:30px;">
+                        <h3 style="margin-top:0; margin-bottom:15px;">Available Liquidity vs Vault Savings Ratio</h3>
+                        <div style="height: 230px; position: relative;">
+                            <canvas id="statsChart"></canvas>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 style="margin-bottom:10px;">Comprehensive Operations Modifications Ledger</h3>
+                        <table>
+                            <thead>
+                                <tr><th>Transaction Context Definition</th><th>Amount</th><th>Execution Date</th><th>Action</th></tr>
+                            </thead>
+                            <tbody id="report-log-body"></tbody>
+                        </table>
+                        <button id="show-more-btn" class="btn-black" style="margin-top:15px; width:auto; background:var(--border-light); color:var(--text-main); display:none;"></button>
+                    </div>
+                </div>
+
+                <div id="page-aesthetics" class="page-content">
+                    <div class="add-section">
+                        <h3 style="margin-top:0;">System Visual Profile Display Scheme</h3>
+                        <button class="btn-black" onclick="toggleAppTheme()">Toggle Theme Canvas (Light / Dark Inversion)</button>
+                    </div>
+                    <div class="add-section">
+                        <h3 style="margin-top:0;">Website Theme Branding Accents</h3>
+                        <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:15px;">Instantly swap out active branding highlights below:</p>
+                        <div class="color-picker-grid">
+                            <div class="color-swatch-dot" style="background:#e5e5e7; border-color: rgba(255,255,255,0.2);" onclick="changeWebsiteColorAccent('#e5e5e7')"></div>
+                            <div class="color-swatch-dot" style="background:#2e7d32;" onclick="changeWebsiteColorAccent('#2e7d32')"></div>
+                            <div class="color-swatch-dot" style="background:#1565c0;" onclick="changeWebsiteColorAccent('#1565c0')"></div>
+                            <div class="color-swatch-dot" style="background:#c62828;" onclick="changeWebsiteColorAccent('#c62828')"></div>
+                            <div class="color-swatch-dot" style="background:#6a1b9a;" onclick="changeWebsiteColorAccent('#6a1b9a')"></div>
+                        </div>
+                        
+                        <div style="margin-top:25px; border-top:1px solid var(--border-light); padding-top:20px;">
+                            <label style="font-size:0.85rem; font-weight:600; color:var(--text-muted); display:block; margin-bottom:10px;">Custom Canvas Preset Color Vector Picker</label>
+                            <div style="display:flex; gap:12px; align-items:center;">
+                                <input type="color" id="custom-accent-picker" value="#e5e5e7" style="width:40px; height:40px; padding:0; border:none; background:none; cursor:pointer; margin-right:0;">
+                                <button class="btn-black" onclick="saveCustomAccentColor()" style="width:auto; padding: 10px 20px;">Lock In Custom Preset</button>
+                            </div>
+                            <div id="custom-saved-slots" style="margin-top:15px; display:flex; gap:8px;"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+
+            <aside class="right-sidebar-column">
+                <div class="savings-card">
+                    <h3 style="margin-top:0; font-size:0.8rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-muted);">Savings Metric Configurations</h3>
+                    
+                    <div style="margin: 25px 0 10px 0;">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:5px; font-size:0.9rem;">
+                            <span style="color:var(--text-muted);">Target Threshold Goal:</span>
+                            <strong id="goal-text">$0</strong>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:15px; font-size:0.9rem;">
+                            <span style="color:var(--text-muted);">Vault Asset Savings Pool:</span>
+                            <strong id="saved-text">$0</strong>
+                        </div>
+                        
+                        <div class="savings-bar">
+                            <div id="savings-progress"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="form-group" style="margin-bottom:15px;">
+                        <label>Adjust Target Savings Goal ($)</label>
+                        <input type="number" id="new-goal-input" placeholder="e.g. 10000" style="width:100%; margin-top:5px;">
+                        <button class="btn-black" style="margin-top:10px; width:100%; padding: 10px;" onclick="updateGoalValue()">Update Value Goal</button>
+                    </div>
+                    <div class="form-group" style="margin-bottom:0; border-top:1px solid var(--border-light); padding-top:15px;">
+                        <label>Overwrite Base Vault Balance ($)</label>
+                        <input type="number" id="new-saved-input" placeholder="e.g. 2500" style="width:100%; margin-top:5px;">
+                        <button class="btn-black" style="margin-top:10px; width:100%; padding: 10px; background: var(--border-light); color: var(--text-main);" onclick="updateSavedValue()">Overwrite Pool Asset Base</button>
+                    </div>
+                </div>
+            </aside>
+
+        </div>
     </div>
-</div>
 
-<script type="module" src="app.js"></script>
+    <script type="module" src="app.js"></script>
 </body>
 </html>
